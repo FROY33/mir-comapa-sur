@@ -1,0 +1,110 @@
+{
+  "generado": "2026-10-08",
+  "conteos": {
+    "gerencias": 5,
+    "unidades": 33,
+    "usuarios": 35,
+    "indicadores_operativos": 123,
+    "indicadores_gerenciales": 32,
+    "catalogo_mir_193": 193,
+    "fixtures_reportes": 123
+  },
+  "hallazgos": {
+    "nivel_prefijo_id_desalineado": 33,
+    "ids_compartidos_operativos_vs_catalogo_mir": 0,
+    "gerencias_sin_indicadores_operativos": [
+      "general"
+    ],
+    "usuarios_con_gerencia_sin_resolver": [],
+    "gerencias_sin_revisor": [
+      "planeacion",
+      "comercial",
+      "administrativa",
+      "general"
+    ],
+    "usuarios_por_rol": {
+      "Administrador": 1,
+      "Enlace": 33,
+      "Revisor": 1
+    },
+    "estados_en_fixtures": {
+      "cerrado": 93,
+      "enviado_revision": 11,
+      "pendiente_carga": 15,
+      "observado": 4
+    },
+    "nombres_gerencia_sin_alias": [],
+    "responsables_enlace_citados": [
+      "Ana Torres",
+      "Jorge Reyes",
+      "María López",
+      "Pedro Sánchez"
+    ],
+    "responsables_enlace_sin_cuenta": [
+      "Pedro Sánchez"
+    ],
+    "responsables_revisor_citados": [
+      "Carlos Mendoza",
+      "Laura Vega",
+      "Miguel Ángel Pérez",
+      "Rosario Díaz"
+    ],
+    "responsables_revisor_sin_cuenta": [
+      "Laura Vega",
+      "Miguel Ángel Pérez",
+      "Rosario Díaz"
+    ],
+    "niveles_operativos": {
+      "Componente": 29,
+      "Actividad": 89,
+      "Propósito": 5
+    },
+    "niveles_catalogo_mir": {
+      "Actividad": 155,
+      "Componente": 30,
+      "Fin": 4,
+      "Propósito": 4
+    }
+  },
+  "archivos": [
+    {
+      "archivo": "csv/gerencias.csv",
+      "filas": 5,
+      "sha256": "8510725ed00e50c4aabfdd2cc21eef90869a9851fd478ddef713cb4ea53d2ee1"
+    },
+    {
+      "archivo": "csv/unidades.csv",
+      "filas": 33,
+      "sha256": "4440161cf5bb20a3b2d37942ab2415214bba1a73995a41538ebc5a561a3188d7"
+    },
+    {
+      "archivo": "csv/usuarios.csv",
+      "filas": 35,
+      "sha256": "1df33d7196ead116852c3848909fb79d8768ea115ba345ca006000159cf5c305"
+    },
+    {
+      "archivo": "csv/indicadores_operativos.csv",
+      "filas": 123,
+      "sha256": "0f31af8ebbb930b5dcebde41a26742c29585783fd835eb24bbd4b7fe7662eb17"
+    },
+    {
+      "archivo": "csv/indicadores_gerenciales.csv",
+      "filas": 32,
+      "sha256": "099ff8118ccf030e6005946d576e71e5a1cb34bb5c11b19c159b51bfe2de816f"
+    },
+    {
+      "archivo": "csv/catalogo_mir_193.csv",
+      "filas": 193,
+      "sha256": "8627eaa4ff9ee2e1d52170723dbc81be1668301d4413c869f6ae97836706579f"
+    },
+    {
+      "archivo": "csv/fixtures_reportes.csv",
+      "filas": 123,
+      "sha256": "d1f926b7377d31329cd07a89efb5da5edd528568b44b62f1ece93fbc57fe8d1d"
+    },
+    {
+      "archivo": "json/seed.json",
+      "sha256": "26417d998a7b13d1d9a4943b452440dc758f932df6fd670e83968818537419e2"
+    }
+  ]
+}
