@@ -8,3 +8,10 @@ data/AGO 2026 MIR_COMAPA SUR_Completa.numbers
 data/COMSUR-Transparencia-Comercial-Q1.csv
 *.xlsx
 *.numbers
+
+# Backend
+node_modules/
+backend/dist/
+.env
+.env.*
+!.env*.example

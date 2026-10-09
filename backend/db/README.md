@@ -18,7 +18,8 @@ cd backend/db
 ./migrar.sh status                 # qué está aplicado
 ```
 
-Otra base: `DATABASE_URL=postgres://usuario:clave@host:5432/base ./migrar.sh up`.
+Base destino: `DATABASE_URL` del entorno; si no está, la de `backend/.env`; si tampoco, `postgres:///comapa_mir`.
+Desde `backend/` también sirve `npm run bd:migrar`. Otra base: `DATABASE_URL=postgres://usuario:clave@host:5432/base ./migrar.sh up`.
 
 `migrar.sh` solo necesita `psql` y usa la misma tabla de control que dbmate (`schema_migrations`),
 así que se puede cambiar a `dbmate up` en cualquier momento sin rehacer nada.

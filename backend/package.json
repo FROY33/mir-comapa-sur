@@ -1,0 +1,27 @@
+{
+  "name": "comapa-mir-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/servidor.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/servidor.js",
+    "tipos": "tsc --noEmit",
+    "bd:migrar": "db/migrar.sh up",
+    "bd:estado": "db/migrar.sh status",
+    "test": "NODE_ENV=test tsx pruebas/preparar.ts && NODE_ENV=test tsx --test pruebas/*.test.ts"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

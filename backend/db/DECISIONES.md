@@ -22,6 +22,7 @@ arquitectura de base de datos» (08/10/2026) y respuestas del equipo.
 | Configuración histórica | Foto del indicador al crear el reporte; congelado de meta, cumplimiento y semáforo al cerrar | RQM HU-R4-11 CA_4, HU-R3-03 CA_4, HU-R4-12 CA_4 | Columnas de foto y de cierre en `reportes`; sin REPORTES_PERIODO |
 | Bloqueo de cerrados | Un reporte cerrado o incumplido solo cambia por override o reapertura autorizados | RQM HU-R3-03 RN_3, HU-R3-04 | Trigger + `SET LOCAL app.reapertura = 'on'` |
 | Catálogos de valores | `text` + `CHECK`, no enums nativos | Revisión del modelo | Cambiar un valor es una migración de una línea |
+| Capa HTTP | `node:http` sin framework; el framework se decide en el ticket de autenticación si hace falta | Equipo, 08/10/2026 (TEC-03) | Ninguno; la capa de datos (`src/bd.ts`) no depende de la capa HTTP |
 | Frecuencias | Seis: mensual, bimestral, trimestral, cuatrimestral, semestral, anual | RQM glosario; datos reales | Catálogo `frecuencias` |
 
 ## Supuestos de S1 (confirmar)
@@ -34,6 +35,7 @@ Tomados para poder migrar; cambiarlos es barato.
 | Semáforo configurable por indicador, 95/80 por defecto | `indicadores.rango_*` | 20 |
 | `sentido_meta`: ascendente o descendente | `indicadores.sentido_meta` | 24e |
 | El Admin también tiene gerencia y unidad | `usuarios` | 5 |
+| Zona horaria de la sesión: `America/Monterrey` (Tamaulipas, sin horario de verano) | `backend/src/bd.ts` | — |
 
 ## Abiertas
 

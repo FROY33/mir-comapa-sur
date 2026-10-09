@@ -6,10 +6,15 @@
 #   ./migrar.sh down     revierte la última aplicada
 #   ./migrar.sh status   muestra qué está aplicado
 #
-# Base destino: DATABASE_URL (por defecto postgres:///comapa_mir)
+# Base destino: DATABASE_URL; si no está en el entorno, la de backend/.env; si tampoco, postgres:///comapa_mir
 
 set -euo pipefail
 
+ENV_BACKEND="$(cd "$(dirname "$0")/.." && pwd)/.env"
+if [ -z "${DATABASE_URL:-}" ] && [ -f "$ENV_BACKEND" ]; then
+  # Solo se lee esa línea; el archivo no se ejecuta
+  DATABASE_URL="$(sed -n 's/^DATABASE_URL=//p' "$ENV_BACKEND" | tail -n 1 | tr -d "\"'")"
+fi
 DB="${DATABASE_URL:-postgres:///comapa_mir}"
 DIR="$(cd "$(dirname "$0")" && pwd)/migrations"
 export PGOPTIONS="${PGOPTIONS:-} -c client_min_messages=warning"
