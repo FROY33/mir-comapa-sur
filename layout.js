@@ -274,9 +274,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ── EVENTO: LOGOUT ───────────────────────────────────────────────────────
+  // Delega en cerrarSesion() (session.js), que revoca la sesión en el servidor
+  // antes de redirigir. Session.clear() sola no basta: solo borra la cookie de
+  // perfil, la de sesión es HttpOnly y seguiría vigente, así que login.html
+  // encontraría la sesión abierta y devolvería al usuario al dashboard.
   document.getElementById('hLogoutBtn').addEventListener('click', () => {
-    Session.clear();
-    window.location.href = 'login.html';
+    cerrarSesion();
   });
 
   // ── REVELAR PÁGINA ───────────────────────────────────────────────────────

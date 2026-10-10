@@ -7,7 +7,7 @@
 // usuario sin que ninguna prueba del backend se queje.
 
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, test } from 'node:test'
 
@@ -138,6 +138,30 @@ describe('adaptador de perfil', () => {
     await Session.logout()
     assert.equal(Session.getUser(), null)
     assert.equal(cookies.valor, '')
+  })
+
+  test('todo punto que cierra sesión pasa por cerrarSesion(), no por Session.clear()', () => {
+    // Regresión: layout.js tenía su propio manejador que llamaba Session.clear() y
+    // redirigía. Eso solo borra la cookie de perfil — la de sesión es HttpOnly y
+    // seguía vigente, así que login.html encontraba la sesión abierta y devolvía al
+    // usuario al dashboard. El botón de cerrar sesión no cerraba nada.
+    const archivos = readdirSync(RAIZ)
+      .filter((f) => f.endsWith('.html') || f.endsWith('.js'))
+      .filter((f) => f !== 'session.js')     // ahí vive la implementación legítima
+
+    const infractores: string[] = []
+    for (const archivo of archivos) {
+      const texto = readFileSync(path.join(RAIZ, archivo), 'utf8')
+      // Session.clear() seguido de una redirección al login, en una ventana de 3 líneas
+      const lineas = texto.split('\n')
+      lineas.forEach((linea, i) => {
+        if (!/Session\.clear\(\)/.test(linea) || /^\s*(\/\/|\*)/.test(linea)) return
+        const alrededor = lineas.slice(i, i + 3).join(' ')
+        if (/login\.html/.test(alrededor)) infractores.push(`${archivo}:${i + 1}`)
+      })
+    }
+    assert.deepEqual(infractores, [],
+      'estos cierran sesión sin revocarla en el servidor; deben llamar cerrarSesion()')
   })
 
   test('el token de sesión no es accesible desde el perfil', () => {
