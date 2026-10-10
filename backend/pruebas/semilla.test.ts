@@ -111,9 +111,26 @@ describe('carga inicial', () => {
     const porEstado = await bd.consultar<{ estado: string; n: string }>(
       `SELECT estado, count(*)::text AS n FROM reportes GROUP BY estado ORDER BY estado`)
     const estados = new Map(porEstado.map((e) => [e.estado, Number(e.n)]))
-    for (const esperado of ['pendiente_carga', 'observado', 'enviado_revision']) {
+    // CA-5 nombra pendiente, borrador y observado
+    for (const esperado of ['pendiente_carga', 'borrador', 'observado', 'enviado_revision']) {
       assert.ok((estados.get(esperado) ?? 0) > 0, `no hay ningún reporte en estado ${esperado}`)
     }
+  })
+
+  test('CA-5: hay un borrador en cada gerencia activa, para probar aislamiento', async () => {
+    const sinBorrador = await bd.consultar<{ clave: string }>(
+      `SELECT g.clave FROM gerencias g
+       WHERE g.organizacion_id = ${ORG} AND g.activo
+         AND EXISTS (SELECT 1 FROM indicadores i WHERE i.gerencia_id = g.id)
+         AND NOT EXISTS (
+           SELECT 1 FROM reportes r WHERE r.gerencia_id = g.id AND r.estado = 'borrador')`)
+    assert.deepEqual(sinBorrador, [], 'hay gerencias activas sin ningún reporte en borrador')
+  })
+
+  test('un borrador no tiene fecha de envío ni de cierre', async () => {
+    assert.equal(await uno<string>(
+      `SELECT count(*) FROM reportes
+       WHERE estado = 'borrador' AND (enviado_at IS NOT NULL OR cerrado_at IS NOT NULL)`), '0')
   })
 
   test('cada indicador MIR tiene nivel y los gerenciales no', async () => {

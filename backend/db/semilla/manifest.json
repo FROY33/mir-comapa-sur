@@ -75,6 +75,13 @@
       "COM-ACT-26",
       "COM-ACT-36"
     ],
+    "borradores_sinteticos_ca5": [
+      "ADM-ACT-45",
+      "COM-ACT-125",
+      "PLA-ACT-9",
+      "TEC-ACT-117"
+    ],
+    "borradores_no_aplicados": [],
     "remapeo_de_periodo": [
       [
         "T3-2026 -> S1-2026",
@@ -132,11 +139,11 @@
     {
       "archivo": "datos/fixtures_reportes.csv",
       "filas": 123,
-      "sha256": "fab21dbfa23a9a0808164508dc7e260b079237c581f5cddf3890fa846007aadc"
+      "sha256": "9e6138e778d1e7737bf8ae9eae358f92e8d78f21f6d15b87cb3ca647f3d07050"
     },
     {
       "archivo": "semilla.json",
-      "sha256": "07b5c3256a7f6a222065e3ee12c91f0a3f7fec1a9f1bcabb2d00fc82f19948e8"
+      "sha256": "83bc9e35e8d09ecb519cc8debcce2825894083cf99a3f6e10d422f24e3748293"
     }
   ]
 }

@@ -28,7 +28,7 @@ Ninguna se resolvió por criterio propio: resolverlas requiere decisión del due
 | 15 | La jerarquía `parent_id` no se deriva por prefijo | CA-1 | Dueño funcional |
 | 16 | Frecuencia «Semanal» fuera del catálogo de seis | CA-1 | TEC-02 + dueño funcional |
 | 18 | La gerencia del único Revisor contradice a las fixtures | CA-5 | Dueño funcional |
-| 19 | No hay ningún reporte en estado `borrador` | CA-5 | TEC-04 (propio) |
+| 19 | No había ningún reporte en estado `borrador` | CA-5 | **Resuelto** con fixtures sintéticas |
 
 ---
 
@@ -364,11 +364,28 @@ reportes del prototipo cubren cuatro estados y **`borrador` no es uno**:
 la interfaz, y `borrador` real significa que el Enlace ya registró el avance del periodo sin
 enviarlo. Ningún registro del prototipo está en ese punto intermedio.
 
-No se inventó: las fixtures reproducen lo que trae el prototipo. Para cerrar CA-5 al pie de la
-letra hacen falta unos pocos reportes en `borrador`, y por ser fixtures de prueba («preparar
-fixtures de ciclos/reportes solo para pruebas») agregarlos está dentro del alcance del ticket.
-Es una línea en `fixtures_reportes.csv`, pero cambia datos que hoy salen del prototipo, así que
-queda a decisión de quién cierra el ticket.
+**Resuelto.** Por ser fixtures de prueba («preparar fixtures de ciclos/reportes solo para
+pruebas»), el extractor promueve **un reporte por gerencia activa** de `pendiente_carga` a
+`borrador`, con valores de avance **sintéticos declarados** en `BORRADORES_CA5` dentro de
+`extraer.ts` — no salen del prototipo y están comentados como tales:
+
+| Reporte | Gerencia | Cálculo | Valores |
+|---|---|---|---|
+| `ADM-ACT-45` | ADM | fracción | 7 / 10 = 70 |
+| `COM-ACT-125` | COM | fracción | 4 / 5 = 80 |
+| `PLA-ACT-9` | PLA | fracción | 1 / 2 = 50 |
+| `TEC-ACT-117` | TEC | valor directo | 12 |
+
+Se elige el primer `pendiente_carga` de cada gerencia, por código, cuya frecuencia tenga un
+periodo ya concluido al corte (por eso ninguno es anual). La promoción solo se aplica si el
+reporte sigue en `pendiente_carga`: si los datos del prototipo cambian y ese reporte ya avanzó,
+el extractor no lo sobrescribe y lo reporta en `manifest.json` → `borradores_no_aplicados`.
+La columna `estado_prototipo` del CSV deja el rastro del estado original.
+
+**Efecto secundario a tener presente:** Planeación tenía **un solo** reporte en
+`pendiente_carga` (`PLA-ACT-9`) y es el que se promovió, así que PLA se queda sin ninguno. Los
+tres estados existen en el conjunto y cada gerencia activa tiene `borrador` y `observado`, pero
+una prueba de aislamiento que exija `pendiente_carga` específicamente en PLA no tiene con qué.
 
 
 ---

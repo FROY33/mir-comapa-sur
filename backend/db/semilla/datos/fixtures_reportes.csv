@@ -1,124 +1,124 @@
-indicador_codigo,periodo_frecuencia,periodo_numero,periodo_etiqueta,periodo_prototipo,estado,enviado_at,enviado_por_email,cerrado_at,cerrado_por_email,vencido,vencido_at,numerador,denominador,avance,responsable_enlace_prototipo,responsable_revisor_prototipo,archivos_evidencia,observaciones,eventos_historial
-ADM-ACT-42,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-43,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-44,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-45,trimestral,3,T3-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-46,semestral,1,S1-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-47,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-48,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-49,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-50,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-51,cuatrimestral,2,C2-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-52,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-53,cuatrimestral,2,C2-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-54,trimestral,3,T3-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-55,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-56,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-57,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-58,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-59,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-60,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-61,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-62,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-63,trimestral,3,T3-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-64,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-65,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-66,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-67,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-68,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-69,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-70,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-71,bimestral,4,B4-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-72,semestral,1,S1-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-73,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-74,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-75,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-76,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-77,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-78,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-79,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-80,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-81,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-82,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-ACT-83,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,María López,Laura Vega,0,0,0
-ADM-COMP-41,anual,1,2026,T3-2026,observado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,65.4,100,65.4,María López,Laura Vega,1,1,3
-ADM-PROP-124,anual,1,2026,T3-2026,pendiente_carga,,,,,false,,,,,,,0,0,0
-COM-ACT-125,trimestral,3,T3-2026,T3-2026,pendiente_carga,,,,,false,,,,,,,0,0,0
-COM-ACT-18,trimestral,3,T3-2026,T3-2026,pendiente_carga,,,,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-19,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-20,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-21,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-22,mensual,9,septiembre-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,,,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-23,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-24,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-25,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-26,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-27,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,,,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-28,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-29,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-30,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-31,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-32,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-33,mensual,9,septiembre-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,,,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-34,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-35,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-36,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,,,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-37,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-38,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-39,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-ACT-40,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
-COM-COMP-17,anual,1,2026,T3-2026,observado,2026-09-14 12:00:00-06,,,,false,,82.3,100,82.3,Pedro Sánchez,Rosario Díaz,1,1,3
-PLA-ACT-10,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-11,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace@comapa.mx,,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-12,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-13,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-14,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-15,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-16,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-4,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace@comapa.mx,,,false,,72.0,100,72.0,Ana Torres,Carlos Mendoza,1,1,2
-PLA-ACT-5,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-6,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-7,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-8,semestral,1,S1-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-ACT-9,semestral,1,S1-2026,T3-2026,pendiente_carga,,enlace@comapa.mx,,,false,,,,,Ana Torres,Carlos Mendoza,0,0,0
-PLA-COMP-3,semestral,1,S1-2026,T3-2026,observado,2026-09-14 12:00:00-06,enlace@comapa.mx,,,false,,78.5,100,78.5,Ana Torres,Carlos Mendoza,1,1,3
-TEC-ACT-100,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-101,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-102,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-103,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-104,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-105,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-106,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-107,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-108,anual,1,2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-109,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-110,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-111,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-112,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-113,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-114,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-115,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-116,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-117,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-118,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-119,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-120,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-121,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-122,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-123,semestral,1,S1-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-85,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-86,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-87,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-88,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-89,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-90,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-91,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-92,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-93,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-94,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-95,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-96,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-97,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-98,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-ACT-99,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
-TEC-COMP-84,anual,1,2026,T3-2026,observado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,71.2,100,71.2,Jorge Reyes,Miguel Ángel Pérez,1,1,3
+indicador_codigo,periodo_frecuencia,periodo_numero,periodo_etiqueta,periodo_prototipo,estado,enviado_at,enviado_por_email,cerrado_at,cerrado_por_email,vencido,vencido_at,numerador,denominador,avance,estado_prototipo,responsable_enlace_prototipo,responsable_revisor_prototipo,archivos_evidencia,observaciones,eventos_historial
+ADM-ACT-42,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-43,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-44,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-45,trimestral,3,T3-2026,T3-2026,borrador,,enlace.admin@comapa.mx,,,false,,7,10,70,pendiente_carga,María López,Laura Vega,0,0,0
+ADM-ACT-46,semestral,1,S1-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-47,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-48,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-49,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-50,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-51,cuatrimestral,2,C2-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-52,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-53,cuatrimestral,2,C2-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-54,trimestral,3,T3-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-55,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-56,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-57,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-58,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-59,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-60,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-61,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-62,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-63,trimestral,3,T3-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-64,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-65,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-66,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-67,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-68,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-69,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-70,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-71,bimestral,4,B4-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-72,semestral,1,S1-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-73,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-74,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-75,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-76,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-77,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-78,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-79,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-80,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-81,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.admin@comapa.mx,,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-82,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-ACT-83,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,María López,Laura Vega,0,0,0
+ADM-COMP-41,anual,1,2026,T3-2026,observado,2026-09-14 12:00:00-06,enlace.admin@comapa.mx,,,false,,65.4,100,65.4,,María López,Laura Vega,1,1,3
+ADM-PROP-124,anual,1,2026,T3-2026,pendiente_carga,,,,,false,,,,,,,,0,0,0
+COM-ACT-125,trimestral,3,T3-2026,T3-2026,borrador,,,,,false,,4,5,80,pendiente_carga,,,0,0,0
+COM-ACT-18,trimestral,3,T3-2026,T3-2026,pendiente_carga,,,,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-19,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-20,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-21,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-22,mensual,9,septiembre-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,,,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-23,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-24,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-25,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-26,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-27,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,,,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-28,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-29,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-30,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-31,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-32,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-33,mensual,9,septiembre-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,,,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-34,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-35,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-36,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,,,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-37,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-38,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-39,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-ACT-40,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,,2026-09-14 12:00:00-06,,false,,,,,,Pedro Sánchez,Rosario Díaz,0,0,0
+COM-COMP-17,anual,1,2026,T3-2026,observado,2026-09-14 12:00:00-06,,,,false,,82.3,100,82.3,,Pedro Sánchez,Rosario Díaz,1,1,3
+PLA-ACT-10,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-11,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace@comapa.mx,,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-12,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-13,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-14,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-15,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-16,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-4,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace@comapa.mx,,,false,,72.0,100,72.0,,Ana Torres,Carlos Mendoza,1,1,2
+PLA-ACT-5,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-6,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-7,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-8,semestral,1,S1-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Ana Torres,Carlos Mendoza,0,0,0
+PLA-ACT-9,semestral,1,S1-2026,T3-2026,borrador,,enlace@comapa.mx,,,false,,1,2,50,pendiente_carga,Ana Torres,Carlos Mendoza,0,0,0
+PLA-COMP-3,semestral,1,S1-2026,T3-2026,observado,2026-09-14 12:00:00-06,enlace@comapa.mx,,,false,,78.5,100,78.5,,Ana Torres,Carlos Mendoza,1,1,3
+TEC-ACT-100,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-101,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-102,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-103,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-104,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-105,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-106,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-107,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-108,anual,1,2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-109,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-110,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-111,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-112,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-113,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-114,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-115,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-116,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-117,mensual,9,septiembre-2026,T3-2026,borrador,,enlace.tecnica@comapa.mx,,,false,,12,,12,pendiente_carga,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-118,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-119,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-120,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-121,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-122,anual,1,2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-123,semestral,1,S1-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-85,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-86,trimestral,3,T3-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-87,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-88,trimestral,3,T3-2026,T3-2026,enviado_revision,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-89,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-90,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-91,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-92,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-93,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-94,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-95,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-96,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-97,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-98,mensual,9,septiembre-2026,T3-2026,cerrado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,2026-09-14 12:00:00-06,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-ACT-99,mensual,9,septiembre-2026,T3-2026,pendiente_carga,,enlace.tecnica@comapa.mx,,,false,,,,,,Jorge Reyes,Miguel Ángel Pérez,0,0,0
+TEC-COMP-84,anual,1,2026,T3-2026,observado,2026-09-14 12:00:00-06,enlace.tecnica@comapa.mx,,,false,,71.2,100,71.2,,Jorge Reyes,Miguel Ángel Pérez,1,1,3

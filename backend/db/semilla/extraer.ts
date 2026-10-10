@@ -364,14 +364,39 @@ for (const f of frecuenciasUsadas) {
   periodoDeCorte.set(f, filasPeriodos.find(p => p.frecuencia === f)!)
 }
 
+// CA-5 pide poder probar los estados «pendiente, borrador y observado», pero el
+// prototipo no trae ningún reporte en `borrador`: sus 15 pendiente_carga vienen sin
+// avance (ver INCONSISTENCIAS.md §19). Se promueve uno por gerencia activa al
+// siguiente paso del flujo, con valores SINTÉTICOS declarados aquí — son fixtures
+// de prueba, no datos del prototipo.
+//
+// Criterio de elección: el primer pendiente_carga de cada gerencia, por código, cuya
+// frecuencia tenga un periodo ya concluido al corte (por eso ninguno es anual).
+const BORRADORES_CA5: Record<string, { numerador: string; denominador: string; avance: string }> = {
+  'ADM-ACT-45':  { numerador: '7',  denominador: '10', avance: '70' },   // fracción · Metas alcanzadas / programadas
+  'COM-ACT-125': { numerador: '4',  denominador: '5',  avance: '80' },   // fracción · Metas alcanzadas / programadas
+  'PLA-ACT-9':   { numerador: '1',  denominador: '2',  avance: '50' },   // fracción · Revisiones realizadas / programadas
+  'TEC-ACT-117': { numerador: '12', denominador: '',   avance: '12' },   // valor directo · Reposiciones del periodo
+}
+
 // ── 7. Fixtures de reporte — SOLO PRUEBAS (CA-4) ────────────────────────────
 const estadosFueraCatalogo = new Set<string>()
 const nombresConCuenta = new Map(filasUsuarios.map(u => [u.nombre, u.email]))
 
+const borradoresNoAplicados: string[] = []
+
 const filasFixtures = src.operativos.map(x => {
   const i = indicadoresMir.find(m => m.codigo === String(x.id))!
   const periodo = periodoDeCorte.get(i.frecuencia)
-  const estado = String(x.estado || 'pendiente_carga')
+  const original = String(x.estado || 'pendiente_carga')
+
+  // Promoción a borrador: solo si el reporte sigue en pendiente_carga, para no
+  // sobrescribir en silencio un estado más avanzado si cambian los datos del prototipo.
+  const sintetico = BORRADORES_CA5[String(x.id)]
+  const promover = sintetico !== undefined && original === 'pendiente_carga'
+  if (sintetico !== undefined && !promover) borradoresNoAplicados.push(`${x.id} (está en ${original})`)
+
+  const estado = promover ? 'borrador' : original
   if (!ESTADOS_REPORTE.has(estado)) estadosFueraCatalogo.add(estado)
   const cerrado = estado === 'cerrado' || estado === 'incumplido'
   const enviado = ['enviado_revision', 'observado', 'corregido', 'aprobado_revisor', 'regresado_correccion'].includes(estado)
@@ -390,9 +415,10 @@ const filasFixtures = src.operativos.map(x => {
     cerrado_por_email: '',                                // cierra el Admin; se resuelve en el cargador
     vencido: false,
     vencido_at: '',
-    numerador: x.numeradorVal ?? '',
-    denominador: x.denominadorVal ?? '',
-    avance: x.avancePeriodo ?? '',
+    numerador: promover ? sintetico.numerador : x.numeradorVal ?? '',
+    denominador: promover ? sintetico.denominador : x.denominadorVal ?? '',
+    avance: promover ? sintetico.avance : x.avancePeriodo ?? '',
+    estado_prototipo: promover ? original : '',      // queda el rastro de la promoción
     responsable_enlace_prototipo: x.responsableEnlace || '',
     responsable_revisor_prototipo: x.responsableRevisor || '',
     archivos_evidencia: (x.archivosEvidencia || []).length,
@@ -498,6 +524,8 @@ const verificacion = {
     unidades_solo_citadas_por_usuarios: filasUnidades
       .filter(u => u.solo_citada_por_usuarios).map(u => `${u.gerencia_clave}||${u.nombre}`),
     tipo_indicador_vacio: filasIndicadores.filter(i => i.tipo === 'mir' && !i.tipo_indicador).map(i => i.codigo),
+    borradores_sinteticos_ca5: Object.keys(BORRADORES_CA5),
+    borradores_no_aplicados: borradoresNoAplicados,
     remapeo_de_periodo: Object.entries(cuenta(
       filasFixtures.filter(f => f.periodo_prototipo && f.periodo_prototipo !== f.periodo_etiqueta),
       f => `${f.periodo_prototipo} -> ${f.periodo_etiqueta}`)),

@@ -11,7 +11,7 @@ Fecha: 2026-10-10 · Rama: `tec-04/dataset-origen` · Base del esquema: `main` e
 | Traducción prototipo → catálogos del esquema | `db/semilla/mapeos.ts` |
 | Cargador idempotente | `db/semilla/cargar.ts` |
 | Envoltura de operación | `db/sembrar.sh`, `npm run bd:sembrar` |
-| Pruebas | `pruebas/semilla.test.ts` (10 pruebas) |
+| Pruebas | `pruebas/semilla.test.ts` (12 pruebas) |
 | Hallazgos y preguntas abiertas | `db/semilla/INCONSISTENCIAS.md` (19) |
 
 ## Cómo se reproduce
@@ -20,7 +20,7 @@ Fecha: 2026-10-10 · Rama: `tec-04/dataset-origen` · Base del esquema: `main` e
 createdb comapa_mir
 cd backend/db && ./migrar.sh up
 cd .. && ./db/sembrar.sh --con-fixtures     # o npm run bd:sembrar
-npm test                                    # 49 pruebas, incluidas las 10 de la semilla
+npm test                                    # 51 pruebas, incluidas las 12 de la semilla
 ```
 
 ## Estado de la base tras la carga
@@ -37,7 +37,7 @@ reportes                123    (solo con --con-fixtures)
 ```
 
 Indicadores por gerencia: ADM 53, COM 32, PLA 21, TEC 49.
-Reportes por estado: `cerrado` 93, `pendiente_carga` 15, `enviado_revision` 11, `observado` 4.
+Reportes por estado: `cerrado` 93, `pendiente_carga` 11, `enviado_revision` 11, `borrador` 4, `observado` 4.
 
 ## Criterios de aceptación
 
@@ -47,7 +47,7 @@ Reportes por estado: `cerrado` 93, `pendiente_carga` 15, `enviado_revision` 11, 
 | **CA-2** — bcrypt de 12 rondas o más | **Cumplido** | Los 39 hashes son `$2b$12$`, con sal propia por usuario (39 hashes distintos). Prueba: «CA-2: las contraseñas son bcrypt de 12 rondas o más» |
 | **CA-3** — la carga se repite sin duplicar | **Cumplido** | Segunda corrida: conteos idénticos y mismo `md5` del conjunto de hashes. Prueba: «CA-3: la segunda carga no duplica ni cambia los hashes» |
 | **CA-4** — las fixtures no corren por defecto en producción | **Cumplido** | Sin `--con-fixtures` se carga la definición y 0 reportes; con `NODE_ENV=production` el cargador rechaza la bandera y sale con código 1. Prueba: «CA-4: sin --con-fixtures…» |
-| **CA-5** — datos para probar aislamiento y estados | **Parcial** | Aislamiento: cumplido — cada gerencia activa tiene Revisor y Enlace, ninguna unidad ni usuario cruza de gerencia. Estados: `pendiente_carga` y `observado` sí; **`borrador` no existe** en los datos del prototipo (ver hallazgo 19) |
+| **CA-5** — datos para probar aislamiento y estados | **Cumplido** | Aislamiento: cada gerencia activa tiene Revisor y Enlace, y ninguna unidad ni usuario cruza de gerencia. Estados: `pendiente_carga` 11, `borrador` 4 (uno por gerencia, sintéticos — hallazgo 19), `observado` 4, `enviado_revision` 11, `cerrado` 93. Salvedad: PLA se queda sin `pendiente_carga` porque tenía uno solo y es el que se promovió a `borrador` |
 
 ## Decisiones tomadas en este ticket
 
@@ -67,6 +67,9 @@ Reportes por estado: `cerrado` 93, `pendiente_carga` 15, `enviado_revision` 11, 
   marcado en `unidad_por_defecto`.
 - **Se corrigió la gerencia de `revisor@comapa.mx`** a PLA, porque las fixtures lo ponen revisando
   Planeación y Técnica ya tiene revisor. Override explícito en `usuarios_prueba.csv` (hallazgo 18).
+- **Cuatro reportes en `borrador` son sintéticos.** El prototipo no traía ninguno y CA-5 lo pide.
+  Los valores de avance están declarados en `BORRADORES_CA5` dentro de `extraer.ts`, uno por
+  gerencia, y el CSV conserva el estado original en `estado_prototipo` (hallazgo 19).
 
 ## Lo que no cierra y por qué
 
@@ -77,6 +80,5 @@ Reportes por estado: `cerrado` 93, `pendiente_carga` 15, `enviado_revision` 11, 
    Administrador tiene gerencia y unidad? ¿Gerencia General existe?), la 24a (¿el Fin es uno o
    cuatro indicadores?) y la 24g (¿32 o 49 indicadores gerenciales?). La respuesta cambia filas,
    no estructura: el dataset se regenera con `node db/semilla/extraer.ts`.
-3. **`borrador` falta para CA-5** (hallazgo 19).
-4. **El universo oficial de indicadores sigue sin definirse:** 123 operativos, 193 en el catálogo
+3. **El universo oficial de indicadores sigue sin definirse:** 123 operativos, 193 en el catálogo
    de abril, 132 en la documentación (hallazgo 2).
