@@ -42,6 +42,24 @@ De dónde salen:
 - **Producción:** no se lee ningún archivo; las variables las pone la plataforma.
 
 Si una variable ya existe en el entorno, gana sobre el archivo. `.env` y `.env.test` están en `.gitignore`.
+
+## Probar el prototipo contra el backend
+
+La cookie de sesión es `SameSite=Strict` (HU-R7-01 CA-3), así que el navegador solo la manda si
+el sitio y la API comparten origen. `dev/servir.ts` sirve el prototipo de la raíz del repo y
+reenvía `/api/*` al backend para conseguirlo en local. En producción lo resuelve la plataforma
+(Netlify redirigiendo `/api/*`, o nginx).
+
+```bash
+npm run dev          # backend en :3000
+npm run dev:sitio    # en otra terminal: prototipo en http://127.0.0.1:4321/login.html
+```
+
+Variables: `PUERTO_SITIO` (4321), `BACKEND_URL` (`http://127.0.0.1:3000`).
+
+Solo sirve el prototipo: `backend/`, `node_modules/`, `.git/` y cualquier archivo que empiece
+con punto quedan fuera, para que `.env` no viaje por HTTP. Si el backend no está arriba,
+`/api/*` responde 502 diciéndolo.
 Solo se versionan los `.example`, que no tienen claves. Si falta `DATABASE_URL`, el backend no arranca y
 el log lo explica sin mostrar valores.
 

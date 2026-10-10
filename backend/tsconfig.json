@@ -11,5 +11,5 @@
     // extraer.ts y cargar.ts importan con .js y corren con tsx, igual que src/
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "pruebas", "db"]
+  "include": ["src", "pruebas", "db", "dev"]
 }
