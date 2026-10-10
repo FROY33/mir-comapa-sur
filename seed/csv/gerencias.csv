@@ -1,6 +1,0 @@
-gerencia_clave,nombre_oficial,nombre_corto,descripcion,frecuencias,en_catalogo_gerencias,indicadores_operativos,indicadores_gerenciales,indicadores_catalogo_mir,confirmacion_institucional
-administrativa,Gerencia Administrativa,Gerencia Administrativa,"Recursos, adquisiciones, finanzas, personal e insumos institucionales.",Mensual|Trimestral|Semestral|Anual,true,44,9,58,PENDIENTE
-comercial,Gerencia Comercial,Gerencia Comercial,"Ingresos, medición, facturación, cobranza y atención comercial.",Mensual|Trimestral|Semestral|Anual,true,25,7,60,PENDIENTE
-general,Gerencia General,Gerencia General,Indicadores institucionales de Fin y Propósito del MIR.,Anual,true,0,0,0,PENDIENTE
-planeacion,Gerencia de Planeación Estratégica,Planeación Estratégica,"Seguimiento institucional, proyectos estratégicos e indicadores de desempeño.",Mensual|Trimestral|Semestral|Anual,true,14,7,19,PENDIENTE
-tecnica,Gerencia Técnica,Gerencia Técnica,"Operación, mantenimiento, infraestructura y servicios técnicos del ciclo del agua.",Mensual|Trimestral|Semestral|Anual,true,40,9,56,PENDIENTE

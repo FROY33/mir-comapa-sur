@@ -1,0 +1,35 @@
+gerencia_clave,nombre,es_coord_general,activo,indicadores_mir,indicadores_gerenciales,solo_citada_por_usuarios,confirmacion_institucional
+ADM,Coordinación de Adquisiciones,false,true,2,1,false,PENDIENTE
+ADM,Coordinación de Contabilidad,false,true,5,0,false,PENDIENTE
+ADM,Coordinación de Finanzas,false,true,5,5,false,PENDIENTE
+ADM,Coordinación de Informática,false,true,6,0,false,PENDIENTE
+ADM,Coordinación de Política de Ingresos,false,true,5,0,false,PENDIENTE
+ADM,Coordinación de Recursos Humanos,false,true,3,2,false,PENDIENTE
+ADM,"Coordinación de Seguridad, Salud e Higiene",false,true,6,0,false,PENDIENTE
+ADM,Coordinación de Servicios Generales,false,true,1,0,false,PENDIENTE
+ADM,Coordinación de Vinculación Social,false,true,5,0,false,PENDIENTE
+ADM,Coordinación General Administrativa,true,true,2,0,false,PENDIENTE
+ADM,Coordinación Jurídica,false,true,3,1,false,PENDIENTE
+ADM,Gerencia Administrativa,false,true,1,0,false,PENDIENTE
+COM,Coordinación de Atención a la Industria y Comercio,false,true,3,0,false,PENDIENTE
+COM,Coordinación de Atención a Usuarios,false,true,3,0,false,PENDIENTE
+COM,Coordinación de Control de Rezago,false,true,3,2,false,PENDIENTE
+COM,Coordinación de Facturación y Medición,false,true,7,2,false,PENDIENTE
+COM,Coordinación de Padrón y Censo,false,true,3,2,false,PENDIENTE
+COM,Coordinación de Política de Ingresos,false,true,0,1,false,PENDIENTE
+COM,Coordinación General Comercial,true,true,2,0,false,PENDIENTE
+COM,Coordinación Módulo de Atención Accesible,false,true,3,0,false,PENDIENTE
+COM,Gerencia Comercial,false,true,1,0,false,PENDIENTE
+GEN,Gerencia General,false,true,0,0,true,PENDIENTE
+PLA,Coordinación de Proyectos Estratégicos,false,true,2,0,false,PENDIENTE
+PLA,Coordinación de Seguimiento a Plantas de Tratamiento,false,true,2,4,false,PENDIENTE
+PLA,Coordinación General de Planeación Estratégica,true,true,2,1,false,PENDIENTE
+PLA,Departamento de Mejora Continua y Calidad,false,true,5,0,false,PENDIENTE
+PLA,Departamento de Seguimiento a Plantas de Tratamiento,false,true,2,2,false,PENDIENTE
+PLA,Gerencia de Planeación Estratégica,false,true,1,0,false,PENDIENTE
+TEC,Coordinación de Distribución y Mantenimiento de Redes,false,true,9,2,false,PENDIENTE
+TEC,Coordinación de Plantas Potabilizadoras y Cárcamos,false,true,14,4,false,PENDIENTE
+TEC,Coordinación de Proyectos Especiales,false,true,4,0,false,PENDIENTE
+TEC,Coordinación de Proyectos y Construcción,false,true,10,0,false,PENDIENTE
+TEC,Coordinación General Técnica,true,true,2,0,false,PENDIENTE
+TEC,Gerencia Técnica,false,true,1,3,false,PENDIENTE

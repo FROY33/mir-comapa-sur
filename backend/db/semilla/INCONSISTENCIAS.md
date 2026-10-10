@@ -1,7 +1,7 @@
 # TEC-04 — Inconsistencias del dataset de origen
 
-> Generado el 2026-10-08 a partir de los archivos del prototipo en el commit `ddf552d`.
-> Las cifras de este documento salen de `seed/manifest.json`, que se regenera con `node seed/extract.js`.
+> Actualizado el 2026-10-10 contra el esquema de TEC-02 (`main` en `c8c3a37`).
+> Las cifras salen de `manifest.json`, que se regenera con `node backend/db/semilla/extraer.ts`.
 
 Este documento registra las contradicciones encontradas al extraer el dataset de origen.
 Ninguna se resolvió por criterio propio: resolverlas requiere decisión del dueño funcional
@@ -22,6 +22,11 @@ Ninguna se resolvió por criterio propio: resolverlas requiere decisión del due
 | 9 | Responsables citados sin cuenta de usuario | CA-5 | TEC-04 (propio) |
 | 10 | Indicadores gerenciales con esquema y formato de fecha propios | CA-3 | TEC-02 |
 | 11 | Contraseñas en claro en el repositorio | CA-2 | TEC-03 |
+| 12 | 6 usuarios sin unidad, pero `unidad_id` es NOT NULL | CA-5 | TEC-04 (propio) |
+| 13 | `es_iso` boolean pierde el código ISO de 40 indicadores | — | TEC-02 |
+| 14 | Las fixtures asignan T3-2026 a indicadores de otras frecuencias | CA-5 | TEC-04 (propio) |
+| 15 | La jerarquía `parent_id` no se deriva por prefijo | CA-1 | Dueño funcional |
+| 16 | Frecuencia «Semanal» fuera del catálogo de seis | CA-1 | TEC-02 + dueño funcional |
 
 ---
 
@@ -202,6 +207,120 @@ Esto no es un hallazgo del dataset sino del prototipo, y queda anotado porque el
 explícitamente no propagar contraseñas a repositorio o reportes. Vale revisar aparte si esas
 credenciales deben salir de `session.js` antes de que el prototipo se exponga fuera del equipo.
 
+
+---
+
+# Hallazgos al mapear contra el esquema de TEC-02
+
+Los nueve anteriores salieron de comparar las fuentes del prototipo entre sí. Estos salieron de
+contrastarlas con las migraciones.
+
+## 12. Seis usuarios no tienen unidad, pero el esquema la exige
+
+`usuarios.unidad_id` es `NOT NULL` y además lleva FK compuesta
+`(unidad_id, gerencia_id) REFERENCES unidades(id, gerencia_id)`: todo usuario necesita una unidad
+**de su propia gerencia**. Seis cuentas del prototipo no traen unidad, incluida la del
+Administrador y la del único Revisor:
+
+`admin@comapa.mx`, `revisor@comapa.mx`, `enlace@comapa.mx`, `enlace.admin@comapa.mx`,
+`enlace.planeacion@comapa.mx`, `enlace.tecnica@comapa.mx`
+
+El extractor les asigna la **Coordinación General** de su gerencia y lo marca en la columna
+`unidad_por_defecto`, para que la asignación sea auditable y no se confunda con un dato de origen.
+Es una decisión reversible, no una confirmación.
+
+Caso aparte: `enlace.general@comapa.mx` tiene unidad `Gerencia General`, que ningún indicador
+referencia. El extractor la registra como unidad porque un usuario la cita, y la marca con
+`solo_citada_por_usuarios`. Si Gerencia General se da de baja (hallazgo 1), esa cuenta queda sin
+gerencia válida.
+
+**Pregunta a resolver:** la pregunta 5 de `../DECISIONES.md` ya está abierta exactamente sobre
+esto — «¿El Administrador tiene gerencia y unidad?». La respuesta decide si esto es un arreglo de
+datos o un cambio al esquema.
+
+## 13. El esquema no guarda el código ISO
+
+`indicadores.es_iso` es `boolean`. El prototipo trae el **código** ISO en 40 indicadores, no solo
+si aplica o no. El extractor conserva el código en la columna de revisión `iso_codigo` para que no
+se pierda, pero no hay columna destino.
+
+**Pregunta a resolver (TEC-02):** ¿el código ISO importa para los reportes de transparencia? Si
+sí, hace falta una columna; si no, `es_iso` basta y `iso_codigo` queda como insumo histórico.
+
+## 14. Las fixtures asignan un periodo trimestral a indicadores de otras frecuencias
+
+`reportes` lleva FK compuesta `(periodo_id, frecuencia) REFERENCES periodos_reporte(id, frecuencia)`:
+**un reporte solo cabe en un periodo de la misma frecuencia que su indicador.** El prototipo
+asigna `T3-2026` a los 123 indicadores sin distinguir frecuencia, así que 65 de ellos violarían
+esa restricción.
+
+El extractor genera los **28 periodos de 2026** (uno por cada periodo de las seis frecuencias,
+con `fecha_limite` contada en días hábiles de lunes a viernes como hace el backend) y reasigna
+cada fixture al último periodo de su propia frecuencia que haya concluido al corte `2026-09-30`:
+
+| Reasignación | Indicadores |
+|---|---|
+| `T3-2026` → `septiembre-2026` (mensual) | 47 |
+| `T3-2026` → `2026` (anual) | 9 |
+| `T3-2026` → `S1-2026` (semestral) | 6 |
+| `T3-2026` → `C2-2026` (cuatrimestral) | 2 |
+| `T3-2026` → `B4-2026` (bimestral) | 1 |
+| se queda en `T3-2026` (trimestral) | 58 |
+
+Se conserva `periodo_prototipo` en el CSV para auditar el remapeo.
+
+**Pendiente, no resuelto:** los 9 indicadores anuales quedan en el periodo `2026`, que **no ha
+concluido** al corte y cuya captura abre el 1 de enero de 2027. Nueve de ellos vienen con estado
+`cerrado` en el prototipo, lo cual no es coherente con un periodo en curso. Para probar el flujo
+hace falta decidir si los anuales se prueban contra el ejercicio 2025 o si se dejan en
+`pendiente_carga`.
+
+## 15. La jerarquía de indicadores no se deriva quitando el último segmento
+
+El esquema modela `indicadores.parent_id`, y la numeración del prototipo parece jerárquica
+(`1.2.4`), pero no lo es por prefijo: el nivel intermedio no existe como indicador.
+
+```
+Propósito    numero = 1
+Componente   numero = 1.2.1     ← no existe un '1.2'
+Actividad    numero = 1.2.2     ← hermana del componente, no su hija por prefijo
+Actividad    numero = 1.2.3
+```
+
+La regla real, inferida de la estructura observada en las cuatro gerencias:
+
+- actividad `a.b.c` → componente `a.b.1`
+- componente `a.b.1` → propósito `a`
+
+Con esa regla se resuelven **116 de 155** indicadores (los 39 restantes son los 5 propósitos, los
+32 gerenciales sin nivel y 2 fuera de patrón), sin un solo huérfano.
+
+**Advertencia:** la regla está inferida de los datos, **no confirmada por el RQM**. Si el Excel
+oficial numera distinto, la jerarquía cargada queda mal. Vale confirmarla junto con la pregunta
+24f de `../DECISIONES.md` («¿cuál es el 3.1 correcto en Técnica?»), que apunta al mismo problema
+de numeración.
+
+## 16. Una frecuencia fuera del catálogo de seis
+
+`COM-ACT-012`, en el catálogo de 193, tiene `frecuenciaMedicion: 'Semanal'`. El catálogo
+`frecuencias` del esquema admite seis valores y «semanal» no es uno
+(`CHECK (clave IN ('mensual', 'bimestral', 'trimestral', 'cuatrimestral', 'semestral', 'anual'))`).
+
+No bloquea hoy porque ese indicador no está entre los 123 operativos. **Sí bloquea si el catálogo
+de 193 resulta ser el universo oficial** (hallazgo 2): cargarlo exigiría una migración que agregue
+`semanal` al catálogo y a `frecuencias.meses`, donde no encaja — el CHECK de `meses` admite
+`(1, 2, 3, 4, 6, 12)` y una semana no es un número de meses.
+
+## 17. Dos indicadores con `tipo_indicador` mal capturado
+
+- `COM-ACT-36` trae `tipo_indicador: 'Porcentaje'` — la unidad de medida en el campo equivocado.
+  Violaría `CHECK (tipo_indicador IN ('estrategico', 'gestion'))`.
+- `COM-ACT-26` lo trae vacío.
+
+La columna acepta `NULL`, así que el extractor deja ambos vacíos y los reporta en
+`manifest.json` → `pendientes.tipo_indicador_vacio`. Son dos correcciones de captura en el Excel,
+no un problema de modelo.
+
 ---
 
 ## Lo que sí quedó limpio
@@ -218,3 +337,15 @@ Para no dar una impresión más alarmante que la real:
 - **Ninguna unidad aparece en más de una gerencia**: la relación gerencia→unidad es limpia.
 - **El modelo de la entidad Indicador está bien documentado** en `estructura-datos-flujo.md`,
   campo por campo, incluidos los 9 estados del flujo y las estructuras anidadas.
+- **Los cuatro estados del prototipo son válidos** contra el CHECK de `reportes.estado`, que
+  admite nueve.
+- **Las seis frecuencias de los 123 operativos están todas en el catálogo** del esquema: el
+  mapeo a minúsculas es limpio y no hay ninguna fuera (la excepción «Semanal» es del catálogo
+  de 193, hallazgo 16).
+- **Ni una colisión de `codigo`** entre los 123 MIR y los 32 gerenciales, que comparten la
+  restricción `UNIQUE` global.
+- **Integridad referencial completa** tras el mapeo: toda `gerencia_clave`, toda unidad, todo
+  `parent_codigo` y todo `indicador_codigo` de las fixtures resuelven contra su tabla. Verificado
+  en cada corrida (`manifest.json` → `integridad`).
+- **Cada gerencia activa tiene exactamente una Coordinación General**, que es lo que exige el
+  índice único parcial `unidades_una_coord_general`.

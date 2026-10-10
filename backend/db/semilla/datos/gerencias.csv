@@ -1,0 +1,6 @@
+clave,nombre,titular_nombre,titular_cargo,activo,indicadores_mir,indicadores_gerenciales,indicadores_catalogo_193,confirmacion_institucional
+ADM,Gerencia Administrativa,,,true,44,9,58,PENDIENTE
+COM,Gerencia Comercial,,,true,25,7,60,PENDIENTE
+GEN,Gerencia General,,,false,0,0,0,PENDIENTE
+PLA,Gerencia de Planeación Estratégica,,,true,14,7,19,PENDIENTE
+TEC,Gerencia Técnica,,,true,40,9,56,PENDIENTE
