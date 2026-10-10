@@ -30,6 +30,7 @@ curl localhost:3000/api/salud
 | `PORT` | no | `3000` | Puerto HTTP |
 | `NODE_ENV` | no | `development` | `development`, `test` o `production` |
 | `BD_MAX_CONEXIONES` | no | `10` | Tamaño del pool |
+| `CONFIAR_PROXY` | no | `false` | `true` solo si el backend está detrás de un proxy propio: entonces la IP de la bitácora se toma de `X-Forwarded-For`. Expuesto directo debe quedar en `false`, o cualquiera podría falsear su IP |
 | `BD_TIMEOUT_CONEXION_MS` | no | `5000` | Cuánto esperar una conexión antes de responder 503 |
 | `BD_TIMEOUT_CONSULTA_MS` | no | `15000` | Límite por consulta (`statement_timeout`) |
 

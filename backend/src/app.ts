@@ -5,7 +5,7 @@ import { listarFrecuencias } from './datos/frecuencias.js'
 import { crearManejador } from './http.js'
 import type { Log } from './log.js'
 
-export function crearApp(bd: BD, log: Log) {
+export function crearApp(bd: BD, log: Log, opciones: { confiarProxy?: boolean } = {}) {
   return crearManejador({
     // 200 si la base responde; 503 si no (lo resuelve el manejo central de errores)
     'GET /api/salud': async () => ({
@@ -14,5 +14,5 @@ export function crearApp(bd: BD, log: Log) {
     }),
 
     'GET /api/frecuencias': async () => ({ status: 200, cuerpo: await listarFrecuencias(bd) }),
-  }, log)
+  }, log, opciones)
 }

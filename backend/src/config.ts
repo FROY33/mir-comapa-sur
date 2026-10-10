@@ -18,6 +18,10 @@ export interface Config {
   entorno: Entorno
   puerto: number
   bd: ConfigBD
+  // Si el backend está detrás de un proxy o balanceador, la IP del cliente viene en
+  // X-Forwarded-For. Apagado por defecto a propósito: expuesto directo, cualquiera
+  // podría mandar esa cabecera y falsear su IP en la bitácora (TEC-05 CA-1).
+  confiarProxy: boolean
 }
 
 const ENTORNOS: Entorno[] = ['development', 'test', 'production']
@@ -42,6 +46,7 @@ export function cargarConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return {
     entorno,
     puerto: entero(env, 'PORT', 3000),
+    confiarProxy: env.CONFIAR_PROXY === 'true',
     bd: {
       url,
       maxConexiones: entero(env, 'BD_MAX_CONEXIONES', 10),

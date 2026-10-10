@@ -5,7 +5,9 @@ import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
 import { after, test } from 'node:test'
+import { randomUUID } from 'node:crypto'
 import { crearBD } from '../src/bd.js'
+import { auditarAcceso, ENTIDAD } from '../src/datos/acceso.js'
 import { listarEventos } from '../src/datos/bitacora.js'
 import { crearLog } from '../src/log.js'
 import { configBD } from './apoyo.js'
@@ -39,6 +41,11 @@ test('lo escrito antes del reinicio sigue ahí después', async () => {
   const primero = arrancar()
   const { evento: inicio1, puerto } = await primero.listo
   assert.equal((await fetch(`http://127.0.0.1:${puerto}/api/salud`)).status, 200)
+
+  // Un evento de acceso escrito mientras el primer proceso vive (TEC-05 CA-3)
+  const emailAcceso = `reinicio-${randomUUID()}@comapasur.gob.mx`
+  await auditarAcceso.loginFallido(bd, emailAcceso, 'credenciales', '10.0.0.1')
+
   assert.equal(await primero.detener(), 0, 'el apagado debe ser limpio')
 
   const segundo = arrancar()
@@ -51,6 +58,11 @@ test('lo escrito antes del reinicio sigue ahí después', async () => {
     assert.ok(ids.includes(inicio2))
     const apagado1 = eventos.find((e) => e.accion === 'apagado' && BigInt(e.id) > BigInt(inicio1) && BigInt(e.id) < BigInt(inicio2))
     assert.ok(apagado1, 'el apagado del primer proceso no quedó registrado')
+
+    // El evento de acceso también sobrevivió (TEC-05 CA-3)
+    const acceso = await listarEventos(bd, ENTIDAD, emailAcceso)
+    assert.equal(acceso.length, 1, 'se perdió el evento de acceso al reiniciar')
+    assert.equal(acceso[0]?.accion, 'login_fallido')
 
     // Y el segundo proceso lee la base sin problema
     assert.equal((await fetch(`http://127.0.0.1:${puerto2}/api/frecuencias`)).status, 200)
