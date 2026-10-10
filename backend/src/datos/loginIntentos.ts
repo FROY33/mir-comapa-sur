@@ -7,7 +7,7 @@
 //   3. Contraseña correcta → reiniciar() y crear la sesión.
 
 import type { BD, Ejecutor } from '../bd.js'
-import { registrarEvento } from './bitacora.js'
+import { normalizarEmail, registrarAcceso } from './acceso.js'
 
 export const MAX_INTENTOS = 5
 export const MINUTOS_BLOQUEO = 15
@@ -21,8 +21,9 @@ export interface EstadoBloqueo {
   bloqueadoHasta: Date | null
 }
 
-// citext ya compara sin mayúsculas, pero la bitácora guarda el correo como texto: se normaliza aquí
-const normalizar = (email: string) => email.trim().toLowerCase()
+// citext ya compara sin mayúsculas, pero la bitácora guarda el correo como texto: se normaliza
+// con la misma función que usa la auditoría de acceso, para que la llave coincida
+const normalizar = normalizarEmail
 
 export async function consultarBloqueo(bd: Ejecutor, email: string): Promise<EstadoBloqueo> {
   const [fila] = await bd.consultar<{ intentos: number; bloqueado_hasta: Date | null; bloqueado: boolean }>(
@@ -59,10 +60,9 @@ export async function registrarFallo(bd: BD, email: string, ip?: string): Promis
       [correo, MAX_INTENTOS, MINUTOS_BLOQUEO],
     )
     if (fila!.recien) {
-      await registrarEvento(tx, {
+      await registrarAcceso(tx, {
         accion: 'cuenta_bloqueada',
-        entidad: 'acceso',
-        entidadId: correo,
+        email: correo,
         ip,
         detalle: { intentos_fallidos: fila!.intentos, bloqueado_hasta: fila!.bloqueado_hasta },
       })
@@ -87,12 +87,11 @@ export async function desbloquear(bd: BD, email: string, admin: { usuarioId: str
       [correo],
     )
     if (!fila) return false
-    await registrarEvento(tx, {
+    await registrarAcceso(tx, {
       usuarioId: admin.usuarioId,
       rol: 'admin',
       accion: 'cuenta_desbloqueada',
-      entidad: 'acceso',
-      entidadId: correo,
+      email: correo,
       ip,
       detalle: { intentos_fallidos: fila.intentos },
     })
