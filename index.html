@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=login.html">
   <title>MIR COMAPA Sur</title>
   <script>
   (function (m, a, z, e) {
@@ -26,6 +25,19 @@
   })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
   </script>
   <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
+  <script>
+    // HU-R7-02 CA_2: la raíz manda a cada quien a su dashboard. Quién es lo dice el
+    // servidor, no el navegador: se consulta la sesión y se redirige según el rol.
+    // Sin sesión, al login. Si el servidor no responde, también al login, que es el
+    // destino seguro.
+    (function () {
+      var ir = function (destino) { window.location.replace(destino); };
+      fetch('/api/auth/sesion', { credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (datos) { ir(datos ? datos.redirigirA : 'login.html'); })
+        .catch(function () { ir('login.html'); });
+    })();
+  </script>
 </head>
 <body>
   <p>Redirigiendo... <a href="login.html">Haz clic aquí si no rediriges automáticamente.</a></p>

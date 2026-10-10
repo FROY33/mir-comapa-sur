@@ -85,7 +85,7 @@ function cargarFormulario(opciones: {
     cargar: () => Promise.resolve(opciones.sesionExistente ?? null),
     login: (email: string, password: string) => {
       intentos.push({ email, password })
-      return (opciones.respuesta ?? (() => Promise.resolve({ ok: true, user: { redirect: 'dashboard-inicio.html' } })))()
+      return (opciones.respuesta ?? (() => Promise.resolve({ ok: true, user: { redirect: 'dashboard-admin.html' } })))()
     },
   }
 
@@ -215,7 +215,7 @@ describe('RN_4: el error que se muestra', () => {
 })
 
 describe('CA_4: redirección por rol', () => {
-  for (const destino of ['dashboard-inicio.html', 'dashboard-revisor.html', 'dashboard-enlace.html']) {
+  for (const destino of ['dashboard-admin.html', 'dashboard-revisor.html', 'dashboard-enlace.html']) {
     test(`va a donde diga el backend: ${destino}`, async () => {
       const f = cargarFormulario({ respuesta: () => Promise.resolve({ ok: true, user: { redirect: destino } }) })
       f.el.email!.value = 'quien@comapa.mx'

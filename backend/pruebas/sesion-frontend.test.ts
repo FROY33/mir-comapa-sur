@@ -54,7 +54,7 @@ const perfil = (datos: Record<string, unknown>) =>
 const BASE = {
   nombre: 'Leticia Solís', email: 'admin@comapa.mx', rol: 'admin',
   gerencia: 'Gerencia de Planeación Estratégica', gerenciaClave: 'PLA',
-  unidad: 'Coordinación General de Planeación Estratégica', redirigirA: 'dashboard-inicio.html',
+  unidad: 'Coordinación General de Planeación Estratégica', redirigirA: 'dashboard-admin.html',
 }
 
 describe('adaptador de perfil', () => {
@@ -73,7 +73,7 @@ describe('adaptador de perfil', () => {
     assert.equal(u.gerencia, BASE.gerencia)
     assert.equal(u.gerenciaClave, 'PLA')
     assert.equal(u.unidadResponsable, BASE.unidad)
-    assert.equal(u.redirect, 'dashboard-inicio.html')
+    assert.equal(u.redirect, 'dashboard-admin.html')
   })
 
   test('deriva las iniciales del nombre, que la tabla usuarios no guarda', () => {
