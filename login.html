@@ -479,6 +479,7 @@ body {
     const spinner  = document.getElementById('spinner');
     const btnText  = document.getElementById('btnText');
     const errorBox = document.getElementById('errorBox');
+    const errorMsg = document.getElementById('errorMsg');
     const emailErr = document.getElementById('emailErr');
     const passErr  = document.getElementById('passErr');
 
@@ -551,11 +552,6 @@ body {
     // Los atajos de demostración que entraban sin contraseña se eliminaron con
     // HU-R7-01: el único camino es el formulario contra POST /api/auth/login.
 
-
-    document.getElementById('forgotLink').addEventListener('click', function (e) {
-      e.preventDefault();
-      alert('Para recuperar tu contraseña contacta al administrador del sistema.');
-    });
   </script>
 </body>
 </html>
