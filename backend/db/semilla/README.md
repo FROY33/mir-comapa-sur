@@ -7,10 +7,21 @@ Catálogos fijos como `frecuencias` ya vienen con sus filas en su propia migraci
 datos **institucionales**: los que cambian, los que necesitan confirmación de Planeación
 Estratégica y los que deben poder recargarse sin duplicar.
 
-## Regenerar
+## Usar
 
 ```sh
-node backend/db/semilla/extraer.ts      # sin dependencias; Node 22+ corre .ts nativo
+cd backend
+./db/migrar.sh up                  # el esquema primero: sin tablas no hay dónde cargar
+./db/sembrar.sh                    # definición: gerencias, unidades, usuarios, indicadores, periodos
+./db/sembrar.sh --con-fixtures     # agrega los 123 reportes de prueba (CA-4)
+./db/sembrar.sh --verificar        # no escribe; reporta qué hay en la base
+npm run bd:sembrar                 # equivalente a ./db/sembrar.sh
+```
+
+## Regenerar el dataset desde el prototipo
+
+```sh
+npx tsx db/semilla/extraer.ts
 ```
 
 Determinista: misma entrada, mismos bytes. Las filas se ordenan por clave natural y
@@ -29,8 +40,9 @@ shasum -a 256 datos/*.csv > /tmp/h1 && node extraer.ts >/dev/null \
 |---|---|
 | `extraer.ts` | Extractor. Lee los `.js` del prototipo en la raíz del repo y escribe `datos/` |
 | `mapeos.ts` | Único lugar con la traducción prototipo → catálogos del esquema |
+| `cargar.ts` | Cargador idempotente. Lee los CSV e inserta en orden de dependencias |
 | `datos/*.csv` | El dataset. Formato de revisión: `gerencias.csv` y `unidades.csv` están hechos para imprimirse y que Planeación confirme renglón por renglón (CA-1) |
-| `semilla.json` | El mismo dataset como bundle, para el cargador |
+| `semilla.json` | El dataset generado como un solo JSON. Artefacto de conveniencia: `cargar.ts` lee los CSV, no este archivo, porque los CSV son lo que Planeación revisa |
 | `manifest.json` | Conteos, `sha256`, verificaciones de integridad y lista de pendientes |
 | `INCONSISTENCIAS.md` | Hallazgos, con el criterio de aceptación que bloquea cada uno y quién decide |
 
@@ -44,6 +56,7 @@ shasum -a 256 datos/*.csv > /tmp/h1 && node extraer.ts >/dev/null \
 | `indicadores.csv` | 155 | `indicadores` | `codigo` |
 | `periodos.csv` | 28 | `periodos_reporte` | `frecuencia` + `ejercicio` + `numero` |
 | `fixtures_reportes.csv` | 123 | `reportes` | `indicador_codigo` + `periodo_frecuencia` + `periodo_numero` |
+| `usuarios_prueba.csv` | 5 | `usuarios` | `email` (cuentas de prueba: los responsables que las fixtures citan y no existen en el prototipo) |
 | `catalogo_mir_193.csv` | 193 | — | `codigo` (catálogo de abril; espacio de IDs disjunto, no se carga) |
 
 Las claves son las mismas que hace cumplir el esquema: `UNIQUE (organizacion_id, clave)` en
@@ -66,8 +79,14 @@ fixtures salvo petición explícita.
 ## Contraseñas (CA-2)
 
 `usuarios.csv` **no tiene contraseñas**. El dataset define identidad, rol y adscripción; el hash
-bcrypt de 12 rondas o más lo genera el cargador (`DICCIONARIO.md`, `usuarios.password_hash`).
-Todos los usuarios salen con `debe_cambiar_password = true`.
+bcrypt de 12 rondas lo genera `cargar.ts` con `bcryptjs`, uno por usuario con su propia sal.
+Todos salen con `debe_cambiar_password = true`.
+
+La contraseña inicial es común y no es un secreto: se cambia al primer acceso. Para no usar el
+valor por omisión, define `SEMILLA_PASSWORD` en el entorno antes de sembrar.
+
+En una segunda carga el hash **no se regenera**: bcrypt daría uno distinto cada vez y la carga no
+sería comparable (CA-3).
 
 ## Antes de cargar
 
@@ -86,7 +105,8 @@ abiertas (5, 24a, 24g y la regla general 2).
 | Resolver si Gerencia General existe | `DECISIONES.md` pregunta 5 |
 | Alta de un Revisor por gerencia (hoy faltan en PLA, COM y ADM) | Propio |
 | Cuentas de los 4 responsables citados en fixtures que no existen | Propio |
-| `cargar.ts` idempotente + `sembrar.sh` + `npm run bd:sembrar` | Propio; necesita dependencia de bcrypt |
-| Prueba de doble carga (CA-3) en `backend/pruebas/semilla.test.ts` | Propio; necesita PostgreSQL |
-| Gating de fixtures por entorno (CA-4) | Propio, sobre `src/config.ts` |
-| `backend/evidencia/TEC-04.md` | Al cierre |
+| Unos reportes en estado `borrador` para CA-5 | Propio; ver hallazgo 19 |
+| Confirmar la gerencia del Revisor Carlos Mendoza | Dueño funcional; ver hallazgo 18 |
+
+Ya hecho: `cargar.ts`, `db/sembrar.sh`, `npm run bd:sembrar`, las 10 pruebas de
+`backend/pruebas/semilla.test.ts` y `backend/evidencia/TEC-04.md`.

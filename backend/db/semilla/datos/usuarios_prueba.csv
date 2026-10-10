@@ -1,0 +1,6 @@
+email,nombre,rol,gerencia_clave,unidad_nombre,motivo
+enlace.comercial@comapa.mx,Pedro Sánchez,enlace,COM,Coordinación General Comercial,Las fixtures lo citan como responsableEnlace de 24 indicadores de COM y no tiene cuenta en el prototipo
+revisor.admin@comapa.mx,Laura Vega,revisor,ADM,Coordinación General Administrativa,Las fixtures lo citan como responsableRevisor de 43 indicadores de ADM y no tiene cuenta en el prototipo
+revisor.comercial@comapa.mx,Rosario Díaz,revisor,COM,Coordinación General Comercial,Las fixtures lo citan como responsableRevisor de 24 indicadores de COM y no tiene cuenta en el prototipo
+revisor.tecnica@comapa.mx,Miguel Ángel Pérez,revisor,TEC,Coordinación General Técnica,Las fixtures lo citan como responsableRevisor de 40 indicadores de TEC y no tiene cuenta en el prototipo
+revisor@comapa.mx,Carlos Mendoza,revisor,PLA,Coordinación General de Planeación Estratégica,Corrige su gerencia: session.js lo registra en TEC pero las fixtures lo ponen revisando los 14 indicadores de PLA y TEC ya tiene a Miguel Ángel Pérez. Ver INCONSISTENCIAS.md 18

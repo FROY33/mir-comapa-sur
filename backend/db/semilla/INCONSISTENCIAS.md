@@ -27,6 +27,8 @@ Ninguna se resolvió por criterio propio: resolverlas requiere decisión del due
 | 14 | Las fixtures asignan T3-2026 a indicadores de otras frecuencias | CA-5 | TEC-04 (propio) |
 | 15 | La jerarquía `parent_id` no se deriva por prefijo | CA-1 | Dueño funcional |
 | 16 | Frecuencia «Semanal» fuera del catálogo de seis | CA-1 | TEC-02 + dueño funcional |
+| 18 | La gerencia del único Revisor contradice a las fixtures | CA-5 | Dueño funcional |
+| 19 | No hay ningún reporte en estado `borrador` | CA-5 | TEC-04 (propio) |
 
 ---
 
@@ -321,6 +323,54 @@ La columna acepta `NULL`, así que el extractor deja ambos vacíos y los reporta
 `manifest.json` → `pendientes.tipo_indicador_vacio`. Son dos correcciones de captura en el Excel,
 no un problema de modelo.
 
+## 18. La gerencia del único Revisor contradice a las fixtures
+
+`session.js` registra a Carlos Mendoza (`revisor@comapa.mx`) en **Gerencia Técnica**. Pero las
+fixtures lo ponen revisando los **14 indicadores de Planeación Estratégica**, y a Técnica le
+asignan a Miguel Ángel Pérez. El reparto que implican las fixtures es uno por gerencia:
+
+| Gerencia | Revisor según las fixtures | Indicadores | ¿Tenía cuenta? |
+|---|---|---|---|
+| PLA | Carlos Mendoza | 14 | sí, pero registrada en TEC |
+| COM | Rosario Díaz | 24 | no |
+| ADM | Laura Vega | 43 | no |
+| TEC | Miguel Ángel Pérez | 40 | no |
+
+Cargado tal cual, **PLA queda sin Revisor y TEC con dos**, y CA-5 no se puede cumplir: no hay con
+quién probar el aislamiento de Planeación.
+
+Las fixtures son internamente consistentes (un revisor por gerencia, sin traslapes) y `session.js`
+no, así que el extractor trata a `session.js` como el dato viejo: `usuarios_prueba.csv` corrige la
+gerencia de `revisor@comapa.mx` a PLA, con el motivo escrito en la propia fila. Es un override
+explícito y auditable, no una confirmación.
+
+**Pregunta a resolver:** ¿Carlos Mendoza revisa Planeación o Técnica? Si es Técnica, entonces
+faltan cuatro revisores y no tres, y las fixtures están mal asignadas.
+
+## 19. No hay ningún reporte en estado `borrador`
+
+CA-5 pide datos suficientes para probar los estados «pendiente, borrador y observado». Los 123
+reportes del prototipo cubren cuatro estados y **`borrador` no es uno**:
+
+| Estado | Reportes |
+|---|---|
+| `cerrado` | 93 |
+| `pendiente_carga` | 15 |
+| `enviado_revision` | 11 |
+| `observado` | 4 |
+| `borrador` | **0** |
+
+`estructura-datos-flujo.md:62` explica por qué: `pendiente_carga` se *presenta* como «borrador» en
+la interfaz, y `borrador` real significa que el Enlace ya registró el avance del periodo sin
+enviarlo. Ningún registro del prototipo está en ese punto intermedio.
+
+No se inventó: las fixtures reproducen lo que trae el prototipo. Para cerrar CA-5 al pie de la
+letra hacen falta unos pocos reportes en `borrador`, y por ser fixtures de prueba («preparar
+fixtures de ciclos/reportes solo para pruebas») agregarlos está dentro del alcance del ticket.
+Es una línea en `fixtures_reportes.csv`, pero cambia datos que hoy salen del prototipo, así que
+queda a decisión de quién cierra el ticket.
+
+
 ---
 
 ## Lo que sí quedó limpio
@@ -349,3 +399,7 @@ Para no dar una impresión más alarmante que la real:
   en cada corrida (`manifest.json` → `integridad`).
 - **Cada gerencia activa tiene exactamente una Coordinación General**, que es lo que exige el
   índice único parcial `unidades_una_coord_general`.
+- **La carga pasa contra el esquema real**: las 9 migraciones aplicadas, 155 indicadores, 39
+  usuarios, 28 periodos y 123 reportes entran sin violar una sola restricción, y correrla dos
+  veces deja los mismos conteos y los mismos hashes (CA-3 verificado en
+  `backend/pruebas/semilla.test.ts`).

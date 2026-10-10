@@ -13,12 +13,15 @@
     "tipos": "tsc --noEmit",
     "bd:migrar": "db/migrar.sh up",
     "bd:estado": "db/migrar.sh status",
+    "bd:sembrar": "db/sembrar.sh",
     "test": "NODE_ENV=test tsx pruebas/preparar.ts && NODE_ENV=test tsx --test pruebas/*.test.ts"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "pg": "^8.23.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.20.5",
     "@types/pg": "^8.23.1",
     "tsx": "^4.23.15",
