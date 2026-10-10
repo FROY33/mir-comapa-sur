@@ -1,0 +1,36 @@
+email,nombre,rol,gerencia_clave,unidad_nombre,unidad_por_defecto,debe_cambiar_password,activo,iniciales,id_prototipo,gerencia_texto_origen
+admin@comapa.mx,Leticia Solís,admin,PLA,Coordinación General de Planeación Estratégica,true,true,true,LS,adm-001,Planeación Estratégica
+enlace.accesible@comapa.mx,Norma Ibáñez,enlace,COM,Coordinación Módulo de Atención Accesible,false,true,true,NI,enl-com-acc,Gerencia Comercial
+enlace.admin@comapa.mx,María López,enlace,ADM,Coordinación General Administrativa,true,true,true,ML,enl-adm-001,Gerencia Administrativa
+enlace.adquisiciones@comapa.mx,Carmen Valdez,enlace,ADM,Coordinación de Adquisiciones,false,true,true,CV,enl-adm-adq,Gerencia Administrativa
+enlace.cg.admin@comapa.mx,Verónica Ruiz,enlace,ADM,Coordinación General Administrativa,false,true,true,VR,enl-adm-cg,Gerencia Administrativa
+enlace.cg.comercial@comapa.mx,Sandra Vega,enlace,COM,Coordinación General Comercial,false,true,true,SV,enl-com-cg,Gerencia Comercial
+enlace.cg.planeacion@comapa.mx,Sofía Castillo,enlace,PLA,Coordinación General de Planeación Estratégica,false,true,true,SC,enl-pla-cg,Gerencia de Planeación Estratégica
+enlace.cg.tecnica@comapa.mx,Ricardo Morales,enlace,TEC,Coordinación General Técnica,false,true,true,RM,enl-tec-cg,Gerencia Técnica
+enlace.contabilidad@comapa.mx,Ernesto Lozano,enlace,ADM,Coordinación de Contabilidad,false,true,true,EL,enl-adm-con,Gerencia Administrativa
+enlace.deptoseguimiento@comapa.mx,Héctor Villanueva,enlace,PLA,Departamento de Seguimiento a Plantas de Tratamiento,false,true,true,HV,enl-pla-dsp,Gerencia de Planeación Estratégica
+enlace.especiales@comapa.mx,Humberto Nava,enlace,TEC,Coordinación de Proyectos Especiales,false,true,true,HN,enl-tec-esp,Gerencia Técnica
+enlace.estrategia@comapa.mx,Isabel Guerrero,enlace,PLA,Coordinación de Proyectos Estratégicos,false,true,true,IG,enl-pla-est,Gerencia de Planeación Estratégica
+enlace.facturacion@comapa.mx,Roberto Sánchez,enlace,COM,Coordinación de Facturación y Medición,false,true,true,RS,enl-com-fac,Gerencia Comercial
+enlace.finanzas@comapa.mx,Fernando Castro,enlace,ADM,Coordinación de Finanzas,false,true,true,FC,enl-adm-fin,Gerencia Administrativa
+enlace.general@comapa.mx,Ana Torres,enlace,GEN,Gerencia General,false,true,true,AT,enl-gen-001,Gerencia General
+enlace.industria@comapa.mx,Verónica Salas,enlace,COM,Coordinación de Atención a la Industria y Comercio,false,true,true,VS,enl-com-ind,Gerencia Comercial
+enlace.informatica@comapa.mx,Beatriz Ríos,enlace,ADM,Coordinación de Informática,false,true,true,BR,enl-adm-inf,Gerencia Administrativa
+enlace.juridica@comapa.mx,Alejandro Medina,enlace,ADM,Coordinación Jurídica,false,true,true,AM,enl-adm-jur,Gerencia Administrativa
+enlace.mejora@comapa.mx,Rocío Fuentes,enlace,PLA,Departamento de Mejora Continua y Calidad,false,true,true,RF,enl-pla-mc,Gerencia de Planeación Estratégica
+enlace.padron@comapa.mx,Ramón Ávila,enlace,COM,Coordinación de Padrón y Censo,false,true,true,RA,enl-com-pad,Gerencia Comercial
+enlace.planeacion@comapa.mx,Marco Gutiérrez,enlace,PLA,Coordinación General de Planeación Estratégica,true,true,true,MG,enl-pla-001,Gerencia de Planeación Estratégica
+enlace.politica@comapa.mx,Silvia Paredes,enlace,ADM,Coordinación de Política de Ingresos,false,true,true,SP,enl-adm-pol,Gerencia Administrativa
+enlace.potabilizadoras@comapa.mx,Gabriela Torres,enlace,TEC,Coordinación de Plantas Potabilizadoras y Cárcamos,false,true,true,GT,enl-tec-pot,Gerencia Técnica
+enlace.proyectos@comapa.mx,Luis Ramírez,enlace,TEC,Coordinación de Proyectos y Construcción,false,true,true,LR,enl-tec-pry,Gerencia Técnica
+enlace.redes@comapa.mx,Eduardo Herrera,enlace,TEC,Coordinación de Distribución y Mantenimiento de Redes,false,true,true,EH,enl-tec-red,Gerencia Técnica
+enlace.rezago@comapa.mx,Patricia Vidal,enlace,COM,Coordinación de Control de Rezago,false,true,true,PV,enl-com-rez,Gerencia Comercial
+enlace.rh@comapa.mx,Claudia Moreno,enlace,ADM,Coordinación de Recursos Humanos,false,true,true,CM2,enl-adm-rh,Gerencia Administrativa
+enlace.seguimiento@comapa.mx,Andrés Peña,enlace,PLA,Coordinación de Seguimiento a Plantas de Tratamiento,false,true,true,AP,enl-pla-seg,Gerencia de Planeación Estratégica
+enlace.seguridad@comapa.mx,Gustavo Núñez,enlace,ADM,"Coordinación de Seguridad, Salud e Higiene",false,true,true,GN,enl-adm-ssh,Gerencia Administrativa
+enlace.servicios@comapa.mx,Lorena Espinoza,enlace,ADM,Coordinación de Servicios Generales,false,true,true,LE,enl-adm-srv,Gerencia Administrativa
+enlace.tecnica@comapa.mx,Jorge Reyes,enlace,TEC,Coordinación General Técnica,true,true,true,JR,enl-tec-001,Gerencia Técnica
+enlace.usuarios@comapa.mx,Diana Flores,enlace,COM,Coordinación de Atención a Usuarios,false,true,true,DF,enl-com-usu,Gerencia Comercial
+enlace.vinculacion@comapa.mx,Marisol Delgado,enlace,ADM,Coordinación de Vinculación Social,false,true,true,MD,enl-adm-vin,Gerencia Administrativa
+enlace@comapa.mx,Ana Torres,enlace,COM,Coordinación General Comercial,true,true,true,AT,enl-com-001,Gerencia Comercial
+revisor@comapa.mx,Carlos Mendoza,revisor,TEC,Coordinación General Técnica,true,true,true,CM,rev-001,Gerencia Técnica

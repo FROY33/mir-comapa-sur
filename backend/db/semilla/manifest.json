@@ -1,0 +1,149 @@
+{
+  "generado": "2026-10-10",
+  "ejercicio": 2026,
+  "corte": "2026-09-30",
+  "conteos": {
+    "gerencias": 5,
+    "unidades": 34,
+    "usuarios": 35,
+    "indicadores": 155,
+    "indicadores_mir": 123,
+    "indicadores_gerenciales": 32,
+    "periodos": 28,
+    "catalogo_mir_193": 193,
+    "fixtures_reportes": 123
+  },
+  "integridad": {
+    "gerencias_desconocidas": [],
+    "unidades_desconocidas": [],
+    "fixtures_sin_indicador": [],
+    "parent_codigo_desconocido": [],
+    "codigos_duplicados": [],
+    "emails_duplicados": []
+  },
+  "mapeos_sin_traduccion": {
+    "gerencias": [],
+    "roles": [],
+    "niveles": [],
+    "frecuencias": [
+      "Semanal"
+    ],
+    "tipos_indicador": [
+      "Porcentaje"
+    ],
+    "estados_reporte": []
+  },
+  "pendientes": {
+    "usuarios_por_rol": {
+      "admin": 1,
+      "enlace": 33,
+      "revisor": 1
+    },
+    "gerencias_activas_sin_revisor": [
+      "ADM",
+      "COM",
+      "PLA"
+    ],
+    "usuarios_con_unidad_por_defecto": [
+      "admin@comapa.mx",
+      "enlace.admin@comapa.mx",
+      "enlace.planeacion@comapa.mx",
+      "enlace.tecnica@comapa.mx",
+      "enlace@comapa.mx",
+      "revisor@comapa.mx"
+    ],
+    "responsables_revisor_sin_cuenta": [
+      "Laura Vega",
+      "Miguel Ángel Pérez",
+      "Rosario Díaz"
+    ],
+    "responsables_enlace_sin_cuenta": [
+      "Pedro Sánchez"
+    ],
+    "fixtures_sin_enviado_por": 21,
+    "jerarquia_con_padre": 116,
+    "jerarquia_sin_padre": [],
+    "numeros_ambiguos": [],
+    "frecuencias_sin_periodo_concluido": [
+      "anual"
+    ],
+    "indicadores_sin_unidad": 0,
+    "unidades_solo_citadas_por_usuarios": [
+      "GEN||Gerencia General"
+    ],
+    "tipo_indicador_vacio": [
+      "COM-ACT-26",
+      "COM-ACT-36"
+    ],
+    "borradores_sinteticos_ca5": [
+      "ADM-ACT-45",
+      "COM-ACT-125",
+      "PLA-ACT-9",
+      "TEC-ACT-117"
+    ],
+    "borradores_no_aplicados": [],
+    "remapeo_de_periodo": [
+      [
+        "T3-2026 -> S1-2026",
+        6
+      ],
+      [
+        "T3-2026 -> septiembre-2026",
+        47
+      ],
+      [
+        "T3-2026 -> C2-2026",
+        2
+      ],
+      [
+        "T3-2026 -> 2026",
+        9
+      ],
+      [
+        "T3-2026 -> B4-2026",
+        1
+      ]
+    ]
+  },
+  "archivos": [
+    {
+      "archivo": "datos/gerencias.csv",
+      "filas": 5,
+      "sha256": "0d583f1e020c31544fa5fc4dd9ce42aa2d4a06da6e77055af75eedf74917dc90"
+    },
+    {
+      "archivo": "datos/unidades.csv",
+      "filas": 34,
+      "sha256": "f7a2e29ac2c9c0213f9f46e51d75cfacd6cc592e27c55998276394402528f9fc"
+    },
+    {
+      "archivo": "datos/usuarios.csv",
+      "filas": 35,
+      "sha256": "d9eb45fcebe1a7162297381c5c445003dfb290e0304dbb87c858e4b7805c65d7"
+    },
+    {
+      "archivo": "datos/indicadores.csv",
+      "filas": 155,
+      "sha256": "5f86952b0153eb18a0a93a4e0ca708838b4a50684c649082ba66f452a146a658"
+    },
+    {
+      "archivo": "datos/periodos.csv",
+      "filas": 28,
+      "sha256": "5bb937dfbe9b17568c917da8f469a14dfedeaa55686174a3383630f2673ef687"
+    },
+    {
+      "archivo": "datos/catalogo_mir_193.csv",
+      "filas": 193,
+      "sha256": "707d6fcb360f9f932aeac47c716368e76d422d3ddeccd5e11f8a3cf391ecdbc9"
+    },
+    {
+      "archivo": "datos/fixtures_reportes.csv",
+      "filas": 123,
+      "sha256": "9e6138e778d1e7737bf8ae9eae358f92e8d78f21f6d15b87cb3ca647f3d07050"
+    },
+    {
+      "archivo": "semilla.json",
+      "sha256": "83bc9e35e8d09ecb519cc8debcce2825894083cf99a3f6e10d422f24e3748293"
+    }
+  ]
+}

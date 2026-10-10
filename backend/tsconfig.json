@@ -7,7 +7,9 @@
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "types": ["node"],
-    "noEmit": true
+    "noEmit": true,
+    // extraer.ts y cargar.ts importan con .js y corren con tsx, igual que src/
+    "allowImportingTsExtensions": true
   },
-  "include": ["src", "pruebas"]
+  "include": ["src", "pruebas", "db"]
 }
