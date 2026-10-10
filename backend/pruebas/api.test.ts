@@ -1,19 +1,22 @@
 // La API sobre una base sana: lectura por HTTP, 404 controlado y recuperación si la base corta conexiones.
 
 import assert from 'node:assert/strict'
+import { readdirSync } from 'node:fs'
 import { after, before, test } from 'node:test'
 import pg from 'pg'
 import { configBD, levantar } from './apoyo.js'
 
 const nombreApp = `comapa-api-prueba-${process.pid}`
 let api: Awaited<ReturnType<typeof levantar>>
+// La versión esperada es la última migración de la carpeta; así una migración nueva no rompe la prueba
+const ultimaMigracion = readdirSync('db/migrations').filter((f) => f.endsWith('.sql')).sort().at(-1)!.split('_')[0]
 before(async () => { api = await levantar({ nombreApp }) })
 after(() => api.cerrar())
 
 test('GET /api/salud responde 200 con la versión del esquema', async () => {
   const r = await api.pedir('/api/salud')
   assert.equal(r.status, 200)
-  assert.deepEqual(JSON.parse(r.texto), { estado: 'ok', bd: 'ok', esquema: '20261008000008' })
+  assert.deepEqual(JSON.parse(r.texto), { estado: 'ok', bd: 'ok', esquema: ultimaMigracion })
   assert.equal(r.cabeceras.get('cache-control'), 'no-store')
   assert.ok(r.cabeceras.get('x-request-id'))
 })

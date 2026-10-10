@@ -24,6 +24,7 @@ arquitectura de base de datos» (08/10/2026) y respuestas del equipo.
 | Catálogos de valores | `text` + `CHECK`, no enums nativos | Revisión del modelo | Cambiar un valor es una migración de una línea |
 | Capa HTTP | `node:http` sin framework; el framework se decide en el ticket de autenticación si hace falta | Equipo, 08/10/2026 (TEC-03) | Ninguno; la capa de datos (`src/bd.ts`) no depende de la capa HTTP |
 | Frecuencias | Seis: mensual, bimestral, trimestral, cuatrimestral, semestral, anual | RQM glosario; datos reales | Catálogo `frecuencias` |
+| Bloqueo por intentos (R7-06) | Se cuenta por correo, exista o no; durante el bloqueo los fallos no suman ni lo alargan; al vencer, la cuenta empieza de 1; el Admin desbloquea y queda en la bitácora | RQM HU-R7-06; implementación 09/10/2026 | `login_intentos` sin FK; eventos `cuenta_bloqueada` y `cuenta_desbloqueada` con `entidad = 'acceso'` |
 
 ## Supuestos de S1 (confirmar)
 

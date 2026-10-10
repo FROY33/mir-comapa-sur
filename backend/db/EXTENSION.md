@@ -224,7 +224,6 @@ Decidido: la validación es por gerencia y corte mensual, con un documento firma
 |---|---|---|---|
 | MEDIOS_VERIFICACION | HU-R4-11 | nombre, tipo (bitácora, reporte, sistema, análisis, documento, acta), formato, gerencia_id, unidad_id, storage_key del archivo de referencia | Al crearla, `indicadores.medio_verificacion` (texto) pasa a FK `medio_verificacion_id`; `origen_mv` se queda en el indicador |
 | NOTIFICACIONES | HU-R2-01 | usuario_id (una fila por destinatario), tipo, indicador_id, entidad, entidad_id, mensaje, created_at, leida_at | Leído por destinatario, no por notificación. Retención mínima 90 días (RN_3) |
-| LOGIN_INTENTOS | HU-R7-06 | email (PK), intentos, ultimo_intento_at, bloqueado_hasta | Contador por correo; bloqueo de 15 min tras 5 fallos |
 | SESIONES | HU-R7-04 | id, usuario_id, expira_at, revocada_at | Solo si se usan sesiones en servidor; con JWT, lista de revocados |
 | CONFIGURACION_SISTEMA | HU-R8-05 | clave (PK), valor | Membrete por defecto, umbrales globales |
 | CONFIGURACION_USUARIO | HU-R8-05 | PK (usuario_id, clave), valor | Membrete por usuario; los logos van al storage, no como dataURL |
@@ -240,4 +239,4 @@ Decidido: la validación es por gerencia y corte mensual, con un documento firma
 | 2 | VALIDACIONES_PERIODO, DOCUMENTOS_VALIDACION | 1 — cierre por gerencia (R3) |
 | 3 | CICLOS_PLANEACION, METAS, METAS_PERIODO, META_VERSIONES | S1 — habilita el cálculo de cumplimiento |
 | 4 | SOLICITUDES_CAMBIO_META, RESPUESTA_SECCIONES | 2 y 3 |
-| 5 | MEDIOS_VERIFICACION, LOGIN_INTENTOS, configuración | Independientes; entran con su HU |
+| 5 | MEDIOS_VERIFICACION, configuración | Independientes; entran con su HU |

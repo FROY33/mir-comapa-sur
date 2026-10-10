@@ -381,6 +381,19 @@ AUDIT_LOG del RQM. Solo inserción: un trigger rechaza UPDATE, DELETE y TRUNCATE
 | ip | inet | sí | | | |
 | created_at | timestamptz | no | `now()` | | |
 
+## login_intentos
+
+Fallos consecutivos de inicio de sesión por correo y bloqueo temporal (HU-R7-06): 5 fallos bloquean 15 minutos.
+Sin FK a usuarios: un correo que no existe también se cuenta, así el login no revela qué correos están registrados.
+Los eventos de bloqueo y desbloqueo van a `bitacora` con `entidad = 'acceso'` y el correo en `entidad_id`.
+
+| Campo | Tipo | Nulo | Default | Restricciones | Descripción |
+|---|---|---|---|---|---|
+| email | citext | no | | PK | Correo tal como se intentó, normalizado a minúsculas y sin espacios |
+| intentos | smallint | no | `0` | CHECK `>= 0` | Fallos consecutivos; un login correcto borra la fila |
+| ultimo_intento_at | timestamptz | no | `now()` | | Último fallo registrado |
+| bloqueado_hasta | timestamptz | sí | | | NULL = sin bloqueo; vencido = la cuenta se abre y el siguiente fallo cuenta desde 1 |
+
 ---
 
 ## Índices

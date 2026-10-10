@@ -91,7 +91,7 @@ Estas tablas quedan para las HU correspondientes; mientras tanto:
 - **Sin MEDIOS_VERIFICACION**: el medio de verificación va como texto en `indicadores`.
 - **Sin VALIDACIONES_PERIODO**: la validación del Admin por gerencia y corte mensual no tiene tabla aún.
   El corte se obtiene del mes de `periodos_reporte.fin_periodo`.
-- **Sin LOGIN_INTENTOS ni sesiones**: entran con la HU de inicio de sesión.
+- **Sin sesiones**: entran con la HU de inicio de sesión. `login_intentos` ya existe (HU-R7-06).
 - **Días hábiles**: no hay calendario de festivos; el backend cuenta lunes a viernes al calcular
   `fecha_limite`, que se guarda al crear el periodo y no se recalcula.
 - **Número de periodo**: la base no valida que `numero` no exceda los periodos de la frecuencia

@@ -19,7 +19,7 @@ Para comprobarlo:
 
 ```bash
 curl localhost:3000/api/salud
-# {"estado":"ok","bd":"ok","esquema":"20261008000008"}
+# {"estado":"ok","bd":"ok","esquema":"20261009000001"}
 ```
 
 ## Variables de entorno
@@ -53,7 +53,7 @@ NODE_ENV=production DATABASE_URL=... PORT=... npm start
 El usuario de base de la app no debe ser dueño de las tablas. Necesita `SELECT, INSERT, UPDATE` sobre las
 tablas de negocio y solo `SELECT, INSERT` sobre `bitacora`. Las migraciones se corren con otro usuario.
 
-## Pruebas (evidencia de TEC-03)
+## Pruebas
 
 ```bash
 cp .env.test.example .env.test
@@ -61,7 +61,7 @@ npm test
 ```
 
 `npm test` borra y recrea la base de `.env.test` (su nombre tiene que terminar en `_test`; si no, se niega a
-correr), le aplica las migraciones y corre 25 pruebas:
+correr), le aplica las migraciones y corre 39 pruebas:
 
 | Archivo | Qué demuestra |
 |---|---|
@@ -69,6 +69,7 @@ correr), le aplica las migraciones y corre 25 pruebas:
 | `pruebas/reinicio.test.ts` | CA-2: arranca el servidor real, lo detiene con SIGTERM y lo vuelve a arrancar; lo escrito antes sigue ahí |
 | `pruebas/fallo-conexion.test.ts` | CA-3 y CA-4: sin base responde 503 controlado; ni la respuesta ni el log llevan la clave |
 | `pruebas/api.test.ts` | Rutas HTTP, 404 y que el proceso sobrevive cuando PostgreSQL corta sus conexiones |
+| `pruebas/bloqueo.test.ts` | HU-R7-06: bloqueo tras 5 fallos, 15 minutos, evento en la bitácora, desbloqueo del Admin y reinicio del contador |
 
 Las migraciones tienen sus propias pruebas en `db/probar.sh`. Para revisar tipos: `npm run tipos`.
 
