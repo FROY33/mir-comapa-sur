@@ -1,266 +1,160 @@
-const MOCK_USERS = [
+// session.js — Sesión real contra la API (HU-R7-01).
+//
+// El token de sesión vive en una cookie HttpOnly que este código NO puede leer ni
+// escribir: la pone y la quita el backend (CA-3). Aquí solo se guarda en memoria lo
+// que la API devuelve del usuario, y nada en localStorage.
+//
+// El frontend y la API se sirven del mismo origen detrás de un proxy inverso, así que
+// las rutas son relativas y la cookie SameSite=Strict viaja sola. Para un desarrollo
+// donde el estático y el backend están separados, define window.COMAPA_API_BASE antes
+// de cargar este archivo.
 
-  // ── Administrador ────────────────────────────────────────────────────────
-  {
-    id: 'adm-001', email: 'admin@comapa.mx', password: 'admin123',
-    nombre: 'Leticia Solís', iniciales: 'LS', rol: 'Administrador',
-    gerencia: 'Planeación Estratégica',
-    redirect: 'dashboard-inicio.html'
-  },
+var API = (typeof window !== 'undefined' && window.COMAPA_API_BASE) || '';
 
-  // ── Revisor (doble rol) ──────────────────────────────────────────────────
-  {
-    id: 'rev-001', email: 'revisor@comapa.mx', password: 'revisor123',
-    nombre: 'Carlos Mendoza', iniciales: 'CM', rol: 'Revisor',
-    gerencia: 'Gerencia Técnica',
-    redirect: 'dashboard-revisor.html'
-  },
+// Cookie legible con el perfil para mostrar. NO es una credencial: el token está en
+// una cookie HttpOnly que este código no puede ver (CA-3). Existe para que la sesión
+// se conozca de forma síncrona, sin que cada página tenga que esperar una petición.
+// Alterarla solo cambia lo que este navegador pinta; la autorización la decide el
+// servidor contra el token en cada llamada a la API.
+var COOKIE_PERFIL = 'comapa_perfil';
 
-  // ── Enlace Coordinación General — ven TODOS los indicadores de su gerencia ─
-  {
-    id: 'enl-com-cg', email: 'enlace.cg.comercial@comapa.mx', password: 'enlace123',
-    nombre: 'Sandra Vega', iniciales: 'SV', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación General Comercial'
-  },
-  {
-    id: 'enl-tec-cg', email: 'enlace.cg.tecnica@comapa.mx', password: 'enlace123',
-    nombre: 'Ricardo Morales', iniciales: 'RM', rol: 'Enlace',
-    gerencia: 'Gerencia Técnica',
-    unidadResponsable: 'Coordinación General Técnica'
-  },
-  {
-    id: 'enl-adm-cg', email: 'enlace.cg.admin@comapa.mx', password: 'enlace123',
-    nombre: 'Verónica Ruiz', iniciales: 'VR', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación General Administrativa'
-  },
-  {
-    id: 'enl-pla-cg', email: 'enlace.cg.planeacion@comapa.mx', password: 'enlace123',
-    nombre: 'Sofía Castillo', iniciales: 'SC', rol: 'Enlace',
-    gerencia: 'Gerencia de Planeación Estratégica',
-    unidadResponsable: 'Coordinación General de Planeación Estratégica'
-  },
-
-  // ── Enlace específico (sin coordinación general) — ven solo su unidad ────
-  {
-    id: 'enl-com-001', email: 'enlace@comapa.mx', password: 'enlace123',
-    nombre: 'Ana Torres', iniciales: 'AT', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial'
-  },
-  {
-    id: 'enl-tec-001', email: 'enlace.tecnica@comapa.mx', password: 'enlace123',
-    nombre: 'Jorge Reyes', iniciales: 'JR', rol: 'Enlace',
-    gerencia: 'Gerencia Técnica'
-  },
-  {
-    id: 'enl-adm-001', email: 'enlace.admin@comapa.mx', password: 'enlace123',
-    nombre: 'María López', iniciales: 'ML', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa'
-  },
-  {
-    id: 'enl-pla-001', email: 'enlace.planeacion@comapa.mx', password: 'enlace123',
-    nombre: 'Marco Gutiérrez', iniciales: 'MG', rol: 'Enlace',
-    gerencia: 'Gerencia de Planeación Estratégica'
-  },
-
-  // ── Enlace — Gerencia General ────────────────────────────────────────────
-  {
-    id: 'enl-gen-001', email: 'enlace.general@comapa.mx', password: 'enlace123',
-    nombre: 'Ana Torres', iniciales: 'AT', rol: 'Enlace',
-    gerencia: 'Gerencia General',
-    unidadResponsable: 'Gerencia General'
-  },
-
-  // ── Enlaces específicos — Gerencia Comercial ─────────────────────────────
-  {
-    id: 'enl-com-fac', email: 'enlace.facturacion@comapa.mx', password: 'enlace123',
-    nombre: 'Roberto Sánchez', iniciales: 'RS', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación de Facturación y Medición'
-  },
-  {
-    id: 'enl-com-rez', email: 'enlace.rezago@comapa.mx', password: 'enlace123',
-    nombre: 'Patricia Vidal', iniciales: 'PV', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación de Control de Rezago'
-  },
-  {
-    id: 'enl-com-usu', email: 'enlace.usuarios@comapa.mx', password: 'enlace123',
-    nombre: 'Diana Flores', iniciales: 'DF', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación de Atención a Usuarios'
-  },
-  {
-    id: 'enl-com-pad', email: 'enlace.padron@comapa.mx', password: 'enlace123',
-    nombre: 'Ramón Ávila', iniciales: 'RA', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación de Padrón y Censo'
-  },
-  {
-    id: 'enl-com-ind', email: 'enlace.industria@comapa.mx', password: 'enlace123',
-    nombre: 'Verónica Salas', iniciales: 'VS', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación de Atención a la Industria y Comercio'
-  },
-  {
-    id: 'enl-com-acc', email: 'enlace.accesible@comapa.mx', password: 'enlace123',
-    nombre: 'Norma Ibáñez', iniciales: 'NI', rol: 'Enlace',
-    gerencia: 'Gerencia Comercial',
-    unidadResponsable: 'Coordinación Módulo de Atención Accesible'
-  },
-
-  // ── Enlaces específicos — Gerencia Técnica ───────────────────────────────
-  {
-    id: 'enl-tec-red', email: 'enlace.redes@comapa.mx', password: 'enlace123',
-    nombre: 'Eduardo Herrera', iniciales: 'EH', rol: 'Enlace',
-    gerencia: 'Gerencia Técnica',
-    unidadResponsable: 'Coordinación de Distribución y Mantenimiento de Redes'
-  },
-  {
-    id: 'enl-tec-pry', email: 'enlace.proyectos@comapa.mx', password: 'enlace123',
-    nombre: 'Luis Ramírez', iniciales: 'LR', rol: 'Enlace',
-    gerencia: 'Gerencia Técnica',
-    unidadResponsable: 'Coordinación de Proyectos y Construcción'
-  },
-  {
-    id: 'enl-tec-pot', email: 'enlace.potabilizadoras@comapa.mx', password: 'enlace123',
-    nombre: 'Gabriela Torres', iniciales: 'GT', rol: 'Enlace',
-    gerencia: 'Gerencia Técnica',
-    unidadResponsable: 'Coordinación de Plantas Potabilizadoras y Cárcamos'
-  },
-  {
-    id: 'enl-tec-esp', email: 'enlace.especiales@comapa.mx', password: 'enlace123',
-    nombre: 'Humberto Nava', iniciales: 'HN', rol: 'Enlace',
-    gerencia: 'Gerencia Técnica',
-    unidadResponsable: 'Coordinación de Proyectos Especiales'
-  },
-
-  // ── Enlaces específicos — Gerencia Administrativa ────────────────────────
-  {
-    id: 'enl-adm-rh', email: 'enlace.rh@comapa.mx', password: 'enlace123',
-    nombre: 'Claudia Moreno', iniciales: 'CM2', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Recursos Humanos'
-  },
-  {
-    id: 'enl-adm-fin', email: 'enlace.finanzas@comapa.mx', password: 'enlace123',
-    nombre: 'Fernando Castro', iniciales: 'FC', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Finanzas'
-  },
-  {
-    id: 'enl-adm-inf', email: 'enlace.informatica@comapa.mx', password: 'enlace123',
-    nombre: 'Beatriz Ríos', iniciales: 'BR', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Informática'
-  },
-  {
-    id: 'enl-adm-jur', email: 'enlace.juridica@comapa.mx', password: 'enlace123',
-    nombre: 'Alejandro Medina', iniciales: 'AM', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación Jurídica'
-  },
-  {
-    id: 'enl-adm-adq', email: 'enlace.adquisiciones@comapa.mx', password: 'enlace123',
-    nombre: 'Carmen Valdez', iniciales: 'CV', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Adquisiciones'
-  },
-  {
-    id: 'enl-adm-con', email: 'enlace.contabilidad@comapa.mx', password: 'enlace123',
-    nombre: 'Ernesto Lozano', iniciales: 'EL', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Contabilidad'
-  },
-  {
-    id: 'enl-adm-pol', email: 'enlace.politica@comapa.mx', password: 'enlace123',
-    nombre: 'Silvia Paredes', iniciales: 'SP', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Política de Ingresos'
-  },
-  {
-    id: 'enl-adm-ssh', email: 'enlace.seguridad@comapa.mx', password: 'enlace123',
-    nombre: 'Gustavo Núñez', iniciales: 'GN', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Seguridad, Salud e Higiene'
-  },
-  {
-    id: 'enl-adm-srv', email: 'enlace.servicios@comapa.mx', password: 'enlace123',
-    nombre: 'Lorena Espinoza', iniciales: 'LE', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Servicios Generales'
-  },
-  {
-    id: 'enl-adm-vin', email: 'enlace.vinculacion@comapa.mx', password: 'enlace123',
-    nombre: 'Marisol Delgado', iniciales: 'MD', rol: 'Enlace',
-    gerencia: 'Gerencia Administrativa',
-    unidadResponsable: 'Coordinación de Vinculación Social'
-  },
-
-  // ── Enlaces específicos — Gerencia de Planeación Estratégica ────────────
-  {
-    id: 'enl-pla-est', email: 'enlace.estrategia@comapa.mx', password: 'enlace123',
-    nombre: 'Isabel Guerrero', iniciales: 'IG', rol: 'Enlace',
-    gerencia: 'Gerencia de Planeación Estratégica',
-    unidadResponsable: 'Coordinación de Proyectos Estratégicos'
-  },
-  {
-    id: 'enl-pla-seg', email: 'enlace.seguimiento@comapa.mx', password: 'enlace123',
-    nombre: 'Andrés Peña', iniciales: 'AP', rol: 'Enlace',
-    gerencia: 'Gerencia de Planeación Estratégica',
-    unidadResponsable: 'Coordinación de Seguimiento a Plantas de Tratamiento'
-  },
-  {
-    id: 'enl-pla-mc', email: 'enlace.mejora@comapa.mx', password: 'enlace123',
-    nombre: 'Rocío Fuentes', iniciales: 'RF', rol: 'Enlace',
-    gerencia: 'Gerencia de Planeación Estratégica',
-    unidadResponsable: 'Departamento de Mejora Continua y Calidad'
-  },
-  {
-    id: 'enl-pla-dsp', email: 'enlace.deptoseguimiento@comapa.mx', password: 'enlace123',
-    nombre: 'Héctor Villanueva', iniciales: 'HV', rol: 'Enlace',
-    gerencia: 'Gerencia de Planeación Estratégica',
-    unidadResponsable: 'Departamento de Seguimiento a Plantas de Tratamiento'
-  },
-];
-
-const Session = {
-  _key: 'comapa_mir_session',
-
-  getUser() {
-    try { return JSON.parse(localStorage.getItem(this._key)); }
-    catch { return null; }
-  },
-
-  setUser(userData) {
-    const { password: _pw, ...safe } = userData;
-    localStorage.setItem(this._key, JSON.stringify(safe));
-  },
-
-  clear() {
-    localStorage.removeItem(this._key);
-    localStorage.removeItem('userGerencia');
-    localStorage.removeItem('userUnidad');
-  },
-
-  login(email, password) {
-    const user = MOCK_USERS.find(
-      u => u.email.toLowerCase() === email.trim().toLowerCase()
-        && u.password === password
-    );
-    if (!user) return null;
-    this.setUser(user);
-    return user;
-  },
-
-  requireAuth() {
-    const user = this.getUser();
-    if (!user) {
-      window.location.href = 'login.html';
-      return null;
+function leerCookie(nombre) {
+  var partes = String(document.cookie || '').split(';');
+  for (var i = 0; i < partes.length; i++) {
+    var p = partes[i].trim();
+    if (p.indexOf(nombre + '=') === 0) {
+      try { return decodeURIComponent(p.slice(nombre.length + 1)); } catch (e) { return null; }
     }
+  }
+  return null;
+}
+
+function perfilDeCookie() {
+  var crudo = leerCookie(COOKIE_PERFIL);
+  if (!crudo) return null;
+  try { return JSON.parse(crudo); } catch (e) { return null; }
+}
+
+// El backend usa 'admin' | 'revisor' | 'enlace'; las vistas comparan contra el nombre
+// en español ("rol !== 'Administrador'"). La traducción vive aquí para no tocar las vistas.
+var ROL_VISTA = { admin: 'Administrador', revisor: 'Revisor', enlace: 'Enlace' };
+
+// La tabla usuarios no guarda iniciales: se derivan del nombre.
+function inicialesDe(nombre) {
+  var partes = String(nombre || '').trim().split(/\s+/).filter(Boolean);
+  if (!partes.length) return '??';
+  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
+  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+}
+
+// Forma que esperan las vistas del prototipo, a partir de lo que devuelve la API
+function adaptar(datos) {
+  var u = datos.usuario;
+  return {
+    id: u.id,
+    nombre: u.nombre,
+    email: u.email,
+    rol: ROL_VISTA[u.rol] || u.rol,
+    rolClave: u.rol,
+    iniciales: inicialesDe(u.nombre),
+    gerencia: u.gerencia.nombre,
+    gerenciaClave: u.gerencia.clave,
+    unidadResponsable: u.unidad,
+    debeCambiarPassword: u.debeCambiarPassword,
+    redirect: datos.redirigirA
+  };
+}
+
+function pedir(ruta, opciones) {
+  var o = opciones || {};
+  o.credentials = 'same-origin';          // sin esto el navegador no manda la cookie
+  o.headers = Object.assign({ 'content-type': 'application/json' }, o.headers || {});
+  return fetch(API + ruta, o);
+}
+
+var Session = {
+  _user: null,          // caché en memoria
+  _carga: null,         // la promesa en vuelo, para no pedir la sesión dos veces
+
+  /**
+   * Usuario de la sesión, de forma síncrona. Sale de la cookie de perfil, así que
+   * está disponible desde la primera línea de cualquier página, sin esperar nada.
+   */
+  getUser: function () {
+    if (this._user) return this._user;
+    var perfil = perfilDeCookie();
+    if (!perfil) return null;
+    this._user = adaptar({ usuario: {
+      id: null, nombre: perfil.nombre, email: perfil.email, rol: perfil.rol,
+      gerencia: { clave: perfil.gerenciaClave, nombre: perfil.gerencia },
+      unidad: perfil.unidad, debeCambiarPassword: false
+    }, redirigirA: perfil.redirigirA });
+    return this._user;
+  },
+
+  /** Alias histórico; algunas vistas llaman Session.get(). */
+  get: function () { return this._user; },
+
+  /**
+   * Trae la sesión del servidor. Devuelve el usuario o null. Se memoiza, así que
+   * llamarlo desde varias partes de la página hace una sola petición.
+   */
+  cargar: function () {
+    var self = this;
+    if (self._carga) return self._carga;
+    self._carga = pedir('/api/auth/sesion')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (datos) {
+        self._user = datos ? adaptar(datos) : null;
+        self._carga = null;
+        return self._user;
+      })
+      .catch(function () { self._carga = null; return null; });
+    return self._carga;
+  },
+
+  /**
+   * Inicia sesión. Resuelve con { ok: true, user } o con { ok: false, error, mensaje }.
+   * Nunca lanza por credenciales malas: eso es una respuesta esperada, no un fallo.
+   */
+  login: function (email, password) {
+    var self = this;
+    return pedir('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: email, password: password })
+    }).then(function (r) {
+      return r.json().then(function (datos) {
+        if (!r.ok) return { ok: false, status: r.status, error: datos.error, mensaje: datos.mensaje };
+        self._user = adaptar(datos);
+        return { ok: true, user: self._user };
+      });
+    });
+  },
+
+  /**
+   * Exige sesión. Si no hay, manda a login.html y devuelve null.
+   *
+   * Síncrono a propósito: las vistas lo usan en la primera línea de su script y
+   * emplean el resultado de inmediato. Lo que decide es si hay sesión y qué pintar;
+   * la autorización de verdad la aplica el servidor en cada llamada a la API, y la
+   * protección de rutas entra con HU-R7-02.
+   */
+  requireAuth: function () {
+    var user = this.getUser();
+    if (!user) { window.location.href = 'login.html'; return null; }
     return user;
+  },
+
+  /**
+   * Olvida la sesión del lado del cliente. El cierre de sesión de verdad —revocar la
+   * sesión en el servidor y borrar la cookie— entra con HU-R7-04.
+   */
+  clear: function () {
+    this._user = null;
+    this._carga = null;
+    // La cookie de perfil sí se puede borrar desde aquí; la de sesión es HttpOnly y
+    // la revoca el servidor (HU-R7-04).
+    try { document.cookie = COOKIE_PERFIL + '=; Path=/; Max-Age=0; SameSite=Strict'; } catch (e) {}
   }
 };
 
@@ -305,29 +199,11 @@ function estadoVista(act) {
   return e;
 }
 
-// Encuentra y registra el usuario correcto según gerencia+unidad.
-// Usado por el picker de login para guardar un usuario realista en sesión.
-Session.loginByUnit = function(gerencia, unidad) {
-  var match = MOCK_USERS.find(function(u) {
-    if (u.gerencia !== gerencia) return false;
-    if (u.rol !== 'Enlace') return false;
-    if (unidad) return u.unidadResponsable === unidad;
-    return !u.unidadResponsable;
-  });
-  var user = match || MOCK_USERS.find(function(u) { return u.email === 'enlace@comapa.mx'; });
-  if (!user) return null;
-  Session.setUser(user);
-  try {
-    localStorage.setItem('userGerencia', gerencia);
-    if (unidad) localStorage.setItem('userUnidad', unidad);
-    else localStorage.removeItem('userUnidad');
-  } catch(e) {}
-  return user;
-};
-
+// Cierra la sesión del lado del cliente y vuelve al login. Revocar la sesión en el
+// servidor y borrar la cookie entra con HU-R7-04; mientras tanto la cookie caduca sola
+// a las 8 horas de inactividad.
 function cerrarSesion() {
   try { Session.clear(); } catch(e) {}
-  try { sessionStorage.removeItem('comapa-demo'); } catch(e) {}
   window.location.href = 'login.html';
 }
 
@@ -370,20 +246,16 @@ function isoBadge(act) {
 }
 
 // Devuelve todos los indicadores de la gerencia del Revisor activo.
-// Respeta localStorage.userGerencia para soportar el picker de gerencia del login.
+// La gerencia sale de la sesión del servidor, no de un override del navegador.
 function getActividadesRevisor() {
   if (typeof ACTIVIDADES_ENLACE === 'undefined') return [];
   var user = Session.getUser();
   if (!user) return ACTIVIDADES_ENLACE;
-  var ger;
-  try { ger = localStorage.getItem('userGerencia') || user.gerencia; }
-  catch(e) { ger = user.gerencia; }
-  return ACTIVIDADES_ENLACE.filter(function(a) { return a.gerencia === ger; });
+  return ACTIVIDADES_ENLACE.filter(function(a) { return a.gerencia === user.gerencia; });
 }
 
 // Devuelve los indicadores MIR del usuario enlace activo.
-// La gerencia y unidad se toman primero de localStorage (overrides del picker de login),
-// y si no existen, del objeto de sesión del usuario.
+// La gerencia y la unidad salen de la sesión del servidor.
 // Coordinación General → todos los de la gerencia.
 // Coordinación específica → solo los de esa unidad.
 // Sin unidad asignada → todos los de la gerencia.
@@ -392,14 +264,8 @@ function getActividadesEnlace() {
   var user = Session.getUser();
   if (!user) return ACTIVIDADES_ENLACE;
 
-  var ger, unidad;
-  try {
-    ger    = localStorage.getItem('userGerencia') || user.gerencia;
-    unidad = localStorage.getItem('userUnidad')   || user.unidadResponsable || null;
-  } catch(e) {
-    ger    = user.gerencia;
-    unidad = user.unidadResponsable || null;
-  }
+  var ger    = user.gerencia;
+  var unidad = user.unidadResponsable || null;
 
   var byGerencia = ACTIVIDADES_ENLACE.filter(function(a) {
     return a.gerencia === ger;
@@ -420,8 +286,8 @@ function getNombreGerenciaEnlace() {
   if (!user) return 'Gerencia';
   var unidad, ger;
   try {
-    unidad = localStorage.getItem('userUnidad')   || user.unidadResponsable || null;
-    ger    = localStorage.getItem('userGerencia') || user.gerencia || 'Gerencia';
+    unidad = user.unidadResponsable || null;
+    ger    = user.gerencia || 'Gerencia';
   } catch(e) {
     unidad = user.unidadResponsable || null;
     ger    = user.gerencia || 'Gerencia';

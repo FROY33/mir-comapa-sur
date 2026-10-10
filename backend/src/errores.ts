@@ -37,6 +37,20 @@ export class ErrorBD extends Error {
   }
 }
 
+/**
+ * Error atribuible a la petición, no a la base: cuerpo mal formado o demasiado grande.
+ * Lleva su propio status y su mensaje sí se le muestra al cliente, porque describe
+ * lo que mandó mal y no filtra nada interno.
+ */
+export class ErrorSolicitud extends Error {
+  readonly tipo = 'solicitud_invalida'
+
+  constructor(message: string, readonly status: number = 400) {
+    super(message)
+    this.name = 'ErrorSolicitud'
+  }
+}
+
 // Errores de red de Node y clases de SQLSTATE que significan «no hay base»:
 // 08 conexión, 28 autenticación, 53 recursos, 57P0x apagado, 57014 consulta cancelada por timeout, 3D000 base inexistente
 const RED = new Set(['ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND', 'ETIMEDOUT', 'EAI_AGAIN', 'EHOSTUNREACH', 'EPIPE'])
@@ -59,6 +73,7 @@ export function traducirErrorPg(err: unknown): ErrorBD {
 
 // Lo que se escribe en el log sobre un error (el log además oculta claves)
 export function detalleError(err: unknown): Record<string, unknown> {
+  if (err instanceof ErrorSolicitud) return { tipo: err.tipo, status: err.status, causa: err.message }
   const e = traducirErrorPg(err)
   const causa = e.cause as { message?: string; stack?: string } | undefined
   return {

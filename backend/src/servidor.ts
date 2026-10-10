@@ -19,7 +19,7 @@ try {
 }
 
 const bd = crearBD(config.bd, log)
-const servidor = createServer(crearApp(bd, log, { confiarProxy: config.confiarProxy }))
+const servidor = createServer(crearApp(bd, log, { confiarProxy: config.confiarProxy, produccion: config.entorno === 'production' }))
 const sistema = { entidad: 'sistema', entidadId: 'backend' }
 
 servidor.listen(config.puerto, () => {
