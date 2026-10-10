@@ -166,7 +166,7 @@ describe('CA-2 y CA-3: la contraseña y el token', () => {
 })
 
 describe('CA-4 y CA-5: rol y sesión existente', () => {
-  const dashboards = { admin: 'dashboard-inicio.html', revisor: 'dashboard-revisor.html', enlace: 'dashboard-enlace.html' }
+  const dashboards = { admin: 'dashboard-admin.html', revisor: 'dashboard-revisor.html', enlace: 'dashboard-enlace.html' }
 
   for (const rol of ['admin', 'revisor', 'enlace'] as const) {
     test(`CA-4: un ${rol} recibe el dashboard de su rol`, async () => {

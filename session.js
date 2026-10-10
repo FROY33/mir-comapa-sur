@@ -18,6 +18,13 @@ var API = (typeof window !== 'undefined' && window.COMAPA_API_BASE) || '';
 // servidor contra el token en cada llamada a la API.
 var COOKIE_PERFIL = 'comapa_perfil';
 
+// Destino al que el usuario quería ir antes de que lo mandáramos al login (HU-R7-02
+// CA_4). Se guarda en cookie, nunca en localStorage (RN_1). Quien decide si se honra
+// es el servidor al iniciar sesión, que es el único que conoce el rol: aquí solo se
+// anota la intención.
+var COOKIE_DESTINO = 'comapa_destino';
+var DESTINO_MINUTOS = 10;
+
 function leerCookie(nombre) {
   var partes = String(document.cookie || '').split(';');
   for (var i = 0; i < partes.length; i++) {
@@ -70,6 +77,21 @@ function pedir(ruta, opciones) {
   o.credentials = 'same-origin';          // sin esto el navegador no manda la cookie
   o.headers = Object.assign({ 'content-type': 'application/json' }, o.headers || {});
   return fetch(API + ruta, o);
+}
+
+/** Guarda a dónde iba el usuario, para volver ahí tras iniciar sesión. */
+function recordarDestino(pagina) {
+  if (!pagina || pagina === 'login.html' || pagina === 'index.html' || pagina === '') return;
+  try {
+    document.cookie = COOKIE_DESTINO + '=' + encodeURIComponent(pagina) +
+      '; Path=/; Max-Age=' + (DESTINO_MINUTOS * 60) + '; SameSite=Strict';
+  } catch (e) {}
+}
+
+/** La página actual, sin carpetas ni query, como la espera el servidor. */
+function paginaActual() {
+  var partes = String(window.location.pathname || '').split('/');
+  return partes[partes.length - 1] || '';
 }
 
 var Session = {
@@ -141,7 +163,11 @@ var Session = {
    */
   requireAuth: function () {
     var user = this.getUser();
-    if (!user) { window.location.href = 'login.html'; return null; }
+    if (!user) {
+      recordarDestino(paginaActual());   // CA_4: para volver aquí tras iniciar sesión
+      window.location.href = 'login.html';
+      return null;
+    }
     return user;
   },
 
@@ -162,8 +188,12 @@ var Session = {
     this._user = null;
     this._carga = null;
     // La cookie de perfil sí se puede borrar desde aquí; la de sesión es HttpOnly y
-    // la revoca el servidor (HU-R7-04).
-    try { document.cookie = COOKIE_PERFIL + '=; Path=/; Max-Age=0; SameSite=Strict'; } catch (e) {}
+    // la revoca el servidor (HU-R7-04). El destino también se olvida: un cierre de
+    // sesión deliberado no debe arrastrar a dónde iba el usuario antes.
+    try {
+      document.cookie = COOKIE_PERFIL + '=; Path=/; Max-Age=0; SameSite=Strict';
+      document.cookie = COOKIE_DESTINO + '=; Path=/; Max-Age=0; SameSite=Strict';
+    } catch (e) {}
   }
 };
 

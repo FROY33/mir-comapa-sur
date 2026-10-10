@@ -21,7 +21,9 @@ import { fileURLToPath } from 'node:url'
 const RAIZ = resolve(fileURLToPath(import.meta.url), '../../..')   // la raíz del repo
 const PUERTO = Number(process.env.PUERTO_SITIO ?? 4321)
 const BACKEND = new URL(process.env.BACKEND_URL ?? 'http://127.0.0.1:3000')
-const INICIO = '/login.html'
+// La raíz sirve index.html, que decide a dónde va cada quien según su sesión
+// (HU-R7-02 CA_2). En producción el host hace lo mismo con su documento por defecto.
+const INICIO = '/index.html'
 
 /**
  * Lo que este servidor NO sirve, aunque esté dentro de la raíz del repo. La
@@ -130,7 +132,7 @@ const servidor = createServer((req, res) => {
 
 servidor.listen(PUERTO, '127.0.0.1', () => {
   process.stdout.write(
-    `Prototipo en http://127.0.0.1:${PUERTO}${INICIO}\n` +
+    `Prototipo en http://127.0.0.1:${PUERTO}/\n` +
     `  estático  ${RAIZ}\n` +
     `  /api/*  →  ${BACKEND.origin}\n`,
   )

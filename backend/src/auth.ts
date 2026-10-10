@@ -15,16 +15,10 @@ import {
   consultarYRenovar, crear, revocar, type SesionActiva,
 } from './datos/sesiones.js'
 import type { CookieSalida, Respuesta, Solicitud } from './http.js'
+import { DASHBOARD, destinoTrasLogin } from './rutas.js'
 
 /** RN_4: un solo mensaje para cuenta inexistente, contraseña mala y cuenta inactiva. */
 const MENSAJE_CREDENCIALES = 'Usuario o contraseña incorrectos. Verifica tus datos'
-
-/** A dónde manda el frontend según el rol (CA-4). El backend lo dice; el cliente no lo decide. */
-const DASHBOARD: Record<SesionActiva['rol'], string> = {
-  admin: 'dashboard-inicio.html',
-  revisor: 'dashboard-revisor.html',
-  enlace: 'dashboard-enlace.html',
-}
 
 /**
  * Hash señuelo con el que se compara cuando el correo no existe, para que la respuesta
@@ -47,7 +41,19 @@ interface FilaUsuario {
   activo: boolean
 }
 
-export function datosSesion(s: SesionActiva) {
+/**
+ * Cookie con el destino al que el usuario quería ir antes de que lo mandaran al login
+ * (HU-R7-02 RN_1). La pone el frontend al redirigir y la consume el backend al iniciar
+ * sesión, que es quien puede validarla contra el rol. Vive poco: es para el viaje de
+ * ida al login, no para recordarse entre sesiones.
+ */
+export const COOKIE_DESTINO = 'comapa_destino'
+const DESTINO_MAX_EDAD_SEGUNDOS = 10 * 60
+
+const borrarDestino = (produccion: boolean): CookieSalida =>
+  ({ nombre: COOKIE_DESTINO, valor: '', maxEdadSegundos: 0, secure: produccion, httpOnly: false })
+
+export function datosSesion(s: SesionActiva, destino?: string) {
   return {
     usuario: {
       id: s.usuarioId,
@@ -58,7 +64,7 @@ export function datosSesion(s: SesionActiva) {
       unidad: s.unidadNombre,
       debeCambiarPassword: s.debeCambiarPassword,
     },
-    redirigirA: DASHBOARD[s.rol],
+    redirigirA: destino ?? DASHBOARD[s.rol],
     expiraAt: s.expiraAt,
   }
 }
@@ -84,6 +90,8 @@ const cookiePerfil = (s: SesionActiva, produccion: boolean): CookieSalida => ({
     gerencia: s.gerenciaNombre,
     gerenciaClave: s.gerenciaClave,
     unidad: s.unidadNombre,
+    // En el perfil va siempre el dashboard del rol, no el destino de un login puntual:
+    // la cookie sobrevive a la navegación y un destino viejo confundiría a CA_2.
     redirigirA: DASHBOARD[s.rol],
   }),
   maxEdadSegundos: COOKIE_MAX_EDAD_SEGUNDOS,
@@ -144,10 +152,14 @@ export function login(bd: BD, produccion: boolean) {
 
     await auditarAcceso.loginExitoso(bd, usuario.email, { id: usuario.id, rol: usuario.rol }, s.ip)
 
+    // CA_4: vuelve a donde iba, si el rol puede abrirlo; si no, a su dashboard (RN_1).
+    // La validación es del servidor: una cookie manipulada simplemente se descarta.
+    const destino = destinoTrasLogin(s.cookies[COOKIE_DESTINO], usuario.rol)
+
     return {
       status: 200,
-      cuerpo: datosSesion(sesion),
-      cookies: [cookieSesion(token, produccion), cookiePerfil(sesion, produccion)],
+      cuerpo: datosSesion(sesion, destino),
+      cookies: [cookieSesion(token, produccion), cookiePerfil(sesion, produccion), borrarDestino(produccion)],
     }
   }
 }
