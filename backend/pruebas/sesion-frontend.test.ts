@@ -13,16 +13,39 @@ import { describe, test } from 'node:test'
 
 const RAIZ = path.resolve(import.meta.dirname, '../..')
 
-/** Carga session.js con un document.cookie dado y devuelve su objeto Session. */
-function cargarSession(cookie: string) {
+interface Llamada { ruta: string; metodo: string | undefined }
+
+/**
+ * Carga session.js con un document.cookie dado. Devuelve su Session, las utilidades
+ * y el registro de peticiones que hizo, para verificar contra qué ruta llama.
+ */
+function cargarSession(cookie: string, respuesta: () => Promise<unknown> = () => Promise.resolve({ ok: true })) {
   const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
-  const ventana: Record<string, unknown> = {}
-  const documento = { cookie }
-  const fn = new Function('window', 'document', 'fetch', `${codigo}\n; return { Session, inicialesDe }`)
-  return fn(ventana, documento, () => Promise.reject(new Error('sin red'))) as {
-    Session: { getUser: () => Record<string, unknown> | null; requireAuth: () => unknown; clear: () => void }
+  const llamadas: Llamada[] = []
+  const cookies = { valor: cookie }
+  const documento = {
+    get cookie() { return cookies.valor },
+    set cookie(v: string) {
+      // Un Max-Age=0 borra; cualquier otra cosa se ignora en esta simulación
+      if (/Max-Age=0/.test(v)) cookies.valor = ''
+    },
+  }
+  const fetchFalso = (ruta: string, opciones?: { method?: string }) => {
+    llamadas.push({ ruta, metodo: opciones?.method })
+    return Promise.resolve({ ok: true, json: () => respuesta() })
+  }
+  const fn = new Function('window', 'document', 'fetch',
+    `${codigo}\n; return { Session, inicialesDe }`)
+  const api = fn({ location: { href: '' } }, documento, fetchFalso) as {
+    Session: {
+      getUser: () => Record<string, unknown> | null
+      requireAuth: () => unknown
+      clear: () => void
+      logout: () => Promise<void>
+    }
     inicialesDe: (n: string) => string
   }
+  return { ...api, llamadas, cookies }
 }
 
 const perfil = (datos: Record<string, unknown>) =>
@@ -88,6 +111,33 @@ describe('adaptador de perfil', () => {
     assert.equal(Session.requireAuth(), null)
     assert.equal(location.href, 'login.html')
     delete (globalThis as any).window
+  })
+
+  test('logout llama a POST /api/auth/logout y olvida al usuario (HU-R7-04)', async () => {
+    const { Session, llamadas, cookies } = cargarSession(perfil(BASE))
+    assert.ok(Session.getUser(), 'debería haber usuario antes de cerrar')
+
+    await Session.logout()
+
+    assert.deepEqual(llamadas, [{ ruta: '/api/auth/logout', metodo: 'POST' }])
+    assert.equal(Session.getUser(), null, 'el usuario siguió en memoria tras cerrar')
+    assert.equal(cookies.valor, '', 'no se borró la cookie de perfil')
+  })
+
+  test('si la red falla, logout limpia igual en vez de dejar al usuario atrapado', async () => {
+    const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
+    const cookies = { valor: perfil(BASE) }
+    const documento = {
+      get cookie() { return cookies.valor },
+      set cookie(v: string) { if (/Max-Age=0/.test(v)) cookies.valor = '' },
+    }
+    const fn = new Function('window', 'document', 'fetch', `${codigo}\n; return Session`)
+    const Session = fn({ location: { href: '' } }, documento,
+      () => Promise.reject(new Error('sin red'))) as { getUser: () => unknown; logout: () => Promise<void> }
+
+    await Session.logout()
+    assert.equal(Session.getUser(), null)
+    assert.equal(cookies.valor, '')
   })
 
   test('el token de sesión no es accesible desde el perfil', () => {

@@ -146,9 +146,18 @@ var Session = {
   },
 
   /**
-   * Olvida la sesión del lado del cliente. El cierre de sesión de verdad —revocar la
-   * sesión en el servidor y borrar la cookie— entra con HU-R7-04.
+   * Cierra la sesión en el servidor (HU-R7-04): revoca la sesión, deja el evento en la
+   * bitácora y borra las dos cookies. Resuelve siempre, incluso si la red falla, porque
+   * dejar al usuario atrapado en una página es peor que un cierre incompleto.
    */
+  logout: function () {
+    var self = this;
+    return pedir('/api/auth/logout', { method: 'POST' })
+      .catch(function () { /* sin red: se sigue limpiando del lado del cliente */ })
+      .then(function () { self.clear(); });
+  },
+
+  /** Olvida la sesión solo del lado del cliente. Para cerrar de verdad, usa logout(). */
   clear: function () {
     this._user = null;
     this._carga = null;
@@ -199,12 +208,16 @@ function estadoVista(act) {
   return e;
 }
 
-// Cierra la sesión del lado del cliente y vuelve al login. Revocar la sesión en el
-// servidor y borrar la cookie entra con HU-R7-04; mientras tanto la cookie caduca sola
-// a las 8 horas de inactividad.
+// Cierra la sesión y vuelve al login. Lo llaman los botones «Cerrar sesión» de las
+// vistas y el del encabezado que arma layout.js.
+//
+// Se espera a que el servidor revoque la sesión antes de redirigir: si se redirigiera
+// de inmediato, el navegador podría cancelar la petición y la sesión seguiría vigente
+// en la base. Si la red falla, se redirige igual — quedarse en la página sería peor.
 function cerrarSesion() {
-  try { Session.clear(); } catch(e) {}
-  window.location.href = 'login.html';
+  var irAlLogin = function () { window.location.href = 'login.html'; };
+  try { Session.logout().then(irAlLogin, irAlLogin); }
+  catch (e) { irAlLogin(); }
 }
 
 // Busca un indicador por id en ACTIVIDADES_ENLACE (incluye datos demo).

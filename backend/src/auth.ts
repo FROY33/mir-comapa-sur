@@ -12,7 +12,7 @@ import { auditarAcceso, type MotivoFallo } from './datos/acceso.js'
 import { consultarBloqueo, MENSAJE_BLOQUEO, registrarFallo, reiniciar } from './datos/loginIntentos.js'
 import {
   COOKIE_MAX_EDAD_SEGUNDOS, COOKIE_PERFIL, COOKIE_SESION,
-  consultarYRenovar, crear, type SesionActiva,
+  consultarYRenovar, crear, revocar, type SesionActiva,
 } from './datos/sesiones.js'
 import type { CookieSalida, Respuesta, Solicitud } from './http.js'
 
@@ -91,6 +91,12 @@ const cookiePerfil = (s: SesionActiva, produccion: boolean): CookieSalida => ({
   httpOnly: false,
 })
 
+/** Borra las dos cookies de sesión del navegador. */
+const cookiesBorradas = (produccion: boolean): CookieSalida[] => [
+  { nombre: COOKIE_SESION, valor: '', maxEdadSegundos: 0, secure: produccion },
+  { nombre: COOKIE_PERFIL, valor: '', maxEdadSegundos: 0, secure: produccion, httpOnly: false },
+]
+
 /** POST /api/auth/login */
 export function login(bd: BD, produccion: boolean) {
   return async (s: Solicitud): Promise<Respuesta> => {
@@ -147,6 +153,34 @@ export function login(bd: BD, produccion: boolean) {
 }
 
 /**
+ * POST /api/auth/logout — cierra la sesión.
+ *
+ * Es POST y no GET a propósito: un GET podría dispararse desde una imagen o un
+ * prefetch y cerrarle la sesión al usuario sin que lo pidiera. Con POST más la cookie
+ * SameSite=Strict, otro sitio no puede provocarlo.
+ *
+ * Responde 200 siempre, haya o no sesión: el navegador queda sin cookies en los dos
+ * casos, y distinguirlos solo serviría para que alguien averigüe si una cookie que
+ * tiene sigue sirviendo. Idempotente, así que repetirlo no es un error.
+ */
+export function logout(bd: BD, produccion: boolean) {
+  return async (s: Solicitud): Promise<Respuesta> => {
+    const cerrada = await revocar(bd, s.cookies[COOKIE_SESION])
+
+    // Solo se audita si de verdad había una sesión que cerrar (TEC-05 CA-2)
+    if (cerrada) {
+      await auditarAcceso.logout(bd, cerrada.email, { id: cerrada.usuarioId, rol: cerrada.rol }, s.ip)
+    }
+
+    return {
+      status: 200,
+      cuerpo: { mensaje: 'Sesión cerrada' },
+      cookies: cookiesBorradas(produccion),
+    }
+  }
+}
+
+/**
  * GET /api/auth/sesion — quién está dentro. Lo usa el frontend para CA-5: si ya hay
  * sesión y se abre /login, redirige al dashboard del rol. 401 si no hay sesión.
  */
@@ -158,7 +192,7 @@ export function sesion(bd: BD, produccion: boolean) {
       return {
         status: 401,
         cuerpo: { error: 'sin_sesion', mensaje: 'No hay sesión activa' },
-        cookies: [{ nombre: COOKIE_PERFIL, valor: '', maxEdadSegundos: 0, secure: produccion, httpOnly: false }],
+        cookies: cookiesBorradas(produccion),
       }
     }
     // Se refresca el perfil junto con la expiración de la sesión

@@ -95,8 +95,18 @@ export async function consultarYRenovar(bd: Ejecutor, token: string | undefined)
   }
 }
 
-/** Cierra una sesión. La usa el cierre de sesión (HU-R7-04); devuelve false si ya no estaba vigente. */
-export async function revocar(bd: Ejecutor, token: string | undefined): Promise<SesionActiva | null> {
+/** Lo que hacía falta saber de una sesión que se acaba de cerrar, para auditarla. */
+export interface SesionCerrada {
+  usuarioId: string
+  rol: SesionActiva['rol']
+  email: string
+}
+
+/**
+ * Cierra una sesión (HU-R7-04). Devuelve null si el token no existía o la sesión ya
+ * estaba revocada, de modo que llamarlo dos veces no audita dos cierres.
+ */
+export async function revocar(bd: Ejecutor, token: string | undefined): Promise<SesionCerrada | null> {
   if (!token) return null
   const [fila] = await bd.consultar<{ usuario_id: string; rol: SesionActiva['rol']; email: string }>(
     `UPDATE sesiones s SET revocada_at = now()
@@ -106,7 +116,7 @@ export async function revocar(bd: Ejecutor, token: string | undefined): Promise<
     [hashear(token)],
   )
   if (!fila) return null
-  return { usuarioId: fila.usuario_id, rol: fila.rol, email: fila.email } as SesionActiva
+  return { usuarioId: fila.usuario_id, rol: fila.rol, email: fila.email }
 }
 
 /**

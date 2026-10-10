@@ -45,8 +45,8 @@ dirección del socket, que no se puede falsear. Las IPv4 mapeadas en IPv6
 
 | CA | Estado | Evidencia |
 |---|---|---|
-| **CA-1** login exitoso y fallido generan registros; el bloqueo registra email, IP, fecha e intentos | **Parcial** | El bloqueo: **cumplido y probado** con email, IP, fecha e intentos. El login exitoso y fallido: la escritura está implementada y probada (`auditarAcceso.loginExitoso` / `loginFallido`), pero **no hay ruta de login que la llame** — eso es R7-01 |
-| **CA-2** el cierre de sesión genera evento | **Parcial** | `auditarAcceso.logout` implementado y probado; **no hay ruta de logout** — eso es R7-04 |
+| **CA-1** login exitoso y fallido generan registros; el bloqueo registra email, IP, fecha e intentos | **Cumplido** (ver nota) | El bloqueo, con email, IP, fecha e intentos. El login exitoso y fallido quedaron cerrados de punta a punta cuando llegó la ruta con HU-R7-01: ver `HU-R7-01.md` |
+| **CA-2** el cierre de sesión genera evento | **Cumplido** (ver nota) | `auditarAcceso.logout` implementado y probado. La ruta `POST /api/auth/logout` llegó con HU-R7-04: ver `HU-R7-04.md` |
 | **CA-3** los eventos persisten tras reiniciar | **Cumplido** | Un evento de acceso escrito por el primer proceso se lee después de un SIGTERM y un arranque nuevo (`reinicio.test.ts`), y se lee también desde un pool distinto |
 | **CA-4** no se registran contraseñas, cookies ni tokens | **Cumplido** | `sinSecretos` oculta 24 patrones de clave (con o sin acento, en cualquier capitalización, anidados en objetos y arreglos) y pasa los textos por `ocultarSecretos`. Probado de punta a punta leyendo la columna `detalle` de la base |
 | **CA-5** usuarios operativos no pueden alterar ni eliminar eventos por la API | **Cumplido** | La API no expone ninguna ruta de escritura sobre la auditoría (verificado con POST, PUT, PATCH y DELETE sobre cuatro rutas), y si se intentara desde la capa de datos la base lo rechaza: el error sale como `ErrorBD` tipo `bloqueado`, status 409, sin filtrar el trigger ni el detalle interno |
@@ -69,7 +69,14 @@ dirección del socket, que no se puede falsear. Las IPv4 mapeadas en IPv6
 - **La IP se lee con `host(ip)`**, no con `ip::text`: la columna `inet` devuelve la
   máscara (`10.0.0.7/32`).
 
-## Lo que no cierra y por qué
+> **Actualización del 2026-10-10.** CA-1 y CA-2 estaban parciales cuando se escribió este
+> documento porque no existían el login ni el cierre de sesión. Llegaron con HU-R7-01 y
+> HU-R7-04, que incluyen pruebas de que los tres eventos (`login_exitoso`, `login_fallido`
+> y `logout`) quedan en la bitácora con su IP. **TEC-05 queda con sus cinco criterios
+> cumplidos.** La sección siguiente describe el estado original y se conserva como
+> registro.
+
+## Lo que no cerraba al entregar TEC-05
 
 **CA-1 y CA-2 no se pueden verificar de punta a punta porque no existe el login ni el
 cierre de sesión.** `src/app.ts` tiene dos rutas, `GET /api/salud` y

@@ -1,6 +1,6 @@
 // Rutas de la API. Autenticación y pendientes se agregan aquí en sus tickets.
 
-import { login, sesion } from './auth.js'
+import { login, logout, sesion } from './auth.js'
 import type { BD } from './bd.js'
 import { listarFrecuencias } from './datos/frecuencias.js'
 import { crearManejador } from './http.js'
@@ -12,8 +12,9 @@ export function crearApp(
   opciones: { confiarProxy?: boolean; produccion?: boolean } = {},
 ) {
   return crearManejador({
-    // Autenticación (HU-R7-01). El cierre de sesión entra con HU-R7-04.
+    // Autenticación: inicio de sesión (HU-R7-01) y cierre (HU-R7-04)
     'POST /api/auth/login': login(bd, opciones.produccion === true),
+    'POST /api/auth/logout': logout(bd, opciones.produccion === true),
     'GET /api/auth/sesion': sesion(bd, opciones.produccion === true),
 
     // 200 si la base responde; 503 si no (lo resuelve el manejo central de errores)
