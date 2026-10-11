@@ -52,7 +52,8 @@ shasum -a 256 db/semilla/datos/*.csv > /tmp/h1 && npx tsx db/semilla/extraer.ts 
 
 | Archivo | Qué es |
 |---|---|
-| `extraer.ts` | Extractor. Lee los `.js` del prototipo en la raíz del repo y escribe `datos/` |
+| `extraer.ts` | Extractor. Lee los `.js` del prototipo en la raíz del repo y escribe `datos/` y `manifest.json` |
+| `extraer/` | Sus etapas: `base` (rutas, carga del prototipo, utilidades), `organizacion` (gerencias, unidades, usuarios), `indicadores` y `reportes` (periodos y fixtures) |
 | `origen/usuarios-prototipo.js` | Los usuarios del prototipo, congelados sin contraseñas: HU-R7-01 los quitó de `session.js` |
 | `mapeos.ts` | Único lugar con la traducción prototipo → catálogos del esquema |
 | `cargar.ts` | Cargador idempotente. Lee los CSV e inserta en orden de dependencias |
