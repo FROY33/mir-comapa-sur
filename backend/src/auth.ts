@@ -104,7 +104,7 @@ const cookiePerfil = (s: SesionActiva, produccion: boolean): CookieSalida => ({
 })
 
 /** Borra las dos cookies de sesión del navegador. */
-const cookiesBorradas = (produccion: boolean): CookieSalida[] => [
+export const cookiesBorradas = (produccion: boolean): CookieSalida[] => [
   { nombre: COOKIE_SESION, valor: '', maxEdadSegundos: 0, secure: produccion },
   { nombre: COOKIE_PERFIL, valor: '', maxEdadSegundos: 0, secure: produccion, httpOnly: false },
 ]

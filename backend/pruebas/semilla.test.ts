@@ -122,14 +122,16 @@ describe('carga inicial', () => {
   })
 
   test('recargar corrige lo que se desvió del CSV: padre, acumulable y unidades que ya no están', async () => {
+    // Solo indicadores de la semilla: otras pruebas crean los suyos en la misma base
+    const DE_LA_SEMILLA = `gerencia_id IN (SELECT id FROM gerencias WHERE organizacion_id = ${ORG})`
     const [raiz] = await bd.consultar<{ id: string; acumulable: boolean }>(
-      `SELECT id, acumulable FROM indicadores WHERE parent_id IS NULL AND tipo = 'mir' LIMIT 1`)
+      `SELECT id, acumulable FROM indicadores WHERE parent_id IS NULL AND tipo = 'mir' AND ${DE_LA_SEMILLA} LIMIT 1`)
     const [otro] = await bd.consultar<{ id: string }>(
-      `SELECT id FROM indicadores WHERE id <> $1 AND parent_id IS NULL LIMIT 1`, [raiz!.id])
+      `SELECT id FROM indicadores WHERE id <> $1 AND parent_id IS NULL AND ${DE_LA_SEMILLA} LIMIT 1`, [raiz!.id])
     await bd.consultar('UPDATE indicadores SET parent_id = $2, acumulable = NOT acumulable WHERE id = $1',
       [raiz!.id, otro!.id])
     const [vieja] = await bd.consultar<{ id: string }>(
-      `INSERT INTO unidades (gerencia_id, nombre) SELECT id, 'Unidad renombrada' FROM gerencias
+      `INSERT INTO unidades (gerencia_id, nombre) SELECT id, 'Unidad renombrada ' || gen_random_uuid() FROM gerencias
         WHERE organizacion_id = ${ORG} AND clave = 'TEC' RETURNING id`)
 
     sembrar()

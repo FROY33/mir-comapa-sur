@@ -1,9 +1,8 @@
 // Qué páginas puede abrir cada rol (HU-R7-02 RN_1).
 //
-// ALCANCE: esto NO protege rutas. Sirve para una sola decisión — si al usuario se le
-// guardó un destino antes de mandarlo al login, ¿se le devuelve ahí o a su dashboard?
-// RN_1 pide descartarlo cuando el rol no tiene acceso. La protección de rutas de verdad
-// (impedir que alguien escriba la URL y entre) es otra historia y no existe todavía.
+// Dos usos: decidir si un destino guardado antes del login se honra (HU-R7-02 RN_1) y
+// responder GET /api/auth/acceso, que la guardia de páginas de session.js consulta antes de
+// mostrar cualquier página (HU-R7-03). Los DATOS los protege el middleware de autorizacion.ts.
 //
 // Fuente: la tabla «Mapeo de vistas por rol» de roles-usuarios.md, más las
 // comprobaciones que cada página ya hace sobre `user.rol`.

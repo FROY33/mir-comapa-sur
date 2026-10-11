@@ -18,6 +18,8 @@ export interface Solicitud {
   ip: string | undefined
   /** Cookies de la petición, ya separadas. */
   cookies: Record<string, string>
+  /** Parámetros de la ruta: para «GET /api/indicadores/:id», { id }. */
+  params: Record<string, string>
   /** Lee el cuerpo como JSON. Falla con 400 si no es JSON o excede el tope. */
   json: () => Promise<Record<string, unknown>>
 }
@@ -54,17 +56,19 @@ export function crearManejador(
   log: Log,
   opciones: { confiarProxy?: boolean } = {},
 ): RequestListener {
+  const buscar = crearBuscador(rutas)
   return async (req, res) => {
     const id = randomUUID()
     const url = new URL(req.url ?? '/', 'http://localhost')
     const ruta = `${req.method} ${url.pathname}`
-    const manejador = rutas[ruta]
+    const encontrada = buscar(req.method ?? '', url.pathname)
     const ip = ipDelCliente(req, opciones.confiarProxy === true)
 
     try {
-      if (!manejador) return enviar(res, id, 404, { error: 'no_encontrado', mensaje: 'Ruta no encontrada' })
-      const { status, cuerpo, cookies } = await manejador({
+      if (!encontrada) return enviar(res, id, 404, { error: 'no_encontrado', mensaje: 'Ruta no encontrada' })
+      const { status, cuerpo, cookies } = await encontrada.manejador({
         id, url, req, ip,
+        params: encontrada.params,
         cookies: leerCookies(req.headers.cookie),
         json: () => leerJson(req),
       })
@@ -80,6 +84,41 @@ export function crearManejador(
         solicitud: id,   // para buscar el detalle en el log
       })
     }
+  }
+}
+
+/**
+ * Busca la ruta de una petición: primero la exacta y luego las que tienen parámetros
+ * («GET /api/indicadores/:id»). Un parámetro es un segmento completo y nunca contiene «/».
+ */
+function crearBuscador(rutas: Record<string, Manejador>) {
+  const conParametros = Object.entries(rutas)
+    .filter(([clave]) => clave.includes('/:'))
+    .map(([clave, manejador]) => {
+      const [metodo, patron] = clave.split(' ') as [string, string]
+      const nombres: string[] = []
+      const regex = new RegExp('^' + patron.replace(/:([a-zA-Z]+)/g, (_, n: string) => {
+        nombres.push(n)
+        return '([^/]+)'
+      }) + '$')
+      return { metodo, regex, nombres, manejador }
+    })
+
+  return (metodo: string, ruta: string) => {
+    const exacta = rutas[`${metodo} ${ruta}`]
+    if (exacta) return { manejador: exacta, params: {} as Record<string, string> }
+    for (const r of conParametros) {
+      const m = r.metodo === metodo ? r.regex.exec(ruta) : null
+      if (!m) continue
+      let params: Record<string, string>
+      try {
+        params = Object.fromEntries(r.nombres.map((n, i) => [n, decodeURIComponent(m[i + 1]!)]))
+      } catch {
+        return null                                  // %XX mal formado: como si no existiera
+      }
+      return { manejador: r.manejador, params }
+    }
+    return null
   }
 }
 

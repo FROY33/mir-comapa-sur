@@ -22,6 +22,8 @@ export interface SesionActiva {
   sesionId: string
   usuarioId: string
   rol: 'admin' | 'revisor' | 'enlace'
+  /** De usuarios, nunca de la petición: decide qué datos ve (HU-R7-03 RN_2). */
+  gerenciaId: string
   nombre: string
   email: string
   gerenciaClave: string
@@ -59,7 +61,7 @@ export async function crear(bd: Ejecutor, usuarioId: string, cliente: DatosClien
 export async function consultarYRenovar(bd: Ejecutor, token: string | undefined): Promise<SesionActiva | null> {
   if (!token) return null
   const [fila] = await bd.consultar<{
-    sesion_id: string; usuario_id: string; rol: SesionActiva['rol']; nombre: string; email: string
+    sesion_id: string; usuario_id: string; rol: SesionActiva['rol']; gerencia_id: string; nombre: string; email: string
     gerencia_clave: string; gerencia_nombre: string; unidad_nombre: string
     debe_cambiar_password: boolean; expira_at: Date
   }>(
@@ -73,7 +75,7 @@ export async function consultarYRenovar(bd: Ejecutor, token: string | undefined)
         AND s.expira_at > now()
         AND u.id = s.usuario_id
         AND u.activo
-     RETURNING s.id AS sesion_id, u.id AS usuario_id, u.rol, u.nombre, u.email::text AS email,
+     RETURNING s.id AS sesion_id, u.id AS usuario_id, u.rol, u.gerencia_id, u.nombre, u.email::text AS email,
                g.clave AS gerencia_clave, g.nombre AS gerencia_nombre, n.nombre AS unidad_nombre,
                u.debe_cambiar_password, s.expira_at`,
     [hashear(token), HORAS_INACTIVIDAD],
@@ -83,6 +85,7 @@ export async function consultarYRenovar(bd: Ejecutor, token: string | undefined)
     sesionId: fila.sesion_id,
     usuarioId: fila.usuario_id,
     rol: fila.rol,
+    gerenciaId: fila.gerencia_id,
     nombre: fila.nombre,
     email: fila.email,
     gerenciaClave: fila.gerencia_clave,

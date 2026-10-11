@@ -82,7 +82,7 @@ npm test
 ```
 
 `npm test` borra y recrea la base de `.env.test` (su nombre tiene que terminar en `_test`; si no, se niega a
-correr), le aplica las migraciones y corre 39 pruebas:
+correr), le aplica las migraciones y corre 228 pruebas:
 
 | Archivo | Qué demuestra |
 |---|---|
@@ -91,8 +91,26 @@ correr), le aplica las migraciones y corre 39 pruebas:
 | `pruebas/fallo-conexion.test.ts` | CA-3 y CA-4: sin base responde 503 controlado; ni la respuesta ni el log llevan la clave |
 | `pruebas/api.test.ts` | Rutas HTTP, 404 y que el proceso sobrevive cuando PostgreSQL corta sus conexiones |
 | `pruebas/bloqueo.test.ts` | HU-R7-06: bloqueo tras 5 fallos, 15 minutos, evento en la bitácora, desbloqueo del Admin y reinicio del contador |
+| `pruebas/autorizacion.test.ts` | HU-R7-03: 401/403 por rol, `/api/admin/*`, páginas por rol y la gerencia de la sesión contra URL y cuerpo |
 
 Las migraciones tienen sus propias pruebas en `db/probar.sh`. Para revisar tipos: `npm run tipos`.
+
+## Autorización (HU-R7-03)
+
+Toda ruta con datos se registra en `src/app.ts` envuelta en `protegida(roles, manejador)`
+(`src/autorizacion.ts`). Sin sesión válida responde 401 y con un rol que no está en la lista,
+403 con el dashboard del propio rol en `redirigirA`. El manejador recibe `s.sesion`, cuya
+`gerenciaId` sale de `usuarios`: para filtrar por gerencia se usa esa, nunca un parámetro de la
+petición. El Administrador conserva el acceso global.
+
+```ts
+'GET /api/indicadores': protegida(['admin', 'revisor', 'enlace'], indicadores.listar(bd)),
+'GET /api/admin/configuracion': protegida(['admin'], …),   // todo /api/admin/ va con ['admin']
+```
+
+`GET /api/auth/acceso?pagina=x.html` dice si la sesión puede abrir una página (tabla de
+`src/rutas.ts`, lista blanca). La consultan la guardia de `session.js` y `dev/servir.ts`; en
+producción, el servidor web debe hacer lo mismo antes de servir una página protegida.
 
 ## Cómo responde la API a los errores
 

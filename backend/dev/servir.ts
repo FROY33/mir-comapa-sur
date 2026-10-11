@@ -107,6 +107,40 @@ async function archivoDe(ruta: string): Promise<string | null> {
   }
 }
 
+/** Páginas que se sirven sin sesión. Las mismas que PAGINAS_PUBLICAS de session.js. */
+const PUBLICAS = new Set(['index.html', 'login.html', 'demo-enlace.html', 'demo-revisor.html', 'design-system.html'])
+
+type Veredicto = { status: 200 } | { status: 401 } | { status: 403; redirigirA: string }
+
+/**
+ * HU-R7-03 CA_1 y CA_2 a nivel HTTP: antes de servir una página protegida se le pregunta al
+ * backend si la sesión de la cookie puede abrirla. En producción, el servidor web (nginx con
+ * auth_request, o similar) debe hacer esta misma consulta a GET /api/auth/acceso.
+ */
+function verificarAcceso(pagina: string, cookie: string | undefined): Promise<Veredicto> {
+  return new Promise((resolver) => {
+    const consulta = pedirAlBackend({
+      protocol: BACKEND.protocol, hostname: BACKEND.hostname, port: BACKEND.port,
+      path: `/api/auth/acceso?pagina=${encodeURIComponent(pagina)}`, method: 'GET',
+      headers: cookie ? { cookie } : {},
+    }, (r) => {
+      let texto = ''
+      r.on('data', (t) => { texto += t })
+      r.on('end', () => {
+        if (r.statusCode === 401) return resolver({ status: 401 })
+        if (r.statusCode === 403) {
+          let redirigirA = 'login.html'
+          try { redirigirA = JSON.parse(texto).redirigirA ?? redirigirA } catch {}
+          return resolver({ status: 403, redirigirA })
+        }
+        resolver({ status: 200 })          // 200, o un backend con problemas: los datos los protege él
+      })
+    })
+    consulta.on('error', () => resolver({ status: 200 }))
+    consulta.end()
+  })
+}
+
 const servidor = createServer((req, res) => {
   const url = new URL(req.url ?? '/', `http://localhost:${PUERTO}`)
 
@@ -115,11 +149,28 @@ const servidor = createServer((req, res) => {
     return
   }
 
-  void archivoDe(url.pathname).then((archivo) => {
+  void archivoDe(url.pathname).then(async (archivo) => {
     if (archivo === null) {
       res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' })
       res.end(`No existe ${url.pathname}`)
       return
+    }
+    const pagina = archivo.slice(RAIZ.length + 1)
+    if (pagina.endsWith('.html') && !PUBLICAS.has(pagina)) {
+      const veredicto = await verificarAcceso(pagina, req.headers.cookie)
+      if (veredicto.status === 401) {
+        res.writeHead(302, { location: '/login.html', 'cache-control': 'no-store' })
+        res.end()
+        return
+      }
+      if (veredicto.status === 403) {
+        // CA_1: 403 y, en el mismo cuerpo, la redirección al dashboard del propio rol
+        const destino = encodeURI(veredicto.redirigirA)
+        res.writeHead(403, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' })
+        res.end(`<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=/${destino}">` +
+          `<title>Sin acceso</title><p>No tienes permiso para esta sección. <a href="/${destino}">Ir a tu inicio</a></p>`)
+        return
+      }
     }
     res.writeHead(200, {
       'content-type': TIPOS[extname(archivo).toLowerCase()] ?? 'application/octet-stream',
