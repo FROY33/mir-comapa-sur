@@ -357,7 +357,9 @@ function pintarDashboardEnlace() {
   if (typeof getActividadesEnlace !== 'function') return;
 
   var ger  = getNombreGerenciaEnlace();
-  var inds = getActividadesEnlace();
+  // Con datos reales, todo lo de la gerencia (MIR y gerenciales), igual que la lista de
+  // mis-actividades: así el KPI y el listado cuentan lo mismo (HU-R1-01 CA_5)
+  var inds = PENDIENTES_ENLACE || getActividadesEnlace();
   var total = inds.length;
 
   // ── Actualizar top navbar ───────────────────────────────────────────
@@ -398,7 +400,8 @@ function pintarDashboardEnlace() {
     var d   = diasRestantes(a.fechaLimite);
     var cls = d <= 3 ? 'urgente' : d <= 14 ? 'proximo' : 'normal';   // CA_2: rojo a 3 días o vencido
     var lbl = d < 0 ? 'Vencida' : d === 0 ? 'Hoy' : 'Vence en ' + d + ' día' + (d === 1 ? '' : 's');
-    return '<div class="ind-item" data-url="detalle-actividad.html?id=' + encodeURIComponent(a.id) + '" onclick="window.location.href=this.dataset.url">' +
+    var ficha = a.id.indexOf('GER-') === 0 ? 'detalle-indicador-gerencial.html' : 'detalle-actividad.html';
+    return '<div class="ind-item" data-url="' + ficha + '?id=' + encodeURIComponent(a.id) + '" onclick="window.location.href=this.dataset.url">' +
       '<div class="ind-dot ' + cls + '"></div>' +
       '<div class="ind-info">' +
         '<p class="ind-id">' + escaparHTML(a.id) + '</p>' +
