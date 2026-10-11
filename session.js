@@ -162,6 +162,7 @@ var Session = {
    * protección de rutas entra con HU-R7-02.
    */
   requireAuth: function () {
+    this._protegida = true;              // para revisar la sesión al volver con Atrás (HU-R7-04 CA_5)
     var user = this.getUser();
     if (!user) {
       recordarDestino(paginaActual());   // CA_4: para volver aquí tras iniciar sesión
@@ -245,9 +246,24 @@ function estadoVista(act) {
 // de inmediato, el navegador podría cancelar la petición y la sesión seguiría vigente
 // en la base. Si la red falla, se redirige igual — quedarse en la página sería peor.
 function cerrarSesion() {
-  var irAlLogin = function () { window.location.href = 'login.html'; };
+  // replace y no href: la página protegida sale del historial, y el login muestra el aviso (CA_4)
+  var irAlLogin = function () { window.location.replace('login.html?sesion=cerrada'); };
   try { Session.logout().then(irAlLogin, irAlLogin); }
   catch (e) { irAlLogin(); }
+}
+
+// HU-R7-04 CA_5: al volver con Atrás, el navegador puede mostrar la página desde su caché
+// (bfcache) sin volver a correr ningún script, así que requireAuth() no se entera de que la
+// sesión se cerró. Al restaurarse una página protegida se revisa: sin la cookie de perfil
+// (el logout la borra) se va al login de inmediato; con ella, se confirma con el servidor.
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted || !Session._protegida) return;
+    var alLogin = function () { window.location.replace('login.html'); };
+    Session._user = null;
+    if (!perfilDeCookie()) { alLogin(); return; }
+    Session.cargar().then(function (user) { if (!user) alLogin(); });
+  });
 }
 
 // Busca un indicador por id en ACTIVIDADES_ENLACE (incluye datos demo).

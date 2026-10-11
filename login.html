@@ -156,6 +156,12 @@ body {
       margin-bottom: 16px; font-size: 12px; color: var(--color-danger-text); line-height: 1.5;
     }
 .error-box.hidden { display: none; }
+/* Aviso informativo: sesión cerrada (HU-R7-04 CA_4) o expirada (HU-R7-05 CA_1) */
+    .aviso-box {
+      background: var(--color-info-tint); border: 1px solid var(--color-info); border-radius: 10px;
+      padding: 11px 14px; margin-bottom: 16px; font-size: 12px; color: var(--color-text-primary); line-height: 1.5;
+    }
+.aviso-box.hidden { display: none; }
 .error-box svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
 .field-error { font-size: 11px; color: var(--color-danger); margin-top: 4px; }
 .field-error.hidden { display: none; }
@@ -396,6 +402,9 @@ body {
         <h1 class="login-title">Iniciar sesión</h1>
         <p class="login-sub">Ingresa tus credenciales para acceder al sistema.</p>
 
+        <!-- Aviso: por qué se llegó aquí (sesión cerrada o expirada) -->
+        <div class="aviso-box hidden" id="avisoBox" role="status"></div>
+
         <!-- Error -->
         <div class="error-box hidden" id="errorBox">
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -447,6 +456,21 @@ body {
     Session.cargar().then(function (user) {
       if (user) window.location.replace(user.redirect);
     });
+
+    // Por qué se llegó al login: ?sesion=cerrada (HU-R7-04 CA_4) o ?sesion=expirada (HU-R7-05 CA_1).
+    // Se quita de la URL después de leerlo, para que recargar no repita el aviso.
+    (function () {
+      const AVISOS = {
+        cerrada: 'Sesión cerrada correctamente',
+        expirada: 'Tu sesión expiró. Inicia sesión nuevamente.'
+      };
+      const motivo = new URLSearchParams(window.location.search).get('sesion');
+      if (!AVISOS[motivo]) return;
+      const aviso = document.getElementById('avisoBox');
+      aviso.textContent = AVISOS[motivo];
+      aviso.classList.remove('hidden');
+      try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+    })();
 
     // ── Rotación de fondos ──────────────────────────────────────────────────
     const scenes   = document.querySelectorAll('.bg-scene');

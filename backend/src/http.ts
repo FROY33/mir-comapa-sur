@@ -26,7 +26,11 @@ export interface Solicitud {
 export interface CookieSalida {
   nombre: string
   valor: string
-  maxEdadSegundos: number
+  /**
+   * Segundos de vida. Sin valor es cookie de sesión del navegador: dura hasta que se cierra,
+   * y la expiración real la decide el servidor (8 h de inactividad, HU-R7-01 RN_2). 0 la borra.
+   */
+  maxEdadSegundos?: number
   /** Solo en producción: una cookie Secure no se guarda sobre HTTP. */
   secure: boolean
   /**
@@ -156,8 +160,8 @@ function serializarCookie(c: CookieSalida): string {
     `${c.nombre}=${encodeURIComponent(c.valor)}`,
     'Path=/',
     'SameSite=Strict',
-    `Max-Age=${c.maxEdadSegundos}`,
   ]
+  if (c.maxEdadSegundos !== undefined) partes.push(`Max-Age=${c.maxEdadSegundos}`)
   if (c.httpOnly !== false) partes.push('HttpOnly')
   if (c.maxEdadSegundos === 0) partes.push('Expires=Thu, 01 Jan 1970 00:00:00 GMT')
   if (c.secure) partes.push('Secure')

@@ -17,8 +17,6 @@ export const COOKIE_SESION = 'comapa_sesion'
  * en el servidor contra el token HttpOnly.
  */
 export const COOKIE_PERFIL = 'comapa_perfil'
-/** La cookie vive lo mismo que la sesión; el servidor manda, pero no tiene sentido guardarla más. */
-export const COOKIE_MAX_EDAD_SEGUNDOS = HORAS_INACTIVIDAD * 60 * 60
 
 export interface SesionActiva {
   sesionId: string

@@ -11,7 +11,7 @@ import type { BD } from './bd.js'
 import { auditarAcceso, type MotivoFallo } from './datos/acceso.js'
 import { confirmarFallo, MENSAJE_BLOQUEO, reiniciar, reservarIntento } from './datos/loginIntentos.js'
 import {
-  COOKIE_MAX_EDAD_SEGUNDOS, COOKIE_PERFIL, COOKIE_SESION,
+  COOKIE_PERFIL, COOKIE_SESION,
   consultarYRenovar, crear, revocar, type SesionActiva,
 } from './datos/sesiones.js'
 import type { CookieSalida, Respuesta, Solicitud } from './http.js'
@@ -69,17 +69,22 @@ export function datosSesion(s: SesionActiva, destino?: string) {
   }
 }
 
-/** El token: HttpOnly siempre, el navegador no lo puede leer (CA-3). */
+/**
+ * El token: HttpOnly siempre, el navegador no lo puede leer (CA-3). Sin Max-Age: con un
+ * Max-Age de 8 h fijado al iniciar sesión, el navegador la borraba a las 8 h del login
+ * aunque el usuario siguiera activo y el servidor ya hubiera renovado la sesión (RN_2).
+ * La expiración por inactividad la decide el servidor; la cookie dura hasta cerrar el navegador.
+ */
 const cookieSesion = (valor: string, produccion: boolean): CookieSalida => ({
   nombre: COOKIE_SESION,
   valor,
-  maxEdadSegundos: COOKIE_MAX_EDAD_SEGUNDOS,
   secure: produccion,
 })
 
 /**
- * El perfil para mostrar: legible por el frontend, sin credencial alguna. Caduca con
- * la sesión, así que no sobrevive a su expiración.
+ * El perfil para mostrar: legible por el frontend, sin credencial alguna. Dura lo mismo
+ * que la cookie del token (hasta cerrar el navegador); si la sesión expira antes en el
+ * servidor, la siguiente petición responde 401 y el frontend lo maneja (HU-R7-05).
  */
 const cookiePerfil = (s: SesionActiva, produccion: boolean): CookieSalida => ({
   nombre: COOKIE_PERFIL,
@@ -94,7 +99,6 @@ const cookiePerfil = (s: SesionActiva, produccion: boolean): CookieSalida => ({
     // la cookie sobrevive a la navegación y un destino viejo confundiría a CA_2.
     redirigirA: DASHBOARD[s.rol],
   }),
-  maxEdadSegundos: COOKIE_MAX_EDAD_SEGUNDOS,
   secure: produccion,
   httpOnly: false,
 })
