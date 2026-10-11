@@ -212,7 +212,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
   function estChip(estado) {
     if (!estado) return '';
     const cfg = ESTADO_CFG[estado] || { label: estado };
-    return `<span class="est-chip ${estado}">${cfg.label}</span>`;
+    return `<span class="est-chip ${escaparHTML(estado)}">${escaparHTML(cfg.label)}</span>`;
   }
 
   function renderHistorial() {
@@ -249,7 +249,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 
     document.getElementById('historialContent').innerHTML = Object.entries(groups).map(([date, items]) => `
       <div class="hist-group">
-        <div class="hist-group-label">${date}</div>
+        <div class="hist-group-label">${escaparHTML(date)}</div>
         <div class="tl">
           ${items.map(h => {
             const tipo = accionTipo(h);
@@ -258,12 +258,12 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
                 <div class="tl-dot ${dotCls(h)}"></div>
                 <div class="tl-card ${cardCls(h)}">
                   <div class="tl-card-head">
-                    <span class="tl-accion">${h.accion}</span>
-                    <span class="tl-time">${h.hora}</span>
+                    <span class="tl-accion">${escaparHTML(h.accion)}</span>
+                    <span class="tl-time">${escaparHTML(h.hora)}</span>
                   </div>
                   <div class="tl-act-ref">
-                    <a href="detalle-actividad.html?id=${h.actId}&rol=revisor">${h.actId}</a> —
-                    ${(h.actIso && h.actIso.toLowerCase()==='x') ? '<span class="iso-badge">ISO</span> ' : ''}${h.actNombre.slice(0, 55)}${h.actNombre.length > 55 ? '…' : ''}
+                    <a href="detalle-actividad.html?id=${encodeURIComponent(h.actId)}&amp;rol=revisor">${escaparHTML(h.actId)}</a> —
+                    ${(h.actIso && h.actIso.toLowerCase()==='x') ? '<span class="iso-badge">ISO</span> ' : ''}${escaparHTML(h.actNombre.slice(0, 55))}${h.actNombre.length > 55 ? '…' : ''}
                   </div>
                   ${(h.estadoAnterior || h.estadoNuevo) ? `
                     <div class="tl-estado-row">
@@ -271,7 +271,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
                       ${h.estadoAnterior && h.estadoNuevo ? '<span class="est-arrow">→</span>' : ''}
                       ${h.estadoNuevo ? estChip(h.estadoNuevo) : ''}
                     </div>` : ''}
-                  <a class="tl-open-btn" href="detalle-actividad.html?id=${h.actId}&rol=revisor">
+                  <a class="tl-open-btn" href="detalle-actividad.html?id=${encodeURIComponent(h.actId)}&amp;rol=revisor">
                     Ver actividad
                     <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
                   </a>

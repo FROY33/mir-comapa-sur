@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function estadoBadge(e) {
     const _ecfg = (typeof ESTADO_CFG_MIR !== 'undefined' ? ESTADO_CFG_MIR : (typeof ESTADO_CFG !== 'undefined' ? ESTADO_CFG : {}));
     const cfg = _ecfg[e] || { label: e, cls: e };
-    return `<span class="estado-badge ${cfg.cls}">${cfg.label}</span>`;
+    return `<span class="estado-badge ${escaparHTML(cfg.cls)}">${escaparHTML(cfg.label)}</span>`;
   }
   function prioBadge(a) {
     const p = prioridad(a);
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function nivelBadge(a) {
     const n = (typeof NIVEL_CFG !== 'undefined' && NIVEL_CFG[a.nivel]) || { label: a.nivel || '—', cls: 'nivel-actividad' };
-    return `<span class="nivel-badge ${n.cls}">${n.label}</span>`;
+    return `<span class="nivel-badge ${n.cls}">${escaparHTML(n.label)}</span>`;
   }
   function rolDotCls(rol) {
     const r = (rol||'').toLowerCase();
@@ -261,16 +261,16 @@ document.addEventListener('DOMContentLoaded', () => {
     : enBandeja.map(a => `
         <tr>
           <td>
-            <div class="act-id">${a.id}</div>
-            <div class="act-name">${isoBadge(a)}${a.nombreIndicador}</div>
-            <div class="act-name-sub">${nivelBadge(a)} · ${a.periodo}</div>
+            <div class="act-id">${escaparHTML(a.id)}</div>
+            <div class="act-name">${isoBadge(a)}${escaparHTML(a.nombreIndicador)}</div>
+            <div class="act-name-sub">${nivelBadge(a)} · ${escaparHTML(a.periodo)}</div>
           </td>
           <td>${estadoBadge(a.estado)}</td>
           <td>${prioBadge(a)}</td>
-          <td>${diaChip(a)} <span style="font-size:11px;color:var(--color-text-secondary);">${formatFecha(a.fechaLimite)}</span></td>
-          <td style="font-size:11px;color:var(--color-text-secondary);">${formatFecha(fechaEnvio(a))}</td>
+          <td>${diaChip(a)} <span style="font-size:11px;color:var(--color-text-secondary);">${escaparHTML(formatFecha(a.fechaLimite))}</span></td>
+          <td style="font-size:11px;color:var(--color-text-secondary);">${escaparHTML(formatFecha(fechaEnvio(a)))}</td>
           <td>
-            <a class="btn-revisar ${a.estado==='corregido'?'purple':'blue'}" href="detalle-actividad.html?id=${a.id}&rol=revisor">
+            <a class="btn-revisar ${a.estado==='corregido'?'purple':'blue'}" href="detalle-actividad.html?id=${encodeURIComponent(a.id)}&amp;rol=revisor">
               ${a.estado==='corregido'?'Revisar corrección':'Revisar'}
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
             </a>
@@ -280,9 +280,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const timelineHtml = recentMovs.map(m => `
     <div class="tl-item">
       <div class="tl-dot ${rolDotCls(m.rol)}"></div>
-      <p class="tl-time">${m.fecha} · ${m.hora}</p>
-      <p class="tl-act">${m.accion}</p>
-      <p class="tl-sub">${m.actId} · ${m.actNombre.slice(0, 42)}${m.actNombre.length > 42 ? '…' : ''}</p>
+      <p class="tl-time">${escaparHTML(m.fecha)} · ${escaparHTML(m.hora)}</p>
+      <p class="tl-act">${escaparHTML(m.accion)}</p>
+      <p class="tl-sub">${escaparHTML(m.actId)} · ${escaparHTML(m.actNombre.slice(0, 42))}${m.actNombre.length > 42 ? '…' : ''}</p>
     </div>`).join('');
 
   const urgentesHtml = urgentes.length === 0
@@ -296,12 +296,12 @@ document.addEventListener('DOMContentLoaded', () => {
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
             </div>
             <div class="ui-body">
-              <div class="ui-id">${a.id}</div>
-              <div class="ui-name">${isoBadge(a)}${a.nombreIndicador}</div>
-              <div class="ui-meta">${d <= 0 ? '¡Vencida!' : `${d} día${d!==1?'s':''} restantes`} · ${formatFecha(a.fechaLimite)}</div>
+              <div class="ui-id">${escaparHTML(a.id)}</div>
+              <div class="ui-name">${isoBadge(a)}${escaparHTML(a.nombreIndicador)}</div>
+              <div class="ui-meta">${d <= 0 ? '¡Vencida!' : `${d} día${d!==1?'s':''} restantes`} · ${escaparHTML(formatFecha(a.fechaLimite))}</div>
             </div>
             <div class="ui-action">
-              <a class="btn-revisar blue" href="detalle-actividad.html?id=${a.id}&rol=revisor">Revisar<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></a>
+              <a class="btn-revisar blue" href="detalle-actividad.html?id=${encodeURIComponent(a.id)}&amp;rol=revisor">Revisar<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></a>
             </div>
           </div>`;
       }).join('');
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="welcome-row">
       <div class="welcome-left">
         <h1>Bienvenido, Carlos Mendoza <span class="role-chip">Revisor</span></h1>
-        <p>${typeof getNombreGerenciaEnlace === 'function' ? getNombreGerenciaEnlace() : 'Gerencia Comercial'} · COMAPA Sur · ${formatFecha('2026-06-09')}</p>
+        <p>${escaparHTML(typeof getNombreGerenciaEnlace === 'function' ? getNombreGerenciaEnlace() : 'Gerencia Comercial')} · COMAPA Sur · ${formatFecha('2026-06-09')}</p>
       </div>
       <span class="welcome-date">Ciclo Q2-2026</span>
     </div>
@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.className = 'cp-banner';
       el.style.cssText = 'background:'+banner.bg+';border-color:'+banner.border+';';
       el.innerHTML = '<div class="cp-banner-dot" style="background:'+banner.dot+(est==='revision'?';animation:cp-pulse-b 2s infinite':'')+';"></div>'
-        +'<div class="cp-banner-info"><div class="cp-banner-title">'+banner.title+'</div><div class="cp-banner-detail">'+banner.detail+'</div></div>'
+        +'<div class="cp-banner-info"><div class="cp-banner-title">'+escaparHTML(banner.title)+'</div><div class="cp-banner-detail">'+escaparHTML(banner.detail)+'</div></div>'
         +(banner.btn?'<button class="cp-banner-btn" onclick="location.href=\''+banner.href+'\'">'+banner.btn+'</button>':'');
       var main = document.getElementById('main');
       if (main) main.insertAdjacentElement('afterbegin', el);

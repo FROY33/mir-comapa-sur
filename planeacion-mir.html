@@ -653,21 +653,21 @@ function renderTable() {
     var gColor = ind.gerenciaColor || GERENCIA_COLORS[ind.gerencia] || '#6B7280';
     var gShort = (GERENCIA_NAMES[ind.gerencia] || ind.gerenciaNombre || '').replace('Gerencia ','').replace('Estratégica','');
     return `<tr>
-      <td><span class="td-clave">${ind.id}</span></td>
-      <td><span class="td-nombre" title="${ind.nombre}">${ind.nombre}</span></td>
-      <td><span class="gerencia-pill" style="background:${gColor}18;color:${gColor}">${gShort}</span></td>
-      <td><span class="nivel-badge ${ind.nivel}">${ind.nivel}</span></td>
-      <td><span class="freq-chip">${ind.frecuencia}</span></td>
-      <td><span class="meta-val">${metaStr}</span></td>
-      <td><span style="font-size:11px;color:var(--color-text-secondary)">${ind.unidad || '—'}</span></td>
+      <td><span class="td-clave">${escaparHTML(ind.id)}</span></td>
+      <td><span class="td-nombre" title="${escaparHTML(ind.nombre)}">${escaparHTML(ind.nombre)}</span></td>
+      <td><span class="gerencia-pill" style="background:${escaparHTML(gColor)}18;color:${escaparHTML(gColor)}">${escaparHTML(gShort)}</span></td>
+      <td><span class="nivel-badge ${escaparHTML(ind.nivel)}">${escaparHTML(ind.nivel)}</span></td>
+      <td><span class="freq-chip">${escaparHTML(ind.frecuencia)}</span></td>
+      <td><span class="meta-val">${escaparHTML(metaStr)}</span></td>
+      <td><span style="font-size:11px;color:var(--color-text-secondary)">${escaparHTML(ind.unidad || '—')}</span></td>
       <td style="text-align:center">${ind.acumulable ? '<span class="acum-icon">✓</span>' : '<span class="dash-icon">—</span>'}</td>
-      <td><span class="estado-pill ${ind.estado}">${ind.estado === 'activo' ? 'Activo' : ind.estado === 'borrador' ? 'Borrador' : 'Inactivo'}</span></td>
+      <td><span class="estado-pill ${escaparHTML(ind.estado)}">${ind.estado === 'activo' ? 'Activo' : ind.estado === 'borrador' ? 'Borrador' : 'Inactivo'}</span></td>
       <td>
         <div class="row-actions">
-          <button class="action-btn edit" onclick="openModal('${ind.id}')" title="Editar">
+          <button class="action-btn edit" data-id="${escaparHTML(ind.id)}" onclick="openModal(this.dataset.id)" title="Editar">
             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>
           </button>
-          <button class="action-btn del" onclick="deleteIndicator('${ind.id}')" title="Eliminar">
+          <button class="action-btn del" data-id="${escaparHTML(ind.id)}" onclick="deleteIndicator(this.dataset.id)" title="Eliminar">
             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
           </button>
         </div>
@@ -948,13 +948,13 @@ function renderPeriodGoals() {
     Anual:      '1 período anual · 2026',
   }[freq] || '';
 
-  var html = `<div class="period-info-box">Frecuencia: <strong>${freq}</strong> — ${freqInfo}${unidad ? ' · Unidad: <strong>' + unidad + '</strong>' : ''}${isAcum ? ' · <strong style="color:var(--color-success)">Acumulable</strong>: las metas se suman período a período' : ''}</div>`;
+  var html = `<div class="period-info-box">Frecuencia: <strong>${escaparHTML(freq)}</strong> — ${freqInfo}${unidad ? ' · Unidad: <strong>' + escaparHTML(unidad) + '</strong>' : ''}${isAcum ? ' · <strong style="color:var(--color-success)">Acumulable</strong>: las metas se suman período a período' : ''}</div>`;
 
   if (freq === 'Anual') {
     html += `<div class="period-goals-grid cols-1">
       <div class="period-goal-item">
         <span class="period-goal-label">Meta anual 2026</span>
-        <input class="period-goal-input" type="number" min="0" step="any" id="pg_0" value="${meta}" placeholder="0" oninput="updateAcumTotal()">
+        <input class="period-goal-input" type="number" min="0" step="any" id="pg_0" value="${escaparHTML(meta)}" placeholder="0" oninput="updateAcumTotal()">
       </div>
     </div>`;
   } else {
@@ -963,8 +963,8 @@ function renderPeriodGoals() {
     periods.forEach(function(p, i) {
       var val = existingVals[p] != null ? existingVals[p] : '';
       html += `<div class="period-goal-item">
-        <span class="period-goal-label">${p}</span>
-        <input class="period-goal-input" type="number" min="0" step="any" id="pg_${i}" value="${val}" placeholder="0" oninput="updateAcumTotal()">
+        <span class="period-goal-label">${escaparHTML(p)}</span>
+        <input class="period-goal-input" type="number" min="0" step="any" id="pg_${i}" value="${escaparHTML(val)}" placeholder="0" oninput="updateAcumTotal()">
       </div>`;
     });
     html += '</div>';
@@ -973,7 +973,7 @@ function renderPeriodGoals() {
   if (isAcum) {
     html += `<div class="acum-total-row">
       <span class="acum-total-label">Total acumulado (suma de períodos)</span>
-      <span class="acum-total-val" id="acumTotalVal">0 ${unidad}</span>
+      <span class="acum-total-val" id="acumTotalVal">0 ${escaparHTML(unidad)}</span>
     </div>`;
   }
 

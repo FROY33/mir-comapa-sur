@@ -463,7 +463,7 @@ function switchView(mode) {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function nivelBadge(nivel) {
   var n = NIVEL_LABELS[nivel] || { label:nivel||'—', cls:'nivel-actividad' };
-  return '<span class="nivel-badge ' + n.cls + '">' + n.label + '</span>';
+  return '<span class="nivel-badge ' + n.cls + '">' + escaparHTML(n.label) + '</span>';
 }
 
 function estadoBadge(estado) {
@@ -471,7 +471,7 @@ function estadoBadge(estado) {
   var icon = estado === 'bloqueado' ? LOCK_SVG + ' ' : '';
   var pulse = (estado === 'enviado' && CURRENT_VIEW === 'demo')
     ? '<span class="badge-pulse-dot"></span>' : '';
-  return '<span class="cfg-badge ' + estado + '" style="background:' + e.bg + ';color:' + e.color + ';display:inline-flex;align-items:center;gap:5px;">' + pulse + icon + e.label + '</span>';
+  return '<span class="cfg-badge ' + escaparHTML(estado) + '" style="background:' + e.bg + ';color:' + e.color + ';display:inline-flex;align-items:center;gap:5px;">' + pulse + icon + e.label + '</span>';
 }
 
 function btnForEstado(est) {
@@ -562,15 +562,15 @@ function renderTable() {
     var est = a.plan ? a.plan.estado : 'pendiente';
     var btn = btnForEstado(est);
     var idEl = isDemo
-      ? '<span style="font-size:10px;font-weight:700;background:var(--color-neutral-100);color:var(--color-text-secondary);padding:2px 7px;border-radius:4px;">' + est.replace(/_/g,' ').toUpperCase() + '</span>'
-      : '<div class="ind-id">' + a.id + '</div>';
-    return '<tr style="cursor:pointer" onclick="openDrawer(\'' + a.id + '\')">' +
-      '<td class="td-ind">' + idEl + '<div class="ind-nombre">' + isoBadge(a) + a.nombreIndicador + '</div></td>' +
+      ? '<span style="font-size:10px;font-weight:700;background:var(--color-neutral-100);color:var(--color-text-secondary);padding:2px 7px;border-radius:4px;">' + escaparHTML(est.replace(/_/g,' ').toUpperCase()) + '</span>'
+      : '<div class="ind-id">' + escaparHTML(a.id) + '</div>';
+    return '<tr style="cursor:pointer" data-id="' + escaparHTML(a.id) + '" onclick="openDrawer(this.dataset.id)">' +
+      '<td class="td-ind">' + idEl + '<div class="ind-nombre">' + isoBadge(a) + escaparHTML(a.nombreIndicador) + '</div></td>' +
       '<td>' + nivelBadge(a.nivel) + '</td>' +
-      '<td><span style="font-size:12px;color:var(--color-text-secondary)">' + (a.frecuenciaMedicion || '—') + '</span></td>' +
+      '<td><span style="font-size:12px;color:var(--color-text-secondary)">' + escaparHTML(a.frecuenciaMedicion || '—') + '</span></td>' +
       '<td>' + estadoBadge(est) + '</td>' +
       '<td style="text-align:right">' +
-        '<button class="btn-cfg" onclick="event.stopPropagation();openDrawer(\'' + a.id + '\')">' +
+        '<button class="btn-cfg" data-id="' + escaparHTML(a.id) + '" onclick="event.stopPropagation();openDrawer(this.dataset.id)">' +
           btn.label +
           ' <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>' +
         '</button>' +
@@ -591,8 +591,8 @@ function openDrawer(id) {
   document.getElementById('mhName').textContent = item.nombreIndicador;
   document.getElementById('mhMeta').innerHTML   =
     nivelBadge(item.nivel) +
-    '<span class="mh-sub">' + (item.unidadResponsable || item.gerencia || '') + '</span>' +
-    (item.frecuenciaMedicion ? '<span class="mh-sub">· ' + item.frecuenciaMedicion + '</span>' : '') +
+    '<span class="mh-sub">' + escaparHTML(item.unidadResponsable || item.gerencia || '') + '</span>' +
+    (item.frecuenciaMedicion ? '<span class="mh-sub">· ' + escaparHTML(item.frecuenciaMedicion) + '</span>' : '') +
     '<span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;background:' + ec.bg + ';color:' + ec.color + '">' + ec.label + '</span>';
 
   document.getElementById('adminInfoPanel').innerHTML = buildAdminPanel(item);
@@ -605,15 +605,15 @@ function buildAdminPanel(act) {
   var LOCK = '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="11" height="11"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>';
   var html = '<div class="readonly-badge">' + LOCK + ' Configurado por Admin</div>';
 
-  html += '<div style="margin-bottom:10px"><p class="info-label">Nombre del indicador</p><p class="info-value" style="font-weight:600;line-height:1.4">' + act.nombreIndicador + '</p></div>';
+  html += '<div style="margin-bottom:10px"><p class="info-label">Nombre del indicador</p><p class="info-value" style="font-weight:600;line-height:1.4">' + escaparHTML(act.nombreIndicador) + '</p></div>';
   html += '<div class="info-divider"></div>';
   html += '<div class="info-row">' +
             '<div class="info-item"><p class="info-label">Nivel MIR</p><p class="info-value">' + nivelBadge(act.nivel) + '</p></div>' +
-            '<div class="info-item"><p class="info-label">Unidad responsable</p><p class="info-value">' + (act.unidadResponsable || act.gerencia || '—') + '</p></div>' +
+            '<div class="info-item"><p class="info-label">Unidad responsable</p><p class="info-value">' + escaparHTML(act.unidadResponsable || act.gerencia || '—') + '</p></div>' +
           '</div>';
   html += '<div class="info-row">' +
-            '<div class="info-item"><p class="info-label">Frecuencia</p><p class="info-value">' + (act.frecuenciaMedicion || '—') + '</p></div>' +
-            '<div class="info-item"><p class="info-label">Unidad de medida</p><p class="info-value">' + (act.unidadMedida || '—') + '</p></div>' +
+            '<div class="info-item"><p class="info-label">Frecuencia</p><p class="info-value">' + escaparHTML(act.frecuenciaMedicion || '—') + '</p></div>' +
+            '<div class="info-item"><p class="info-label">Unidad de medida</p><p class="info-value">' + escaparHTML(act.unidadMedida || '—') + '</p></div>' +
           '</div>';
   html += '<div class="info-row">' +
             '<div class="info-item"><p class="info-label">Tipo</p><p class="info-value">' + (act.acumulable ? 'Acumulable' : 'No acumulable') + '</p></div>' +
@@ -621,27 +621,27 @@ function buildAdminPanel(act) {
           '</div>';
   if (act.tieneDenominador) {
     html += '<div class="info-row">' +
-              '<div class="info-item"><p class="info-label">Numerador</p><p class="info-value">' + (act.numerador || '—') + '</p></div>' +
-              '<div class="info-item"><p class="info-label">Denominador</p><p class="info-value">' + (act.denominador || '—') + '</p></div>' +
+              '<div class="info-item"><p class="info-label">Numerador</p><p class="info-value">' + escaparHTML(act.numerador || '—') + '</p></div>' +
+              '<div class="info-item"><p class="info-label">Denominador</p><p class="info-value">' + escaparHTML(act.denominador || '—') + '</p></div>' +
             '</div>';
   }
   if (act.metodoCalculo) {
     html += '<div class="info-divider"></div><div style="margin-bottom:10px"><p class="info-label">Fórmula</p>' +
-            '<p class="info-value" style="font-family:monospace;font-size:12px;background:var(--color-neutral-100);padding:5px 10px;border-radius:6px;display:inline-block">' + act.metodoCalculo + '</p></div>';
+            '<p class="info-value" style="font-family:monospace;font-size:12px;background:var(--color-neutral-100);padding:5px 10px;border-radius:6px;display:inline-block">' + escaparHTML(act.metodoCalculo) + '</p></div>';
   }
   if (act.medioVerificacion) {
-    html += '<div style="margin-bottom:10px"><p class="info-label">Medio de verificación</p><p class="info-value">' + act.medioVerificacion + '</p></div>';
+    html += '<div style="margin-bottom:10px"><p class="info-label">Medio de verificación</p><p class="info-value">' + escaparHTML(act.medioVerificacion) + '</p></div>';
   }
   if (act.resumenNarrativo) {
     html += '<div class="info-divider"></div><div><p class="info-label">Descripción</p>' +
-            '<p class="info-value" style="font-size:12px;color:var(--color-text-secondary);line-height:1.6">' + act.resumenNarrativo + '</p></div>';
+            '<p class="info-value" style="font-size:12px;color:var(--color-text-secondary);line-height:1.6">' + escaparHTML(act.resumenNarrativo) + '</p></div>';
   }
   if (act.plan && act.plan.comentariosEnlace) {
     html += '<div class="info-divider"></div>';
     html += '<div><p class="info-label" style="display:flex;align-items:center;gap:4px;">' +
             '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="10" height="10"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>' +
             'Justificación del enlace</p>' +
-            '<p class="info-value" style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;font-style:italic;">"' + act.plan.comentariosEnlace + '"</p></div>';
+            '<p class="info-value" style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;font-style:italic;">"' + escaparHTML(act.plan.comentariosEnlace) + '"</p></div>';
   }
   return html;
 }
@@ -655,12 +655,12 @@ function buildMetaHeader(item) {
   return '<div class="form-group" style="margin-bottom:14px;">'+
     '<label class="form-label" style="margin-bottom:5px;">Línea base '+
     '<span style="font-weight:400;font-size:11px;color:var(--color-text-secondary);text-transform:none;">(valor de referencia inicial)</span></label>'+
-    '<input class="form-input" type="text" disabled value="'+(lineaBase != null ? lineaBase : '—')+'">'+
+    '<input class="form-input" type="text" disabled value="'+escaparHTML(lineaBase != null ? lineaBase : '—')+'">'+
   '</div>'+
   '<div class="form-group" style="margin-bottom:18px;">'+
     '<label class="form-label" style="margin-bottom:5px;">Meta anual '+
     '<span style="font-weight:400;font-size:11px;color:var(--color-text-secondary);text-transform:none;">(configurada)</span></label>'+
-    '<input class="form-input" type="text" disabled value="'+(metaAnual != null ? metaAnual : '—')+'">'+
+    '<input class="form-input" type="text" disabled value="'+escaparHTML(metaAnual != null ? metaAnual : '—')+'">'+
   '</div>'+
   '<div class="info-divider"></div>';
 }
@@ -675,7 +675,7 @@ function buildReadonlyPeriodGrid(item, metas, hideAvance) {
   var chkSvg  = '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="9" height="9"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
   var warnSvg = '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="9" height="9"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>';
 
-  var html = '<p class="form-label" style="margin-top:16px;margin-bottom:3px;">Distribución por período &nbsp;|&nbsp; ' + freq + '</p>' +
+  var html = '<p class="form-label" style="margin-top:16px;margin-bottom:3px;">Distribución por período &nbsp;|&nbsp; ' + escaparHTML(freq) + '</p>' +
     '<p class="form-hint" style="margin-bottom:14px;">Valor esperado por cada período de reporte en 2026.</p>';
 
   html += '<div class="period-grid cols-' + cols + '">';
@@ -688,14 +688,14 @@ function buildReadonlyPeriodGrid(item, metas, hideAvance) {
       var ratio = typeof metaVal === 'number' ? avance / metaVal : 1;
       var cls   = ratio >= 1 ? 'ok' : ratio >= 0.9 ? 'warn' : 'bad';
       var ico   = cls === 'ok' ? chkSvg : warnSvg;
-      tag = '<div class="avance-tag ' + cls + '">' + ico + ' Avance reportado: ' + avance + '</div>';
+      tag = '<div class="avance-tag ' + cls + '">' + ico + ' Avance reportado: ' + escaparHTML(avance) + '</div>';
     } else if (!isRep) {
       tag = '<p class="period-pending">Pendiente</p>';
     }
     html += '<div class="period-cell">' +
-      '<label>' + lbl + '</label>' +
+      '<label>' + escaparHTML(lbl) + '</label>' +
       (isRep && !hideAvance ? '<p class="period-meta-label">Meta</p>' : '') +
-      '<input type="text" disabled value="' + metaVal + '">' +
+      '<input type="text" disabled value="' + escaparHTML(metaVal) + '">' +
       tag +
     '</div>';
   });
@@ -707,7 +707,7 @@ function buildReadonlyPeriodGrid(item, metas, hideAvance) {
 function renderCambioTimeline(cambio) {
   var chk = '<svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="white" width="10" height="10"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
   var steps = [
-    { label:'Solicitud enviada',        sub:'Enviada el ' + (cambio.fecha || '2026-07-28'), st:'done'   },
+    { label:'Solicitud enviada',        sub:'Enviada el ' + escaparHTML(cambio.fecha || '2026-07-28'), st:'done'   },
     { label:'Revisión por Revisor',     sub:'Pendiente tu decisión',                       st:'active' },
     { label:'Aprobación Administrador', sub:'Pendiente',                                   st:'pending'},
     { label:'Meta actualizada',         sub:'Pendiente',                                   st:'pending'},
@@ -721,7 +721,7 @@ function renderCambioTimeline(cambio) {
   }).join('');
   return '<div class="cambio-status-box">' +
     '<p class="cambio-status-title">↩ Solicitud de cambio pendiente de revisión</p>' +
-    (cambio.motivo ? '<div class="cambio-motivo">"' + cambio.motivo + '"</div>' : '') +
+    (cambio.motivo ? '<div class="cambio-motivo">"' + escaparHTML(cambio.motivo) + '"</div>' : '') +
     '<div class="sol-timeline">' + stepsHtml + '</div></div>';
 }
 
@@ -742,22 +742,22 @@ function buildMetaComparison(item, cambio) {
     var lbChanged = lbOrig !== lbNueva;
     var maChanged = maOrig !== maNueva;
     headerRows +=
-      '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Línea base</span><span class="meta-compare-val' + (lbChanged ? ' changed' : '') + '">' + (lbNueva != null ? lbNueva : '—') + '</span></div>' +
-      '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Meta anual</span><span class="meta-compare-val' + (maChanged ? ' changed' : '') + '">' + (maNueva != null ? maNueva : '—') + '</span></div>';
+      '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Línea base</span><span class="meta-compare-val' + (lbChanged ? ' changed' : '') + '">' + escaparHTML(lbNueva != null ? lbNueva : '—') + '</span></div>' +
+      '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Meta anual</span><span class="meta-compare-val' + (maChanged ? ' changed' : '') + '">' + escaparHTML(maNueva != null ? maNueva : '—') + '</span></div>';
   }
   var origRows = labels.map(function(lbl, i) {
-    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">' + lbl + '</span><span class="meta-compare-val">' + (original[i] != null ? original[i] : '—') + '</span></div>';
+    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">' + escaparHTML(lbl) + '</span><span class="meta-compare-val">' + escaparHTML(original[i] != null ? original[i] : '—') + '</span></div>';
   }).join('');
   var newRows = labels.map(function(lbl, i) {
     var changed = original[i] !== nueva[i];
-    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">' + lbl + '</span><span class="meta-compare-val' + (changed ? ' changed' : '') + '">' + (nueva[i] != null ? nueva[i] : '—') + '</span></div>';
+    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">' + escaparHTML(lbl) + '</span><span class="meta-compare-val' + (changed ? ' changed' : '') + '">' + escaparHTML(nueva[i] != null ? nueva[i] : '—') + '</span></div>';
   }).join('');
 
   return '<div class="meta-compare-grid">' +
     '<div class="meta-compare-col"><p class="meta-compare-head original">Meta original</p>' +
       (lbOrig !== lbNueva || maOrig !== maNueva ?
-        '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Línea base</span><span class="meta-compare-val">' + (lbOrig != null ? lbOrig : '—') + '</span></div>' +
-        '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Meta anual</span><span class="meta-compare-val">' + (maOrig != null ? maOrig : '—') + '</span></div>' : '') +
+        '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Línea base</span><span class="meta-compare-val">' + escaparHTML(lbOrig != null ? lbOrig : '—') + '</span></div>' +
+        '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">Meta anual</span><span class="meta-compare-val">' + escaparHTML(maOrig != null ? maOrig : '—') + '</span></div>' : '') +
       origRows + '</div>' +
     '<div class="meta-compare-col"><p class="meta-compare-head nueva">Meta propuesta</p>' +
       headerRows + newRows + '</div>' +
@@ -783,9 +783,9 @@ function buildRightPanel(item) {
             '<p class="decision-title">Tu decisión</p>' +
             '<textarea class="comment-textarea" id="obsTA" placeholder="Comentarios para el enlace (requeridos si rechazas, opcionales si apruebas)…"></textarea>' +
             '</div>';
-    footer = '<button class="btn-action red" onclick="rejectByRevisor(\'' + OPEN_ID + '\')">' +
+    footer = '<button class="btn-action red" onclick="rejectByRevisor(OPEN_ID)">' +
              warnIco + 'Con observaciones</button>' +
-             '<button class="btn-action green" onclick="approveByRevisor(\'' + OPEN_ID + '\')">' +
+             '<button class="btn-action green" onclick="approveByRevisor(OPEN_ID)">' +
              chkIco + 'Aprobar meta</button>';
 
   } else if (est === 'cambio_en_revision') {
@@ -795,9 +795,9 @@ function buildRightPanel(item) {
             '<p class="decision-title">Tu decisión sobre el cambio</p>' +
             '<textarea class="comment-textarea" id="obsTA" placeholder="Comentarios (requeridos si rechazas el cambio)…"></textarea>' +
             '</div>';
-    footer = '<button class="btn-action red" onclick="rejectChangeByRevisor(\'' + OPEN_ID + '\')">' +
+    footer = '<button class="btn-action red" onclick="rejectChangeByRevisor(OPEN_ID)">' +
              warnIco + 'Rechazar cambio</button>' +
-             '<button class="btn-action purple" onclick="approveChangeByRevisor(\'' + OPEN_ID + '\')">' +
+             '<button class="btn-action purple" onclick="approveChangeByRevisor(OPEN_ID)">' +
              chkIco + 'Aprobar cambio</button>';
 
   } else if (est === 'aprobado') {
@@ -805,7 +805,7 @@ function buildRightPanel(item) {
             chkIco + 'Meta aprobada por ti, pendiente de aprobación definitiva del administrador.</div>';
     if (plan.obsRevisor) {
       html += '<div class="obs-callout"><p class="obs-callout-title">' + chkIco + 'Tu comentario</p>' +
-              '<p class="obs-callout-body">' + plan.obsRevisor + '</p></div>';
+              '<p class="obs-callout-body">' + escaparHTML(plan.obsRevisor) + '</p></div>';
     }
     html += header;
     html += buildReadonlyPeriodGrid(item, plan.metas || []);
@@ -822,11 +822,11 @@ function buildRightPanel(item) {
             warnIco + 'Devuelto al enlace con observaciones.</div>';
     html += '<div style="margin-bottom:14px;">' +
             '<label class="form-label" style="margin-bottom:6px;display:block;">Tus observaciones</label>' +
-            '<textarea id="obsEditTA" oninput="document.getElementById(\'saveObsBtn\').disabled=false;" style="width:100%;padding:10px 12px;font-size:12px;font-family:inherit;border:none;border-radius:10px;resize:vertical;min-height:72px;outline:none;line-height:1.5;background:var(--color-neutral-100);color:var(--color-text-primary);">' + (plan.obsRevisor || '') + '</textarea>' +
+            '<textarea id="obsEditTA" oninput="document.getElementById(\'saveObsBtn\').disabled=false;" style="width:100%;padding:10px 12px;font-size:12px;font-family:inherit;border:none;border-radius:10px;resize:vertical;min-height:72px;outline:none;line-height:1.5;background:var(--color-neutral-100);color:var(--color-text-primary);">' + escaparHTML(plan.obsRevisor || '') + '</textarea>' +
             '</div>';
     html += header;
     html += buildReadonlyPeriodGrid(item, plan.metas || [], true);
-    footer = '<button id="saveObsBtn" class="btn-action blue" onclick="saveObsRevisor(\'' + OPEN_ID + '\')" disabled>Guardar observaciones</button>';
+    footer = '<button id="saveObsBtn" class="btn-action blue" onclick="saveObsRevisor(OPEN_ID)" disabled>Guardar observaciones</button>';
 
   } else if (est === 'borrador') {
     html += '<div class="readonly-notice" style="background:var(--color-warning-tint);border:1px solid #FDE68A;color:var(--color-warning-text);">' +
@@ -987,7 +987,7 @@ function cicloRevisorGate() {
     gate.style.cssText = 'text-align:center;padding:64px 24px 48px;';
     gate.innerHTML = '<div style="font-size:40px;margin-bottom:16px;">'+info.icon+'</div>'
       +'<h2 style="font-size:18px;font-weight:700;color:var(--color-text-primary);margin-bottom:8px;">'+info.title+'</h2>'
-      +'<p style="font-size:13px;color:var(--color-text-secondary);max-width:420px;margin:0 auto;line-height:1.6;">'+info.body+'</p>';
+      +'<p style="font-size:13px;color:var(--color-text-secondary);max-width:420px;margin:0 auto;line-height:1.6;">'+escaparHTML(info.body)+'</p>';
     container.appendChild(gate);
   }
   window.openModal = function() {};

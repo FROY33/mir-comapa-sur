@@ -837,7 +837,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
             ? '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'
             : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>'}
         </svg>
-        ${i.text}
+        ${escaparHTML(i.text)}
       </div>`).join('');
     document.getElementById('modalTitle').textContent = isObs ? 'Enviar corrección al Revisor' : 'Confirmar envío a revisión';
     document.getElementById('modalSub').textContent   = isObs
@@ -863,7 +863,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
         </div>`;
       if (correctionNote.trim()) {
         html += `<p style="font-size:11px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Nota de corrección</p>
-          <div class="correccion-nota-box">${correctionNote.trim()}</div>`;
+          <div class="correccion-nota-box">${escaparHTML(correctionNote.trim())}</div>`;
       }
       extraEl.innerHTML = html;
       extraEl.hidden = false;
@@ -1310,7 +1310,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     document.getElementById('aprobarSummary').innerHTML = rows.map(function(r) {
       return '<div class="modal-summary-row">' +
         '<span class="modal-summary-lbl">' + r.l + '</span>' +
-        '<span class="modal-summary-val' + (r.accent ? ' accent' : '') + '">' + r.v + '</span>' +
+        '<span class="modal-summary-val' + (r.accent ? ' accent' : '') + '">' + escaparHTML(r.v) + '</span>' +
       '</div>';
     }).join('');
     document.getElementById('aprobarModal').classList.add('open');
@@ -1347,8 +1347,8 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
             <p class="approved-date">Aprobado el ${formatFecha(fecha)} · ${hora}</p>
           </div>
           <div class="wf-steps">
-            <div class="wf-step"><div class="wf-step-line"></div><div class="wf-dot done"><svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div><div class="wf-info"><p class="wf-label done">Enlace reportó avance</p><p class="wf-actor done">${actividad.responsableEnlace || '—'}</p></div></div>
-            <div class="wf-step"><div class="wf-step-line"></div><div class="wf-dot done"><svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div><div class="wf-info"><p class="wf-label done">Revisor aprobó</p><p class="wf-actor done">${actividad.responsableRevisor || 'Carlos Mendoza'} · Tú</p></div></div>
+            <div class="wf-step"><div class="wf-step-line"></div><div class="wf-dot done"><svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div><div class="wf-info"><p class="wf-label done">Enlace reportó avance</p><p class="wf-actor done">${escaparHTML(actividad.responsableEnlace || '—')}</p></div></div>
+            <div class="wf-step"><div class="wf-step-line"></div><div class="wf-dot done"><svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div><div class="wf-info"><p class="wf-label done">Revisor aprobó</p><p class="wf-actor done">${escaparHTML(actividad.responsableRevisor || 'Carlos Mendoza')} · Tú</p></div></div>
             <div class="wf-step"><div class="wf-step-line"></div><div class="wf-dot active"><svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg></div><div class="wf-info"><p class="wf-label active">Admin valida</p><p class="wf-actor active">Luis Sandoval · Pendiente</p></div></div>
             <div class="wf-step"><div class="wf-dot pending"></div><div class="wf-info"><p class="wf-label pending">Reporte cerrado</p><p class="wf-actor pending">Completitud de período</p></div></div>
           </div>
@@ -1583,8 +1583,8 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
           roContent = `<div class="sin-avance-ro">${WARN_ICO}<p>Sin avance reportado para este período.</p></div>`;
         } else {
           roContent = isFrac
-            ? `<p class="avance-ro-val">Avance registrado: <strong>${avanceValue}</strong> &nbsp;<span style="font-size:12px;color:var(--color-text-secondary)">Numerador: ${avanceNum} / Denominador: ${avanceDen}</span></p>`
-            : `<p class="avance-ro-val">Avance registrado: <strong>${avanceValue}${unitSuffix}</strong></p>`;
+            ? `<p class="avance-ro-val">Avance registrado: <strong>${escaparHTML(avanceValue)}</strong> &nbsp;<span style="font-size:12px;color:var(--color-text-secondary)">Numerador: ${escaparHTML(avanceNum)} / Denominador: ${escaparHTML(avanceDen)}</span></p>`
+            : `<p class="avance-ro-val">Avance registrado: <strong>${escaparHTML(avanceValue)}${unitSuffix}</strong></p>`;
         }
       } else {
         roContent = `<p style="font-size:13px;color:var(--color-text-secondary)">Sin avance reportado para este período.</p>`;
@@ -1613,7 +1613,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
            </div>`
         : `<div>
             <span class="avance-frac-label">Denominador (Y)</span>
-            <input type="number" class="avance-input-field" value="${denVal}"
+            <input type="number" class="avance-input-field" value="${escaparHTML(denVal)}"
                    oninput="onAvanceDen(this.value)" placeholder="0.01" min="0.01" style="width:100%">
             <p class="avance-frac-desc">${act.denominador}</p>
            </div>`;
@@ -1624,14 +1624,14 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
         ${avanceSaved ? `
           <div class="avance-saved-banner">
             ${CHECK_ICO}
-            Avance guardado: <strong style="margin-left:2px">${avanceValue}</strong>
-            <span style="font-size:11px;color:var(--color-success-dark);margin-left:4px">(X=${avanceNum}, Y=${denVal})</span>
+            Avance guardado: <strong style="margin-left:2px">${escaparHTML(avanceValue)}</strong>
+            <span style="font-size:11px;color:var(--color-success-dark);margin-left:4px">(X=${escaparHTML(avanceNum)}, Y=${escaparHTML(denVal)})</span>
             . Puedes actualizarlo.
           </div>` : ''}
         <div class="avance-frac-grid">
           <div>
             <span class="avance-frac-label">Numerador (X)</span>
-            <input type="number" class="avance-input-field" value="${avanceNum}"
+            <input type="number" class="avance-input-field" value="${escaparHTML(avanceNum)}"
                    oninput="onAvanceNum(this.value)" placeholder="0" min="0" style="width:100%">
             <p class="avance-frac-desc">${act.numerador}</p>
           </div>
@@ -1671,11 +1671,11 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       ${avanceSaved ? `
         <div class="avance-saved-banner">
           ${CHECK_ICO}
-          Avance guardado: <strong style="margin-left:2px">${avanceValue}${unitSuffix}</strong>. Puedes actualizarlo si es necesario.
+          Avance guardado: <strong style="margin-left:2px">${escaparHTML(avanceValue)}${unitSuffix}</strong>. Puedes actualizarlo si es necesario.
         </div>` : ''}
       <label class="avance-input-label">Valor de avance — ${act.periodo}</label>
       <div class="avance-input-row">
-        <input type="text" class="avance-input-field" value="${avanceValue}"
+        <input type="text" class="avance-input-field" value="${escaparHTML(avanceValue)}"
                oninput="onAvanceInput(this.value)"
                placeholder="Ej: ${act.acumulable ? '150' : '78.5'}">
         ${unitSuffix ? `<span class="avance-unit">${unitSuffix}</span>` : ''}
@@ -1791,7 +1791,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
           <div class="step-title-col">
             <p class="step-card-name">Meta del indicador</p>
             ${avanceSaved && !editingStep1
-              ? `<span class="step-saved-summary">${avanceValue}</span>
+              ? `<span class="step-saved-summary">${escaparHTML(avanceValue)}</span>
                  ${!readOnlyView ? `<button class="step-edit-btn" onclick="toggleEditStep(1)">${EDIT_S} Modificar</button>` : ''}`
               : ''}
           </div>
@@ -1872,7 +1872,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       : `${analisisSaved ? `<div class="avance-saved-banner" style="margin-bottom:12px">${CHECK_ICO} Análisis guardado. Puedes actualizarlo.</div>` : ''}
          <span class="analisis-q" style="margin-top:0">${analisisLabel}</span>
          <span class="analisis-caption">${analisisCaption}</span>
-         <textarea class="txt-area" rows="3" oninput="${analisisChange}(this.value)" placeholder="${analisisHint}">${analisisValue}</textarea>
+         <textarea class="txt-area" rows="3" oninput="${analisisChange}(this.value)" placeholder="${analisisHint}">${escaparHTML(analisisValue)}</textarea>
          ${!analisisExito ? `
          <span class="analisis-q">¿Identificaste Riesgos?</span>
          <span class="analisis-caption">Explica las situaciones o cambios que pongan en peligro lograr la meta del indicador:</span>
@@ -1880,24 +1880,24 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
            <button class="yn-btn yn-si${riesgosToggle === true ? ' active' : ''}" onclick="setRiesgosToggle(true)">Sí</button>
            <button class="yn-btn yn-no${riesgosToggle === false ? ' active' : ''}" onclick="setRiesgosToggle(false)">No</button>
          </div>
-         ${riesgosToggle === true ? `<textarea class="txt-area" rows="3" oninput="onAnalisisRiesgos(this.value)" placeholder="Describe posibles amenazas o factores que dificulten el cumplimiento futuro…">${analisisRiesgos}</textarea>` : ''}
+         ${riesgosToggle === true ? `<textarea class="txt-area" rows="3" oninput="onAnalisisRiesgos(this.value)" placeholder="Describe posibles amenazas o factores que dificulten el cumplimiento futuro…">${escaparHTML(analisisRiesgos)}</textarea>` : ''}
          <span class="analisis-q">¿Identificaste Oportunidades?</span>
          <span class="analisis-caption">Explica las situaciones o cambios que puedan aprovecharse para lograr la meta del indicador:</span>
          <div class="yn-toggle">
            <button class="yn-btn yn-si${oportunidadesToggle === true ? ' active' : ''}" onclick="setOportunidadesToggle(true)">Sí</button>
            <button class="yn-btn yn-no${oportunidadesToggle === false ? ' active' : ''}" onclick="setOportunidadesToggle(false)">No</button>
          </div>
-         ${oportunidadesToggle === true ? `<textarea class="txt-area" rows="3" oninput="onAnalisisOportunidades(this.value)" placeholder="Describe factores favorables o áreas de mejora que puedan potenciarse…">${analisisOportunidades}</textarea>` : ''}
+         ${oportunidadesToggle === true ? `<textarea class="txt-area" rows="3" oninput="onAnalisisOportunidades(this.value)" placeholder="Describe factores favorables o áreas de mejora que puedan potenciarse…">${escaparHTML(analisisOportunidades)}</textarea>` : ''}
          ` : ''}
          <button class="btn-save-avance" onclick="guardarAnalisis()" style="margin-top:14px" ${analisisComplete && (act.estado !== 'observado' || step3Dirty) ? '' : 'disabled'}>
            ${SAVE_S} Guardar análisis
          </button>`;
 
     const analisisReadOnly = analisisSaved && avanceRegistrado
-      ? `<div class="ro-analisis-field"><span class="ro-analisis-label">${analisisLabel}</span><p class="ro-analisis-value">${analisisValue || '—'}</p></div>
+      ? `<div class="ro-analisis-field"><span class="ro-analisis-label">${analisisLabel}</span><p class="ro-analisis-value">${escaparHTML(analisisValue) || '—'}</p></div>
          ${!analisisExito ? `
-         <div class="ro-analisis-field"><span class="ro-analisis-label">Riesgos identificados</span><p class="ro-analisis-value">${riesgosToggle === true ? (analisisRiesgos || '—') : riesgosToggle === false ? 'No' : '—'}</p></div>
-         <div class="ro-analisis-field"><span class="ro-analisis-label">Oportunidades identificadas</span><p class="ro-analisis-value">${oportunidadesToggle === true ? (analisisOportunidades || '—') : oportunidadesToggle === false ? 'No' : '—'}</p></div>` : ''}`
+         <div class="ro-analisis-field"><span class="ro-analisis-label">Riesgos identificados</span><p class="ro-analisis-value">${riesgosToggle === true ? (escaparHTML(analisisRiesgos) || '—') : riesgosToggle === false ? 'No' : '—'}</p></div>
+         <div class="ro-analisis-field"><span class="ro-analisis-label">Oportunidades identificadas</span><p class="ro-analisis-value">${oportunidadesToggle === true ? (escaparHTML(analisisOportunidades) || '—') : oportunidadesToggle === false ? 'No' : '—'}</p></div>` : ''}`
       : `<p style="font-size:13px;color:var(--color-text-secondary)">Sin análisis registrado para este período.</p>`;
 
     const analisisContent = step3Editable ? analisisEditForm : analisisReadOnly;
@@ -1975,15 +1975,15 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
             </div>
             <div class="file-actions">
               <span class="file-estado ${fSt}">${fLbl}</span>
-              <button class="file-btn" onclick="openFileViewer('${f.id}')" title="Ver archivo"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></button>
-              ${isRep ? `<button class="file-btn" onclick="replaceFile('${f.id}')" title="Reemplazar archivo"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg></button>` : ''}
-              ${isDel ? `<button class="file-btn del" onclick="deleteFile('${f.id}')" title="Eliminar"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg></button>` : ''}
+              <button class="file-btn" data-id="${f.id}" onclick="openFileViewer(this.dataset.id)" title="Ver archivo"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg></button>
+              ${isRep ? `<button class="file-btn" data-id="${f.id}" onclick="replaceFile(this.dataset.id)" title="Reemplazar archivo"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg></button>` : ''}
+              ${isDel ? `<button class="file-btn del" data-id="${f.id}" onclick="deleteFile(this.dataset.id)" title="Eliminar"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg></button>` : ''}
             </div>
           </div>
           ${isDel ? `
             <div class="file-notes-wrap">
               <label class="file-notes-label">Nota opcional sobre este archivo</label>
-              <textarea class="file-notes-ta" id="notes-${f.id}" placeholder="Ej: Reporte generado el 08-jun. Incluye desglose por zona." oninput="updateFileNotes('${f.id}',this.value)">${f.notes||''}</textarea>
+              <textarea class="file-notes-ta" id="notes-${f.id}" placeholder="Ej: Reporte generado el 08-jun. Incluye desglose por zona." data-id="${f.id}" oninput="updateFileNotes(this.dataset.id,this.value)">${f.notes||''}</textarea>
             </div>` : (f.notes ? `<div class="file-notes-wrap"><p class="file-notes-ro">"${f.notes}"</p></div>` : '')}
         </div>`;
     }).join('');
@@ -2004,7 +2004,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
         </div>`;
 
     const justSupportHtml = justSupportFile
-      ? `<div class="justify-support-file"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg><span>Adjunto: <strong>${justSupportFile.name}</strong></span></div>`
+      ? `<div class="justify-support-file"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg><span>Adjunto: <strong>${escaparHTML(justSupportFile.name)}</strong></span></div>`
       : `<button class="justify-file-btn" onclick="document.getElementById('justSupportInput').click()"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>Adjuntar soporte (opcional)</button>`;
 
     const justCharsOk = justText.trim().length > 0;
@@ -2014,8 +2014,8 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
         <div class="upload-error-banner">
           <div class="ue-icon"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg></div>
           <div class="ue-body">
-            <p class="ue-title">No se pudo cargar "${uploadError.name}"</p>
-            <p class="ue-msg">${uploadError.msg}</p>
+            <p class="ue-title">No se pudo cargar "${escaparHTML(uploadError.name)}"</p>
+            <p class="ue-msg">${escaparHTML(uploadError.msg)}</p>
           </div>
           <button class="ue-dismiss" onclick="dismissError()" title="Cerrar">×</button>
         </div>` : ''}
@@ -2049,7 +2049,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
               Esta opción debe usarse únicamente cuando el documento requerido no está disponible en el período. El Revisor evaluará si la justificación es válida antes de aprobar o rechazar la actividad.
             </div>
-            <textarea id="justTA" class="justify-ta" placeholder="Describe detalladamente el motivo por el que no cuentas con el medio de verificación para este período. Incluye fechas, causas y cualquier evidencia alternativa disponible…" oninput="onJustifyInput(this.value)">${justText}</textarea>
+            <textarea id="justTA" class="justify-ta" placeholder="Describe detalladamente el motivo por el que no cuentas con el medio de verificación para este período. Incluye fechas, causas y cualquier evidencia alternativa disponible…" oninput="onJustifyInput(this.value)">${escaparHTML(justText)}</textarea>
             <label class="justify-support-label">Documento de soporte (opcional)</label>
             ${justSupportHtml}
             <button class="btn-send-justify" id="btnSendJustify" onclick="sendJustification()" ${justCharsOk?'':'disabled'}>
@@ -2165,7 +2165,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
           </div>
         </div>
         <span class="revisor-obs-label">Observación al enlace</span>
-        <textarea class="obs-ta" placeholder="Describe qué debe corregir o complementar el enlace en su reporte…" oninput="onObsInput(this.value)">${obsRevisorText}</textarea>
+        <textarea class="obs-ta" placeholder="Describe qué debe corregir o complementar el enlace en su reporte…" oninput="onObsInput(this.value)">${escaparHTML(obsRevisorText)}</textarea>
         <button class="btn-full warning" onclick="enviarObservacion()" style="margin-top:8px" ${obsRevisorText.trim() ? '' : 'disabled'}>
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
           Enviar observación
@@ -2423,7 +2423,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
             ${isObs ? `
             <div class="correction-note-wrap">
               <label class="correction-note-label">Nota de corrección <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
-              <textarea class="correction-note-ta" placeholder="Describe brevemente qué corregiste o qué cambios realizaste…" oninput="onCorrectionNote(this.value)">${correctionNote}</textarea>
+              <textarea class="correction-note-ta" placeholder="Describe brevemente qué corregiste o qué cambios realizaste…" oninput="onCorrectionNote(this.value)">${escaparHTML(correctionNote)}</textarea>
             </div>` : ''}
             <button id="btnEnviar" class="btn-send-primary" onclick="openModal()" disabled>
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
@@ -2450,9 +2450,18 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     if (!isRevisor) setTimeout(updateSendBtn, 0);
   }
 
+  // Copia del indicador con todos sus textos escapados (también en listas y objetos anidados),
+  // para armar el HTML sin olvidar ningún dato. Números, booleanos y null quedan igual.
+  function copiaEscapada(v) {
+    if (typeof v === 'string') return escaparHTML(v);
+    if (Array.isArray(v)) return v.map(copiaEscapada);
+    if (v && typeof v === 'object') { const c = {}; Object.keys(v).forEach(k => { c[k] = copiaEscapada(v[k]); }); return c; }
+    return v;
+  }
+
   function renderPage() {
     if (!actividad) return;
-    renderMain(actividad);
+    renderMain(copiaEscapada(actividad));
     renderActionPanel(actividad);
   }
 
@@ -2515,7 +2524,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       analisisAcciones = 'Se implementó un protocolo de seguimiento semanal con brigadas de campo para validar altas y bajas. Se propone incrementar la meta mensual de reactivaciones de 80 a 95 a partir de julio con refuerzo de 2 personas al equipo.';
     }
     if (!actividad) {
-      document.getElementById('mainContent').innerHTML = `<div class="not-found"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg><h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">Actividad no encontrada</h2><p style="font-size:13px;color:var(--color-text-secondary);">El indicador "${id}" no está asignado.<br><br><a href="mis-actividades.html" style="color:var(--color-primary);font-weight:700;">← Volver al listado</a></p></div>`;
+      document.getElementById('mainContent').innerHTML = `<div class="not-found"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg><h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">Actividad no encontrada</h2><p style="font-size:13px;color:var(--color-text-secondary);">El indicador "${escaparHTML(id)}" no está asignado.<br><br><a href="mis-actividades.html" style="color:var(--color-primary);font-weight:700;">← Volver al listado</a></p></div>`;
       document.getElementById('actionPanel').innerHTML = '';
       return;
     }
@@ -2525,8 +2534,8 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       console.error('renderPage error:', e);
       document.getElementById('mainContent').innerHTML =
         `<div style="padding:32px;color:var(--color-danger);font-size:13px">
-          <strong>Error al cargar el indicador:</strong> ${e.message}
-          <pre style="margin-top:8px;font-size:11px;white-space:pre-wrap;opacity:.7">${e.stack||''}</pre>
+          <strong>Error al cargar el indicador:</strong> ${escaparHTML(e.message)}
+          <pre style="margin-top:8px;font-size:11px;white-space:pre-wrap;opacity:.7">${escaparHTML(e.stack||'')}</pre>
           <a href="mis-actividades.html" style="color:var(--color-primary);font-weight:700;display:block;margin-top:16px;">← Volver al listado</a>
         </div>`;
     }
@@ -2544,13 +2553,13 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     var isImg = f.preview && typeof f.preview === 'string' && f.preview.startsWith('data:image');
     var content;
     if (isImg) {
-      content = '<img class="fv-img" src="' + f.preview + '" alt="' + f.nombre + '">';
+      content = '<img class="fv-img" src="' + escaparHTML(f.preview) + '" alt="' + escaparHTML(f.nombre) + '">';
     } else {
       content =
         '<div class="fv-placeholder">' +
-          '<div class="fv-placeholder-icon">' + fileIconLbl(f.tipo) + '</div>' +
-          '<p class="fv-placeholder-name">' + f.nombre + '</p>' +
-          '<p class="fv-placeholder-sub">Vista previa no disponible para archivos ' + f.tipo + '.<br>Descarga el archivo para visualizarlo.</p>' +
+          '<div class="fv-placeholder-icon">' + escaparHTML(fileIconLbl(f.tipo)) + '</div>' +
+          '<p class="fv-placeholder-name">' + escaparHTML(f.nombre) + '</p>' +
+          '<p class="fv-placeholder-sub">Vista previa no disponible para archivos ' + escaparHTML(f.tipo) + '.<br>Descarga el archivo para visualizarlo.</p>' +
         '</div>';
     }
     document.getElementById('fvContent').innerHTML = content;

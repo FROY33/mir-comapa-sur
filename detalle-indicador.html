@@ -271,15 +271,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
 
   var params = new URLSearchParams(window.location.search);
   var id = params.get('id') || 'PLA-FIN-001';
-  var r = (window.MIR_DATA || []).find(function (x) { return x.id === id; });
+  var dato = (window.MIR_DATA || []).find(function (x) { return x.id === id; });
   var main = document.getElementById('mainContent');
 
-  if (!r) {
-    main.innerHTML = '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + id + '</p>';
+  if (!dato) {
+    main.innerHTML = '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + escaparHTML(id) + '</p>';
     return;
   }
 
-  document.title = r.id + ' — Detalle de indicador · MIR COMAPA Sur';
+  // Todos los textos del indicador acaban en HTML: se escapan una sola vez aquí. Los null,
+  // números y booleanos quedan igual, así que las comparaciones de abajo no cambian.
+  var r = {};
+  Object.keys(dato).forEach(function (k) { r[k] = typeof dato[k] === 'string' ? escaparHTML(dato[k]) : dato[k]; });
+
+  document.title = dato.id + ' — Detalle de indicador · MIR COMAPA Sur';
 
   function gCls(g)  { return {'Planeación Estratégica':'pe','Técnica':'tec','Comercial':'com','Administrativa':'adm'}[g]||'pe'; }
   function lvCls(n) { return {'Fin':'fin','Propósito':'proposito','Componente':'componente','Actividad':'actividad'}[n]||''; }

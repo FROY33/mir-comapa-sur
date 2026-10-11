@@ -248,15 +248,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
   var id      = params.get('id') || 'GER-COM-001';
   var isAdmin = params.get('rol') === 'admin';
   var page    = document.getElementById('pageContent');
-  var r       = (typeof ACTIVIDADES_GERENCIA !== 'undefined' ? ACTIVIDADES_GERENCIA : [])
+  var dato    = (typeof ACTIVIDADES_GERENCIA !== 'undefined' ? ACTIVIDADES_GERENCIA : [])
                   .find(function (x) { return x.id === id; });
 
-  if (!r) {
-    page.innerHTML = '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + id + '</p>';
+  if (!dato) {
+    page.innerHTML = '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + escaparHTML(id) + '</p>';
     return;
   }
 
-  document.title = r.id + ' — Indicador Gerencial · COMAPA Sur';
+  document.title = dato.id + ' — Indicador Gerencial · COMAPA Sur';
+
+  // Todos los textos del indicador acaban en HTML: se escapan una sola vez aquí. Los null,
+  // números y booleanos quedan igual, así que las comparaciones de abajo no cambian.
+  var r = {};
+  Object.keys(dato).forEach(function (k) { r[k] = typeof dato[k] === 'string' ? escaparHTML(dato[k]) : dato[k]; });
 
   /* ── derived display values ─────────────────────────────── */
   var frecMap      = { Mensual:'12', Trimestral:'4', Semestral:'2', Anual:'1', Bimestral:'6' };
@@ -431,9 +436,9 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     });
     historial.forEach(function (h) {
       html += '<div class="hist-period-item hist-period-item--new">' +
-        '<div><p class="hist-period-num">' + h.periodo + '</p>' +
-        '<p class="hist-period-meta">' + h.accion + ' · ' + h.fecha + '</p></div>' +
-        '<span class="hist-period-value-ok">' + h.valor + (r.unidadMedida ? ' ' + r.unidadMedida : '') + '</span>' +
+        '<div><p class="hist-period-num">' + escaparHTML(h.periodo) + '</p>' +
+        '<p class="hist-period-meta">' + escaparHTML(h.accion) + ' · ' + escaparHTML(h.fecha) + '</p></div>' +
+        '<span class="hist-period-value-ok">' + escaparHTML(h.valor) + (r.unidadMedida ? ' ' + r.unidadMedida : '') + '</span>' +
       '</div>';
     });
     html += '</div></div>';
@@ -462,8 +467,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
         html +=
           '<div class="obs-received-card">' +
             '<p class="obs-received-title">' + ICON_WARN + 'Observación del administrador</p>' +
-            '<p class="obs-received-text">' + obs.texto + '</p>' +
-            '<p class="obs-received-meta">' + obs.autor + ' · ' + obs.fecha + '</p>' +
+            '<p class="obs-received-text">' + escaparHTML(obs.texto) + '</p>' +
+            '<p class="obs-received-meta">' + escaparHTML(obs.autor) + ' · ' + escaparHTML(obs.fecha) + '</p>' +
           '</div>';
       }
 
@@ -478,7 +483,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
               '<label class="avance-input-label">Valor del período</label>' +
               '<div class="avance-inp-row">' +
                 '<input type="text" class="avance-inp" id="avanceInput" oninput="onAvanceInput(this.value)"' +
-                  ' value="' + (valorReportado || '') + '"' +
+                  ' value="' + escaparHTML(valorReportado || '') + '"' +
                   ' placeholder="Ej: ' + indExample + '" autocomplete="off">' +
                 '<span class="avance-unit">' + (r.unidadMedida || '—') + '</span>' +
               '</div>' +
@@ -513,7 +518,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
             '<p class="ger-status-info-sub">El administrador revisará el valor y emitirá su resolución.</p>' +
             '<div class="ger-status-info-val">' +
               '<span class="ger-status-info-lbl">Valor reportado</span>' +
-              '<span class="ger-status-info-num">' + valorReportado + '<span style="font-size:13px;font-weight:500"> ' + (r.unidadMedida || '') + '</span></span>' +
+              '<span class="ger-status-info-num">' + escaparHTML(valorReportado) + '<span style="font-size:13px;font-weight:500"> ' + (r.unidadMedida || '') + '</span></span>' +
             '</div>' +
           '</div>';
       }
@@ -525,7 +530,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
             '<div class="ger-approved-icon">' + ICON_SHIELD + '</div>' +
             '<p class="ger-approved-title">Indicador aprobado</p>' +
             '<p class="ger-approved-sub">El valor reportado fue validado por el administrador.</p>' +
-            '<div class="ger-approved-val">' + valorReportado + ' ' + (r.unidadMedida || '') + '</div>' +
+            '<div class="ger-approved-val">' + escaparHTML(valorReportado) + ' ' + (r.unidadMedida || '') + '</div>' +
           '</div>';
       }
     }
@@ -536,7 +541,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
         html +=
           '<div class="ger-valor-card">' +
             '<div><p class="ger-valor-lbl">Valor reportado por la gerencia</p>' +
-            '<p class="ger-valor-num">' + valorReportado + '<span class="ger-valor-unit"> ' + (r.unidadMedida || '') + '</span></p></div>' +
+            '<p class="ger-valor-num">' + escaparHTML(valorReportado) + '<span class="ger-valor-unit"> ' + (r.unidadMedida || '') + '</span></p></div>' +
             '<div class="ger-valor-meta"><p>' + r.area + '</p><p>' + periodoLabel + '</p></div>' +
           '</div>';
       } else {
@@ -563,8 +568,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
         html += '<div class="history-section"><p class="section-heading">' + ICON_OBS + 'Observaciones enviadas</p><div class="hist-period-list">';
         observaciones.forEach(function (o) {
           html += '<div class="hist-period-item" style="flex-direction:column;align-items:flex-start;gap:6px">' +
-            '<p style="font-size:12px;color:var(--color-text-primary);line-height:1.5">' + o.texto + '</p>' +
-            '<p class="hist-period-meta">' + o.autor + ' · ' + o.fecha + '</p></div>';
+            '<p style="font-size:12px;color:var(--color-text-primary);line-height:1.5">' + escaparHTML(o.texto) + '</p>' +
+            '<p class="hist-period-meta">' + escaparHTML(o.autor) + ' · ' + escaparHTML(o.fecha) + '</p></div>';
         });
         html += '</div></div>';
       }
@@ -575,7 +580,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
             '<div class="ger-approved-icon">' + ICON_SHIELD + '</div>' +
             '<p class="ger-approved-title">Indicador aprobado</p>' +
             '<p class="ger-approved-sub">Aprobado el 31 ago 2026 por Administración.</p>' +
-            '<div class="ger-approved-val">' + valorReportado + ' ' + (r.unidadMedida || '') + '</div>' +
+            '<div class="ger-approved-val">' + escaparHTML(valorReportado) + ' ' + (r.unidadMedida || '') + '</div>' +
           '</div>';
       }
     }

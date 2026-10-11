@@ -856,7 +856,7 @@ body {
     const reported = aprobados + enRevision + observados;
     const pct = total > 0 ? Math.round((reported / total) * 100) : 0;
     const icon = ICONS[g.id] || ICONS['planeacion'];
-    const iconBg = g.color;
+    const iconBg = escaparHTML(g.color);
 
     return `
       <div class="gerencia-card">
@@ -868,8 +868,8 @@ body {
               </svg>
             </div>
             <div>
-              <p class="g-name">${g.nombre}</p>
-              ${g.descripcion ? `<p class="g-desc">${g.descripcion}</p>` : ''}
+              <p class="g-name">${escaparHTML(g.nombre)}</p>
+              ${g.descripcion ? `<p class="g-desc">${escaparHTML(g.descripcion)}</p>` : ''}
             </div>
           </div>
           <span class="g-badge">${total} indicadores en período</span>
@@ -881,7 +881,7 @@ body {
             <span class="g-progress-pct">${pct}%</span>
           </div>
           <div class="g-progress-bar">
-            <div class="g-progress-fill" style="width:${pct}%;background:${g.color};"></div>
+            <div class="g-progress-fill" style="width:${pct}%;background:${iconBg};"></div>
           </div>
         </div>
 
@@ -895,17 +895,17 @@ body {
         <div class="g-team-row">
           <span class="g-team-label">Equipo</span>
           <span class="g-person-chip">
-            <span class="g-person-avatar" style="background:${g.color};">${g.enlace.iniciales}</span>
-            ${g.enlace.nombre}
+            <span class="g-person-avatar" style="background:${iconBg};">${escaparHTML(g.enlace.iniciales)}</span>
+            ${escaparHTML(g.enlace.nombre)}
           </span>
           <span class="g-person-chip">
-            <span class="g-person-avatar" style="background:var(--color-text-secondary);">${g.revisor.iniciales}</span>
-            ${g.revisor.nombre}
+            <span class="g-person-avatar" style="background:var(--color-text-secondary);">${escaparHTML(g.revisor.iniciales)}</span>
+            ${escaparHTML(g.revisor.nombre)}
           </span>
         </div>
 
         <div class="g-actions">
-          <button class="btn btn-primary sm" onclick="window.location='detalle-gerencia.html?g=${g.id}'">
+          <button class="btn btn-primary sm" data-href="detalle-gerencia.html?g=${encodeURIComponent(g.id)}" onclick="window.location.href=this.dataset.href">
             Ver detalle &rarr;
           </button>
         </div>
@@ -1040,8 +1040,8 @@ body {
     grid.innerHTML = gerencias.map(function (g) {
       var estadoLbl  = _estadoLabels[g.periodoEstado] || g.periodoEstado;
       var pctCorte   = _pctSafe(g.indicadoresConCorte, g.totalIndicadores);
-      var accentColor = g.color || '#8B1D3A';
-      var url = 'validacion-gerencia-detalle.html?ger=' + g.id + '&periodo=' + _periodo;
+      var accentColor = escaparHTML(g.color || '#8B1D3A');
+      var url = 'validacion-gerencia-detalle.html?ger=' + encodeURIComponent(g.id) + '&amp;periodo=' + encodeURIComponent(_periodo);
       var incumStatus = g.rojo > 0 ? 'rojo' : g.amarillo > 0 ? 'amarillo' : 'verde';
       var incumText = g.rojo > 0
         ? g.rojo + ' en incumplimiento de meta'
@@ -1057,11 +1057,11 @@ body {
         '      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">',
         '        ' + iconHtml,
         '        <div style="min-width:0">',
-        '          <div class="g-name">' + g.nombre.replace('Gerencia de ','').replace('Gerencia ','') + '</div>',
+        '          <div class="g-name">' + escaparHTML(g.nombre.replace('Gerencia de ','').replace('Gerencia ','')) + '</div>',
         '          <div class="g-meta">' + g.numUnidades + ' unidades · ' + g.totalIndicadores + ' indicadores total</div>',
         '        </div>',
         '      </div>',
-        '      <span class="g-estado-badge ' + g.periodoEstado + '"><span class="badge-dot"></span>' + estadoLbl + '</span>',
+        '      <span class="g-estado-badge ' + escaparHTML(g.periodoEstado) + '"><span class="badge-dot"></span>' + escaparHTML(estadoLbl) + '</span>',
         '    </div>',
         '    <div class="g-fraction">',
         '      <div class="g-fraction-row">',

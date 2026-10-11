@@ -1160,10 +1160,10 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
 
           return '<div class="db-card">'+
             '<div class="db-card-top">'+
-              '<span class="db-proceso-chip" title="'+ind.p+'">'+ind.p+'</span>'+
+              '<span class="db-proceso-chip" title="'+escaparHTML(ind.p)+'">'+escaparHTML(ind.p)+'</span>'+
               '<span class="db-status '+stCls+'">'+stLabel+'</span>'+
             '</div>'+
-            '<div class="db-card-name">'+ind.n+'</div>'+
+            '<div class="db-card-name">'+escaparHTML(ind.n)+'</div>'+
             '<div class="db-val-row">'+
               '<div class="db-val-big">'+fmtVal(val, ind.pct, ind.unit||'')+'</div>'+
               '<div>'+
@@ -1177,9 +1177,9 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
                 MESES_SHORT.map(function(l){ return '<span class="db-spark-lbl">'+l[0]+'</span>'; }).join('')+
               '</div>'+
             '</div>'+
-            (ind.obs ? '<div class="db-card-obs"><b>Obs:</b> '+ind.obs+'</div>' : '')+
+            (ind.obs ? '<div class="db-card-obs"><b>Obs:</b> '+escaparHTML(ind.obs)+'</div>' : '')+
             '<div class="db-card-footer">'+
-              '<span class="db-period-tag">'+ind.per+'</span>'+
+              '<span class="db-period-tag">'+escaparHTML(ind.per)+'</span>'+
             '</div>'+
           '</div>';
         }
@@ -1193,7 +1193,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           });
           var html = '';
           Object.keys(byP).forEach(function(proc) {
-            html += '<div class="db-proceso-hdr">'+proc+'</div>';
+            html += '<div class="db-proceso-hdr">'+escaparHTML(proc)+'</div>';
             html += '<div class="db-grid">';
             byP[proc].forEach(function(ind){ html += buildCard(ind); });
             html += '</div>';
@@ -1220,7 +1220,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           document.getElementById('db-summary-row').innerHTML = chips.map(function(c){
             return '<div class="db-sum-card">'+
               '<div class="db-sum-icon" style="background:'+c.bg+';color:'+c.ic+'">'+c.svg+'</div>'+
-              '<div><div class="db-sum-num" style="color:'+c.ic+'">'+c.n+'</div><div class="db-sum-lbl">'+c.l+'</div></div>'+
+              '<div><div class="db-sum-num" style="color:'+c.ic+'">'+c.n+'</div><div class="db-sum-lbl">'+escaparHTML(c.l)+'</div></div>'+
             '</div>';
           }).join('');
         }
@@ -1263,7 +1263,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var rows = items.map(function(it){
             return '<div style="display:flex;gap:8px;align-items:flex-start;">'+
               '<span style="font-size:10px;font-weight:700;color:'+it.tc+';background:'+it.bg+';padding:2px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;margin-top:2px;">'+it.lbl+'</span>'+
-              '<span style="font-size:11px;color:var(--color-text-primary);line-height:1.55;">'+it.val+'</span>'+
+              '<span style="font-size:11px;color:var(--color-text-primary);line-height:1.55;">'+escaparHTML(it.val)+'</span>'+
             '</div>';
           }).join('');
           return '<tr style="background:var(--color-neutral-50);">'+
@@ -1293,7 +1293,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           inds.forEach(function(ind){ if(!byP[ind.p]) byP[ind.p]=[]; byP[ind.p].push(ind); });
           var rowsHtml = '';
           Object.keys(byP).forEach(function(proc) {
-            rowsHtml += '<tr class="proc-hdr"><td colspan="15">'+proc+'</td></tr>';
+            rowsHtml += '<tr class="proc-hdr"><td colspan="15">'+escaparHTML(proc)+'</td></tr>';
             byP[proc].forEach(function(ind) {
               var cells = ind.m.map(function(v, i) {
                 if (v === null) return '<td class="c-nd">—</td>';
@@ -1303,9 +1303,9 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               }).join('');
               var isoPrefix = isISOInd(ind.n) ? '<span class="iso-tag-tbl">ISO</span>' : '';
               rowsHtml += '<tr>'+
-                '<td class="c-ind">'+isoPrefix+ind.n+'</td>'+
+                '<td class="c-ind">'+isoPrefix+escaparHTML(ind.n)+'</td>'+
                 '<td class="c-meta">'+fmtMetaCell(ind)+'</td>'+
-                '<td class="c-per">'+ind.per+'</td>'+
+                '<td class="c-per">'+escaparHTML(ind.per)+'</td>'+
                 cells+
               '</tr>';
               rowsHtml += buildAnalysisRow(ind);
@@ -1317,10 +1317,10 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var _imgStyle = 'max-width:100px;max-height:60px;object-fit:contain;border-radius:4px;';
           var _logoWrap = 'width:100px;height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
           var logoL = _membreteConfig.logoLeft
-            ? '<div style="'+_logoWrap+'"><img src="'+_membreteConfig.logoLeft+'" style="'+_imgStyle+'"></div>'
+            ? '<div style="'+_logoWrap+'"><img src=\"'+escaparHTML(_membreteConfig.logoLeft)+'\" style="'+_imgStyle+'"></div>'
             : '<div class="mbr-logo">Escudo<br>Tamaulipas</div>';
           var logoR = _membreteConfig.logoRight
-            ? '<div style="'+_logoWrap+'"><img src="'+_membreteConfig.logoRight+'" style="'+_imgStyle+'"></div>'
+            ? '<div style="'+_logoWrap+'"><img src=\"'+escaparHTML(_membreteConfig.logoRight)+'\" style="'+_imgStyle+'"></div>'
             : '<div class="mbr-logo">Logo<br>COMAPA Sur</div>';
           var mbrTit = _membreteConfig.title
             ? _membreteConfig.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -1329,7 +1329,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               logoL+
               '<div class="mbr-center">'+
                 '<div class="mbr-title">'+mbrTit+'</div>'+
-                '<div class="mbr-ger">Gerencia '+ger+'</div>'+
+                '<div class="mbr-ger">Gerencia '+escaparHTML(ger)+'</div>'+
                 '<div class="mbr-fecha">Generado el '+_fecha+'</div>'+
               '</div>'+
               logoR+
@@ -1856,10 +1856,10 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var pct = (ef.val*100).toFixed(1);
           var barW = Math.min(100, ef.val*100).toFixed(1);
           return '<div class="gpe-ef-card">'+
-            '<div class="gpe-ef-label">'+ef.lbl+'</div>'+
-            '<div class="gpe-ef-pct" style="color:'+ef.color+'">'+pct+'%</div>'+
-            '<div class="gpe-ef-bar-wrap"><div class="gpe-ef-bar" style="width:'+barW+'%;background:'+ef.color+'"></div></div>'+
-            '<div class="gpe-ef-desc">'+ef.desc+'</div>'+
+            '<div class="gpe-ef-label">'+escaparHTML(ef.lbl)+'</div>'+
+            '<div class="gpe-ef-pct" style="color:'+escaparHTML(ef.color)+'">'+pct+'%</div>'+
+            '<div class="gpe-ef-bar-wrap"><div class="gpe-ef-bar" style="width:'+barW+'%;background:'+escaparHTML(ef.color)+'"></div></div>'+
+            '<div class="gpe-ef-desc">'+escaparHTML(ef.desc)+'</div>'+
           '</div>';
         }).join('');
 
@@ -1867,18 +1867,18 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
         document.getElementById('gpe-ger-grid').innerHTML = GPE.gerencias.map(function(g){
           var metrics = g.metricas.map(function(m){
             return '<div class="gpe-metric">'+
-              '<div class="gpe-metric-lbl">'+m.lbl+'</div>'+
-              '<div class="gpe-metric-val">'+fmtGpe(m)+(m.unit?'<span class="gpe-metric-unit">'+m.unit+'</span>':'')+
+              '<div class="gpe-metric-lbl">'+escaparHTML(m.lbl)+'</div>'+
+              '<div class="gpe-metric-val">'+fmtGpe(m)+(m.unit?'<span class="gpe-metric-unit">'+escaparHTML(m.unit)+'</span>':'')+
                 (m.tipo==='mxn'?'<span class="gpe-metric-unit">MXN</span>':'')+
               '</div>'+
-              (m.sub?'<div class="gpe-metric-sub">'+m.sub+'</div>':'')+
+              (m.sub?'<div class="gpe-metric-sub">'+escaparHTML(m.sub)+'</div>':'')+
               (m.tipo==='pct'?chipHtml(m.val,m.meta):'')+
             '</div>';
           }).join('');
           return '<div class="gpe-ger-card">'+
             '<div class="gpe-ger-hdr">'+
-              '<div class="gpe-ger-dot" style="background:'+g.color+'"></div>'+
-              '<span class="gpe-ger-name" style="color:'+g.color+'">'+g.nombre+'</span>'+
+              '<div class="gpe-ger-dot" style="background:'+escaparHTML(g.color)+'"></div>'+
+              '<span class="gpe-ger-name" style="color:'+escaparHTML(g.color)+'">'+escaparHTML(g.nombre)+'</span>'+
             '</div>'+
             '<div class="gpe-metrics">'+metrics+'</div>'+
           '</div>';
@@ -1887,16 +1887,16 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
         // Render table view
         var tblHtml = GPE.gerencias.map(function(g){
           var rows = g.metricas.map(function(m){
-            return '<div class="gpe-tbl-row"><div class="gpe-tbl-lbl">'+m.lbl+'</div><div class="gpe-tbl-val">'+fmtGpe(m)+(m.unit?' '+m.unit:'')+'</div></div>';
+            return '<div class="gpe-tbl-row"><div class="gpe-tbl-lbl">'+escaparHTML(m.lbl)+'</div><div class="gpe-tbl-val">'+fmtGpe(m)+(m.unit?' '+escaparHTML(m.unit):'')+'</div></div>';
           }).join('');
           return '<div class="gpe-tbl-section">'+
-            '<div class="gpe-tbl-sec-hdr" style="background:'+g.color+'">'+g.nombre+'</div>'+
+            '<div class="gpe-tbl-sec-hdr" style="background:'+escaparHTML(g.color)+'">'+escaparHTML(g.nombre)+'</div>'+
             '<div class="gpe-tbl-inner">'+rows+'</div>'+
           '</div>';
         }).join('');
         tblHtml += '<div class="gpe-tbl-section"><div class="gpe-tbl-sec-hdr" style="background:var(--color-text-primary)">Eficiencias</div><div class="gpe-tbl-inner">'+
           GPE.eficiencias.map(function(ef){
-            return '<div class="gpe-tbl-row"><div class="gpe-tbl-lbl">'+ef.lbl+'</div><div class="gpe-tbl-val">'+(ef.val*100).toFixed(2)+'%</div></div>';
+            return '<div class="gpe-tbl-row"><div class="gpe-tbl-lbl">'+escaparHTML(ef.lbl)+'</div><div class="gpe-tbl-val">'+(ef.val*100).toFixed(2)+'%</div></div>';
           }).join('')+'</div></div>';
         document.getElementById('gpe-tbl-container').innerHTML = tblHtml;
 
@@ -2076,9 +2076,9 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               var stLabel=s==='ok'?'<span class="db-status db-status-ok">Cumple</span>':s==='warn'?'<span class="db-status db-status-warn">En riesgo</span>':s==='bad'?'<span class="db-status db-status-bad">No cumple</span>':'<span class="db-status db-status-nd">Sin datos</span>';
               var mCells=MESES5.map(function(mi){
                 var val=ind.m[mi];
-                return '<td class="'+cellCls(val,ind.meta)+'">'+fmtV(val,ind.pct)+'</td>';
+                return '<td class="'+cellCls(val,ind.meta)+'">'+escaparHTML(fmtV(val,ind.pct))+'</td>';
               }).join('');
-              rows+='<tr><td class="td-proceso">'+(filter==='Todas'?g:ind.p)+'</td><td class="td-proceso">'+ind.p+'</td><td class="td-indicador">'+ind.n+'</td><td class="td-meta">'+fmtMeta(ind)+'</td><td class="td-per">'+ind.per+'</td>'+mCells+'<td>'+stLabel+'</td></tr>';
+              rows+='<tr><td class="td-proceso">'+escaparHTML(filter==='Todas'?g:ind.p)+'</td><td class="td-proceso">'+escaparHTML(ind.p)+'</td><td class="td-indicador">'+escaparHTML(ind.n)+'</td><td class="td-meta">'+escaparHTML(fmtMeta(ind))+'</td><td class="td-per">'+escaparHTML(ind.per)+'</td>'+mCells+'<td>'+stLabel+'</td></tr>';
             });
           });
           document.getElementById('mtr-tbody').innerHTML = rows;
@@ -2090,7 +2090,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
         // Filters
         var filterOpts = ['Todas','Administrativa','Comercial','Técnica','Planeación Estratégica'];
         document.getElementById('mtr-filters').innerHTML = filterOpts.map(function(f){
-          return '<button class="mtr-filter-btn'+(f==='Todas'?' active':'')+'" data-f="'+f+'" onclick="mtrFilter(\''+f+'\')">'+f+'</button>';
+          return '<button class="mtr-filter-btn'+(f==='Todas'?' active':'')+'" data-f="'+escaparHTML(f)+'" onclick="mtrFilter(this.dataset.f)">'+escaparHTML(f)+'</button>';
         }).join('');
         renderMtr('Todas');
         window.mtrFilter = function(f){ renderMtr(f); };
@@ -2446,7 +2446,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
         // Ordered list so tables appear in a consistent, logical order
         var FREQ_ORDER = ['Mensual','Bimestral','Trimestral','Cuatrimestral','Semestral','Anual'];
 
-        function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function esc(s) { return escaparHTML(s||''); }   // también escapa comillas: se usa en atributos
 
         function isPct(act) { return act.unidadMedida === 'Porcentaje' || act.unidadMedida === 'Variación'; }
 
@@ -2698,10 +2698,10 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var iS = 'max-width:100px;max-height:60px;object-fit:contain;border-radius:4px;';
           var wS = 'width:100px;height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
           var logoL = _mtMembreteConfig.logoLeft
-            ? '<div style="'+wS+'"><img src="'+_mtMembreteConfig.logoLeft+'" style="'+iS+'"></div>'
+            ? '<div style="'+wS+'"><img src=\"'+escaparHTML(_mtMembreteConfig.logoLeft)+'\" style="'+iS+'"></div>'
             : '<div class="mbr-logo">Logo</div>';
           var logoR = _mtMembreteConfig.logoRight
-            ? '<div style="'+wS+'"><img src="'+_mtMembreteConfig.logoRight+'" style="'+iS+'"></div>'
+            ? '<div style="'+wS+'"><img src=\"'+escaparHTML(_mtMembreteConfig.logoRight)+'\" style="'+iS+'"></div>'
             : '<div class="mbr-logo">Logo</div>';
           var title = _mtMembreteConfig.title
             ? _mtMembreteConfig.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2880,7 +2880,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           document.getElementById('mt-summary-row').innerHTML = chips.map(function(c){
             return '<div class="db-sum-card">'+
               '<div class="db-sum-icon" style="background:'+c.bg+';color:'+c.ic+'">'+c.svg+'</div>'+
-              '<div><div class="db-sum-num" style="color:'+c.ic+'">'+c.n+'</div><div class="db-sum-lbl">'+c.l+'</div></div>'+
+              '<div><div class="db-sum-num" style="color:'+c.ic+'">'+c.n+'</div><div class="db-sum-lbl">'+escaparHTML(c.l)+'</div></div>'+
             '</div>';
           }).join('');
         }
@@ -3444,17 +3444,17 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var _iS = 'max-width:60px;max-height:60px;object-fit:contain;border-radius:4px;';
           var _wS = 'width:60px;height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
           var logoL = _trMembreteConfig.logoLeft
-            ? '<div style="'+_wS+'"><img src="'+_trMembreteConfig.logoLeft+'" style="'+_iS+'"></div>'
+            ? '<div style="'+_wS+'"><img src=\"'+escaparHTML(_trMembreteConfig.logoLeft)+'\" style="'+_iS+'"></div>'
             : '<div class="mbr-logo">Escudo<br>Tamaulipas</div>';
           var logoR = _trMembreteConfig.logoRight
-            ? '<div style="'+_wS+'"><img src="'+_trMembreteConfig.logoRight+'" style="'+_iS+'"></div>'
+            ? '<div style="'+_wS+'"><img src=\"'+escaparHTML(_trMembreteConfig.logoRight)+'\" style="'+_iS+'"></div>'
             : '<div class="mbr-logo">Logo<br>COMAPA Sur</div>';
           var mbrTit = (_trMembreteConfig.title || 'Reporte Trimestral · Información Pública de Oficio')
             .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
           var trimLabels = {Q1:'1er Trimestre',Q2:'2do Trimestre',Q3:'3er Trimestre',Q4:'4to Trimestre'};
           var periodLabel = allMode ? 'Todos los periodos' : (trimLabels[TR_CUR_TRIM] || TR_CUR_TRIM);
           var showGerHdr = TR_CUR_GER === 'Todas' && grouped.length > 1;
-          var v = function(x){ return (x !== null && x !== undefined) ? x : '—'; };
+          var v = function(x){ return (x !== null && x !== undefined) ? escaparHTML(x) : '—'; };
           var qcls = ['th-q1-g','th-q2-g','th-q3-g','th-q4-g'];
           var qscls = ['th-q1','th-q2','th-q3','th-q4'];
 
@@ -3463,10 +3463,10 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           }
           function pdfSubRow(ind, ncols) {
             return '<tr class="tr-sub-row" data-kind="s"><td colspan="'+ncols+'"><div class="sub-grid">'
-              +'<div class="sub-item"><span class="sub-lbl">Descripción del objetivo</span><span class="sub-val">'+ind.objetivo+'</span></div>'
-              +'<div class="sub-item"><span class="sub-lbl">Fórmula utilizada</span><span class="sub-val sub-em">'+ind.formula+'</span></div>'
-              +'<div class="sub-item"><span class="sub-lbl">Unidad responsable</span><span class="sub-val">'+ind.ur+'</span></div>'
-              +'<div class="sub-item"><span class="sub-lbl">Frecuencia</span><span class="sub-val">'+ind.freq+'</span></div>'
+              +'<div class="sub-item"><span class="sub-lbl">Descripción del objetivo</span><span class="sub-val">'+escaparHTML(ind.objetivo)+'</span></div>'
+              +'<div class="sub-item"><span class="sub-lbl">Fórmula utilizada</span><span class="sub-val sub-em">'+escaparHTML(ind.formula)+'</span></div>'
+              +'<div class="sub-item"><span class="sub-lbl">Unidad responsable</span><span class="sub-val">'+escaparHTML(ind.ur)+'</span></div>'
+              +'<div class="sub-item"><span class="sub-lbl">Frecuencia</span><span class="sub-val">'+escaparHTML(ind.freq)+'</span></div>'
               +'</div></td></tr>';
           }
 
@@ -3481,13 +3481,13 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
                 +'<th class="th-base th-ind">Indicador</th>'
                 +'<th class="th-base th-udm">UDM</th>'
                 +'<th class="th-meta-bold">Meta Anual</th>';
-              sampleM.forEach(function(pd){ thead += '<th class="th-meta" style="min-width:40px;text-align:center;">'+pd.lbl+'</th>'; });
+              sampleM.forEach(function(pd){ thead += '<th class="th-meta" style="min-width:40px;text-align:center;">'+escaparHTML(pd.lbl)+'</th>'; });
               thead += '</tr></thead>';
               inds.forEach(function(ind){
                 var it = pdfIsoTag(ind);
                 rows += '<tr class="tr-data-row" data-kind="d">'
-                  +'<td class="td-ind">'+it+ind.nombre+'</td>'
-                  +'<td class="td-ctr">'+ind.udm+'</td>'
+                  +'<td class="td-ind">'+it+escaparHTML(ind.nombre)+'</td>'
+                  +'<td class="td-ctr">'+escaparHTML(ind.udm)+'</td>'
                   +'<td class="td-num td-meta">'+v(ind.metaAnual)+'</td>';
                 (ind.m||[]).forEach(function(pd){
                   var cc = trChipCls(pd.resN, pd.metaN);
@@ -3509,8 +3509,8 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               inds.forEach(function(ind){
                 var pd=(ind.m||[])[0]||{}; var cc=trChipCls(pd.resN,pd.metaN); var it=pdfIsoTag(ind);
                 rows += '<tr class="tr-data-row" data-kind="d">'
-                  +'<td class="td-ind">'+it+ind.nombre+'</td>'
-                  +'<td class="td-ctr">'+ind.udm+'</td>'
+                  +'<td class="td-ind">'+it+escaparHTML(ind.nombre)+'</td>'
+                  +'<td class="td-ctr">'+escaparHTML(ind.udm)+'</td>'
                   +'<td class="td-num td-meta">'+v(pd.meta)+'</td>'
                   +'<td class="td-num td-acum"><span class="'+cc+'">'+v(pd.res)+'</span></td>'
                   +'<td class="td-num td-acum"><span class="'+cc+'">'+v(pd.acum)+'</span></td>'
@@ -3522,7 +3522,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             var thead = '<thead><tr>'
               +'<th rowspan="2" class="th-base th-ind">Indicador</th>'
               +'<th rowspan="2" class="th-base th-udm">UDM</th>';
-            sampleM.forEach(function(pd,i){ thead += '<th colspan="3" class="th-qg '+qcls[i%4]+'">'+pd.lbl+'</th>'; });
+            sampleM.forEach(function(pd,i){ thead += '<th colspan="3" class="th-qg '+qcls[i%4]+'">'+escaparHTML(pd.lbl)+'</th>'; });
             thead += '</tr><tr>';
             sampleM.forEach(function(pd,i){
               var sc=qscls[i%4];
@@ -3532,8 +3532,8 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             inds.forEach(function(ind){
               var it=pdfIsoTag(ind);
               rows += '<tr class="tr-data-row" data-kind="d">'
-                +'<td class="td-ind">'+it+ind.nombre+'</td>'
-                +'<td class="td-ctr">'+ind.udm+'</td>';
+                +'<td class="td-ind">'+it+escaparHTML(ind.nombre)+'</td>'
+                +'<td class="td-ctr">'+escaparHTML(ind.udm)+'</td>';
               (ind.m||[]).forEach(function(pd){
                 var cc=trChipCls(pd.resN,pd.metaN);
                 rows += '<td class="td-num td-meta">'+v(pd.meta)+'</td>'
@@ -3561,8 +3561,8 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             inds.forEach(function(ind){
               var qd=ind.q[TR_CUR_TRIM]||{}; var cc=trChipCls(qd.resN,qd.metaN); var it=pdfIsoTag(ind);
               rows += '<tr class="tr-data-row" data-kind="d">'
-                +'<td class="td-ind">'+it+ind.nombre+'</td>'
-                +'<td class="td-ctr">'+ind.udm+'</td>'
+                +'<td class="td-ind">'+it+escaparHTML(ind.nombre)+'</td>'
+                +'<td class="td-ctr">'+escaparHTML(ind.udm)+'</td>'
                 +'<td class="td-num td-meta">'+v(qd.v1m)+'</td>'
                 +'<td class="td-num td-meta">'+v(qd.v2m)+'</td>'
                 +'<td class="td-num td-meta td-meta-bold">'+v(qd.meta)+'</td>'
@@ -3577,20 +3577,20 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
 
           var html = '';
           grouped.forEach(function(gg) {
-            var mbrGer = 'Gerencia '+gg.ger+' · '+periodLabel+' 2026';
+            var mbrGer = 'Gerencia '+escaparHTML(gg.ger)+' · '+periodLabel+' 2026';
             gg.unidades.forEach(function(ug) {
               var membrete = '<div class="membrete">'+logoL
                 +'<div class="mbr-center"><div class="mbr-title">'+mbrTit+'</div>'
                 +'<div class="mbr-ger">'+mbrGer+'</div>'
                 +'<div class="mbr-fecha">Generado el '+_fecha+'</div></div>'+logoR+'</div>';
-              var gerPfx = showGerHdr ? 'Gerencia '+gg.ger+' &middot; ' : '';
+              var gerPfx = showGerHdr ? 'Gerencia '+escaparHTML(gg.ger)+' &middot; ' : '';
               if (allMode) {
                 ug.freqGroups.forEach(function(fg) {
-                  var secHdr = '<div class="pdf-sec-hdr">'+gerPfx+ug.ur+' &middot; <span class="pdf-sec-freq">'+fg.freqKey+'</span></div>';
+                  var secHdr = '<div class="pdf-sec-hdr">'+gerPfx+escaparHTML(ug.ur)+' &middot; <span class="pdf-sec-freq">'+escaparHTML(fg.freqKey)+'</span></div>';
                   html += '<div class="page"><div class="page-content">'+membrete+secHdr+buildFreqTable(fg.freqKey,fg.inds)+'</div></div>';
                 });
               } else {
-                var secHdr = '<div class="pdf-sec-hdr">'+gerPfx+ug.ur+'</div>';
+                var secHdr = '<div class="pdf-sec-hdr">'+gerPfx+escaparHTML(ug.ur)+'</div>';
                 html += '<div class="page"><div class="page-content">'+membrete+secHdr+buildSingleTable(ug.allInds)+'</div></div>';
               }
             });
@@ -3992,8 +3992,8 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var chk = '<svg class="tr-dd-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
           var html = '<div class="tr-dd-opt selected" data-val="Todas" onclick="trPickUnid(\'Todas\',\'Todas\')">' + chk + 'Todas</div>';
           unidades.forEach(function(u) {
-            var s = u.replace(/'/g,"\\'");
-            html += '<div class="tr-dd-opt" data-val="' + u + '" onclick="trPickUnid(\'' + s + '\',\'' + s + '\')">' + chk + u + '</div>';
+            // El nombre va en data-val y el manejador lo lee de ahí: nunca dentro del código del onclick
+            html += '<div class="tr-dd-opt" data-val="' + escaparHTML(u) + '" onclick="trPickUnid(this.dataset.val,this.dataset.val)">' + chk + escaparHTML(u) + '</div>';
           });
           panel.innerHTML = html;
           document.getElementById('trDDUnidLabel').textContent = 'Todas';
@@ -4053,16 +4053,16 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
 
         function _trMetaRow(ind, ncols) {
           var h = '<tr class="tr-meta-row"><td colspan="'+ncols+'" class="tr-td-meta"><div class="tr-meta-grid">';
-          h += '<div class="tr-meta-item"><span class="tr-meta-label">Descripción del objetivo</span><span class="tr-meta-value">'+ind.objetivo+'</span></div>';
-          h += '<div class="tr-meta-item"><span class="tr-meta-label">Fórmula utilizada</span><span class="tr-meta-value tr-meta-formula">'+ind.formula+'</span></div>';
-          h += '<div class="tr-meta-item tr-meta-short"><span class="tr-meta-label">Unidad responsable</span><span class="tr-meta-value">'+ind.ur+'</span></div>';
-          h += '<div class="tr-meta-item tr-meta-short"><span class="tr-meta-label">Frecuencia de medición</span><span class="tr-meta-value">'+ind.freq+'</span></div>';
+          h += '<div class="tr-meta-item"><span class="tr-meta-label">Descripción del objetivo</span><span class="tr-meta-value">'+escaparHTML(ind.objetivo)+'</span></div>';
+          h += '<div class="tr-meta-item"><span class="tr-meta-label">Fórmula utilizada</span><span class="tr-meta-value tr-meta-formula">'+escaparHTML(ind.formula)+'</span></div>';
+          h += '<div class="tr-meta-item tr-meta-short"><span class="tr-meta-label">Unidad responsable</span><span class="tr-meta-value">'+escaparHTML(ind.ur)+'</span></div>';
+          h += '<div class="tr-meta-item tr-meta-short"><span class="tr-meta-label">Frecuencia de medición</span><span class="tr-meta-value">'+escaparHTML(ind.freq)+'</span></div>';
           h += '</div></td></tr>';
           return h;
         }
 
         function trBuildFreqTableHTML(freqKey, inds) {
-          var v = function(x){ return (x !== null && x !== undefined) ? x : '—'; };
+          var v = function(x){ return (x !== null && x !== undefined) ? escaparHTML(x) : '—'; };
           var iso = function(ind){ return (ind.iso && ind.iso.toLowerCase()==='x') ? '<span class="iso-tag-tbl">ISO</span>' : ''; };
           var qcls = ['tr-group-q1','tr-group-q2','tr-group-q3','tr-group-q4'];
           var scls = ['tr-sub-q1','tr-sub-q2','tr-sub-q3','tr-sub-q4'];
@@ -4076,12 +4076,12 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               +'<th class="tr-th-indicador">Indicador</th>'
               +'<th class="tr-th-udm">UDM</th>'
               +'<th class="tr-th-calc tr-sub-meta" style="min-width:76px;text-align:right;">Meta anual</th>';
-            sampleM.forEach(function(pd){ thead += '<th class="tr-th-q tr-sub-meta" style="min-width:68px;text-align:center;">'+pd.lbl+'</th>'; });
+            sampleM.forEach(function(pd){ thead += '<th class="tr-th-q tr-sub-meta" style="min-width:68px;text-align:center;">'+escaparHTML(pd.lbl)+'</th>'; });
             thead += '</tr></thead>';
             var tbody = '<tbody>';
             inds.forEach(function(ind, i){
               var ev = i%2===0?' tr-row-even':' tr-row-odd';
-              tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+iso(ind)+ind.nombre+'</td><td class="tr-td-center">'+ind.udm+'</td>';
+              tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+iso(ind)+escaparHTML(ind.nombre)+'</td><td class="tr-td-center">'+escaparHTML(ind.udm)+'</td>';
               tbody += '<td class="tr-td-num tr-col-meta">'+v(ind.metaAnual)+'</td>';
               (ind.m||[]).forEach(function(pd){
                 var st=trGetStatus(pd.resN,pd.metaN); var chip={ok:'tr-chip-ok',warn:'tr-chip-warn',bad:'tr-chip-bad',nd:'tr-chip-nd'}[st];
@@ -4103,7 +4103,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             inds.forEach(function(ind, i){
               var pd=(ind.m||[])[0]||{}; var st=trGetStatus(pd.resN,pd.metaN); var chip={ok:'tr-chip-ok',warn:'tr-chip-warn',bad:'tr-chip-bad',nd:'tr-chip-nd'}[st];
               var ev = i%2===0?' tr-row-even':' tr-row-odd';
-              tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+iso(ind)+ind.nombre+'</td><td class="tr-td-center">'+ind.udm+'</td>';
+              tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+iso(ind)+escaparHTML(ind.nombre)+'</td><td class="tr-td-center">'+escaparHTML(ind.udm)+'</td>';
               tbody += '<td class="tr-td-num tr-col-meta">'+v(pd.meta)+'</td>';
               tbody += '<td class="tr-td-num tr-col-res"><span class="tr-res-chip '+chip+'">'+v(pd.res)+'</span></td>';
               tbody += '<td class="tr-td-num tr-col-acum"><span class="tr-res-chip '+chip+'">'+v(pd.acum)+'</span></td></tr>';
@@ -4115,14 +4115,14 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           // Generic multi-period (Trimestral, Semestral, Cuatrimestral, Bimestral)
           var ncols = 2 + np * 3;
           var thead = '<thead><tr><th rowspan="2" class="tr-th-indicador">Indicador</th><th rowspan="2" class="tr-th-udm">UDM</th>';
-          sampleM.forEach(function(pd,i){ thead += '<th colspan="3" class="tr-th-group '+qcls[i%4]+'">'+pd.lbl+'</th>'; });
+          sampleM.forEach(function(pd,i){ thead += '<th colspan="3" class="tr-th-group '+qcls[i%4]+'">'+escaparHTML(pd.lbl)+'</th>'; });
           thead += '</tr><tr>';
           sampleM.forEach(function(pd,i){ var sc=scls[i%4]; thead += '<th class="tr-th-q '+sc+'">Meta</th><th class="tr-th-q '+sc+'">Resultado</th><th class="tr-th-q tr-th-q-res '+sc+'">Acum.</th>'; });
           thead += '</tr></thead>';
           var tbody = '<tbody>';
           inds.forEach(function(ind, i){
             var ev = i%2===0?' tr-row-even':' tr-row-odd';
-            tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+iso(ind)+ind.nombre+'</td><td class="tr-td-center">'+ind.udm+'</td>';
+            tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+iso(ind)+escaparHTML(ind.nombre)+'</td><td class="tr-td-center">'+escaparHTML(ind.udm)+'</td>';
             (ind.m||[]).forEach(function(pd){
               var st=trGetStatus(pd.resN,pd.metaN); var chip={ok:'tr-chip-ok',warn:'tr-chip-warn',bad:'tr-chip-bad',nd:'tr-chip-nd'}[st];
               tbody += '<td class="tr-td-num tr-col-meta">'+v(pd.meta)+'</td>';
@@ -4135,7 +4135,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
         }
 
         function trBuildSinglePeriodTableHTML(inds) {
-          var v = function(x){ return (x !== null && x !== undefined) ? x : '—'; };
+          var v = function(x){ return (x !== null && x !== undefined) ? escaparHTML(x) : '—'; };
           var thead = '<thead><tr class="tr-header-group">'
             +'<th rowspan="2" class="tr-th-indicador">Indicador</th>'
             +'<th rowspan="2" class="tr-th-udm">U. de medida</th>'
@@ -4151,7 +4151,7 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             var qd=ind.q[TR_CUR_TRIM]||{}; var st=trGetStatus(qd.resN,qd.metaN); var chip={ok:'tr-chip-ok',warn:'tr-chip-warn',bad:'tr-chip-bad',nd:'tr-chip-nd'}[st];
             var isoTag=(ind.iso&&ind.iso.toLowerCase()==='x')?'<span class="iso-tag-tbl">ISO</span>':'';
             var ev=i%2===0?' tr-row-even':' tr-row-odd';
-            tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+isoTag+ind.nombre+'</td><td class="tr-td-center">'+ind.udm+'</td>';
+            tbody += '<tr class="tr-indicador-row'+ev+'"><td class="tr-td-indicador">'+isoTag+escaparHTML(ind.nombre)+'</td><td class="tr-td-center">'+escaparHTML(ind.udm)+'</td>';
             tbody += '<td class="tr-td-num tr-col-meta">'+v(qd.v1m)+'</td><td class="tr-td-num tr-col-meta">'+v(qd.v2m)+'</td><td class="tr-td-num tr-col-meta tr-col-meta-bold">'+v(qd.meta)+'</td>';
             tbody += '<td class="tr-td-num tr-col-res">'+v(qd.v1r)+'</td><td class="tr-td-num tr-col-res">'+v(qd.v2r)+'</td>';
             tbody += '<td class="tr-td-num tr-col-res"><span class="tr-res-chip '+chip+'">'+v(qd.res)+'</span></td>';
@@ -4172,14 +4172,14 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var showGerHdr = TR_CUR_GER === 'Todas' && grouped.length > 1;
           var html = '';
           grouped.forEach(function(gerGroup) {
-            if (showGerHdr) html += '<div class="tr-ger-hdr">Gerencia '+gerGroup.ger+'</div>';
+            if (showGerHdr) html += '<div class="tr-ger-hdr">Gerencia '+escaparHTML(gerGroup.ger)+'</div>';
             gerGroup.unidades.forEach(function(unitGroup) {
-              html += '<div class="tr-unit-section"><div class="tr-unit-hdr">'+unitGroup.ur+'</div>';
+              html += '<div class="tr-unit-section"><div class="tr-unit-hdr">'+escaparHTML(unitGroup.ur)+'</div>';
               if (allMode) {
                 unitGroup.freqGroups.forEach(function(fg) {
                   html += '<div class="tr-freq-section">';
                   if (unitGroup.freqGroups.length > 1) {
-                    html += '<div class="tr-freq-hdr">'+fg.freqKey+' · '+fg.inds.length+' indicador'+(fg.inds.length!==1?'es':'')+'</div>';
+                    html += '<div class="tr-freq-hdr">'+escaparHTML(fg.freqKey)+' · '+fg.inds.length+' indicador'+(fg.inds.length!==1?'es':'')+'</div>';
                   }
                   html += '<div class="tr-table-wrap">'+trBuildFreqTableHTML(fg.freqKey, fg.inds)+'</div>';
                   html += '</div>';
@@ -4266,12 +4266,12 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           };
           var rows = inds.map(function(ind) {
             var qd = ind.q[TR_CUR_TRIM] || {};
-            var v = function(x){ return (x !== null && x !== undefined) ? x : '—'; };
+            var v = function(x){ return (x !== null && x !== undefined) ? escaparHTML(x) : '—'; };
             var st = statusCls(qd.resN, qd.metaN);
             var cs = chipStyle(st);
             return '<tr class="data">'
-              + '<td class="ind">' + ind.nombre + '</td>'
-              + '<td class="ctr">' + ind.udm + '</td>'
+              + '<td class="ind">' + escaparHTML(ind.nombre) + '</td>'
+              + '<td class="ctr">' + escaparHTML(ind.udm) + '</td>'
               + '<td class="num meta">' + v(qd.v1m) + '</td>'
               + '<td class="num meta">' + v(qd.v2m) + '</td>'
               + '<td class="num meta bold">' + v(qd.meta) + '</td>'
@@ -4283,14 +4283,15 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               + '<tr class="sub">'
               + '<td colspan="9" style="padding:6px 12px 10px;border-bottom:1px solid var(--color-border);background:var(--color-neutral-50);">'
               + '<table style="width:100%;border-collapse:collapse;font-size:10px;"><tr>'
-              + '<td style="width:35%;padding-right:12px;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Descripción del objetivo</strong><br>' + ind.objetivo + '</td>'
-              + '<td style="width:35%;padding-right:12px;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Fórmula utilizada</strong><br><em>' + ind.formula + '</em></td>'
-              + '<td style="width:15%;padding-right:12px;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Unidad responsable</strong><br>' + ind.ur + '</td>'
-              + '<td style="width:15%;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Frecuencia</strong><br>' + ind.freq + '</td>'
+              + '<td style="width:35%;padding-right:12px;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Descripción del objetivo</strong><br>' + escaparHTML(ind.objetivo) + '</td>'
+              + '<td style="width:35%;padding-right:12px;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Fórmula utilizada</strong><br><em>' + escaparHTML(ind.formula) + '</em></td>'
+              + '<td style="width:15%;padding-right:12px;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Unidad responsable</strong><br>' + escaparHTML(ind.ur) + '</td>'
+              + '<td style="width:15%;vertical-align:top;"><strong style="color:var(--color-text-secondary);font-size:9px;text-transform:uppercase;">Frecuencia</strong><br>' + escaparHTML(ind.freq) + '</td>'
               + '</tr></table></td></tr>';
           }).join('');
 
           var win = window.open('','_blank');
+          if (!win) return;
           win.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
             + '<title>Reporte Trimestral — COMAPA Sur</title>'
             + '<style>'
@@ -4312,9 +4313,9 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             + '<h1>Reporte Trimestral — COMAPA Sur</h1>'
             + '<p class="sub-h">Información pública de oficio — indicadores de desempeño</p>'
             + '<div class="meta-bar">'
-            + '<span><strong>Gerencia:</strong> ' + TR_CUR_GER + '</span>'
-            + '<span><strong>Período:</strong> ' + trimLabel + ' 2026</span>'
-            + (TR_CUR_UNID !== 'Todas' ? '<span><strong>Unidad responsable:</strong> ' + TR_CUR_UNID + '</span>' : '')
+            + '<span><strong>Gerencia:</strong> ' + escaparHTML(TR_CUR_GER) + '</span>'
+            + '<span><strong>Período:</strong> ' + escaparHTML(trimLabel) + ' 2026</span>'
+            + (TR_CUR_UNID !== 'Todas' ? '<span><strong>Unidad responsable:</strong> ' + escaparHTML(TR_CUR_UNID) + '</span>' : '')
             + '<span><strong>Fecha de generación:</strong> ' + new Date().toLocaleDateString('es-MX') + '</span>'
             + '</div>'
             + '<table><thead>'
@@ -4667,8 +4668,8 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
 
         /* ── Chart builders ────────────────────────────────────────────── */
         function buildTable(heads, rows) {
-          var h = '<table><thead><tr>' + heads.map(function(x){ return '<th>'+x+'</th>'; }).join('') + '</tr></thead><tbody>';
-          rows.forEach(function(r){ h += '<tr>' + r.map(function(c){ return '<td>'+(c===null||c===undefined?'—':c)+'</td>'; }).join('') + '</tr>'; });
+          var h = '<table><thead><tr>' + heads.map(function(x){ return '<th>'+escaparHTML(x)+'</th>'; }).join('') + '</tr></thead><tbody>';
+          rows.forEach(function(r){ h += '<tr>' + r.map(function(c){ return '<td>'+(c===null||c===undefined?'—':escaparHTML(c))+'</td>'; }).join('') + '</tr>'; });
           h += '</tbody></table>';
           var el = document.getElementById('gfx2TblWrap'); if (el) el.innerHTML = h;
         }
@@ -4703,12 +4704,12 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
             else if (id === 'tend-cumpl')   chartTendCumpl(ctx);
             else {
               var wrap = canvas.closest('.gfx2-canvas-wrap');
-              if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6B7280;font-size:13px;">Tipo de gráfica no reconocido: '+id+'</div>';
+              if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6B7280;font-size:13px;">Tipo de gráfica no reconocido: '+escaparHTML(id)+'</div>';
             }
           } catch(e) {
             console.error('gfx2 chart error:', e);
             var wrap = canvas.closest('.gfx2-canvas-wrap');
-            if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#EF4444;font-size:13px;padding:20px;text-align:center;">Error al generar la gráfica:<br><code style="font-size:11px;">'+e.message+'</code></div>';
+            if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#EF4444;font-size:13px;padding:20px;text-align:center;">Error al generar la gráfica:<br><code style="font-size:11px;">'+escaparHTML(e.message)+'</code></div>';
           }
         }
 
@@ -5195,8 +5196,8 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           var h = '';
           GERS.forEach(function(g, i) {
             h += '<button class="hger-ger-pill'+(i===ST.gerIdx?' active':'')+'" onclick="hgerPickGer('+i+')">';
-            h += '<span class="hger-ger-dot" style="background:'+g.color+'"></span>';
-            h += g.nombre + '</button>';
+            h += '<span class="hger-ger-dot" style="background:'+escaparHTML(g.color)+'"></span>';
+            h += escaparHTML(g.nombre) + '</button>';
           });
           document.getElementById('hgerGerPills').innerHTML = h;
         }
@@ -5208,9 +5209,9 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
           g.metricas.forEach(function(m, i) {
             var mayVal = m.hist[4];
             var sel = i === ST.metIdx;
-            h += '<button class="hger-list-item'+(sel?' active':'')+'" style="--hger-color:'+g.color+'" onclick="hgerPickMet('+i+')">';
-            h += '<div class="hger-item-lbl">'+m.lbl+'</div>';
-            h += '<div class="hger-item-val">'+fmtV(m, mayVal)+' · May 2026</div>';
+            h += '<button class="hger-list-item'+(sel?' active':'')+'" style="--hger-color:'+escaparHTML(g.color)+'" onclick="hgerPickMet('+i+')">';
+            h += '<div class="hger-item-lbl">'+escaparHTML(m.lbl)+'</div>';
+            h += '<div class="hger-item-val">'+escaparHTML(fmtV(m, mayVal))+' · May 2026</div>';
             h += '</button>';
           });
           document.getElementById('hgerList').innerHTML = h;
@@ -5239,14 +5240,14 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
 
           function statFmt(v) {
             if (m.tipo === 'pct') return v.toFixed(1)+'%';
-            return fmtV(m, m.tipo === 'mxn' ? v : v);
+            return escaparHTML(fmtV(m, v));
           }
 
           var h = '<div class="hger-result">';
           h += '<div class="hger-result-hdr"><div class="hger-result-meta">';
-          h += '<div class="hger-result-ger" style="color:'+g.color+'">'+g.nombre+'</div>';
-          h += '<div class="hger-result-title">'+m.lbl+'</div>';
-          h += '<div class="hger-result-period">Ene – Sep 2026'+(m.unit ? ' · '+m.unit : '')+'</div>';
+          h += '<div class="hger-result-ger" style="color:'+escaparHTML(g.color)+'">'+escaparHTML(g.nombre)+'</div>';
+          h += '<div class="hger-result-title">'+escaparHTML(m.lbl)+'</div>';
+          h += '<div class="hger-result-period">Ene – Sep 2026'+(m.unit ? ' · '+escaparHTML(m.unit) : '')+'</div>';
           h += '</div><div class="hger-result-actions">';
           h += '<button class="hger-act-btn" onclick="hgerPNG()">↓ PNG</button>';
           h += '</div></div>';
@@ -5327,11 +5328,11 @@ td {padding:12px 16px;vertical-align:middle;font-size:13px;}
               var raw = m.hist[i];
               tH += '<tr'+(i===4?' style="font-weight:700;"':'')+'>';
               tH += '<td>'+mes+' 2026'+(i===4?' ★':'')+'</td>';
-              tH += '<td>'+fmtV(m, raw)+'</td>';
+              tH += '<td>'+escaparHTML(fmtV(m, raw))+'</td>';
               if (m.meta !== undefined) {
                 var ratio = (raw/m.meta*100).toFixed(1);
                 var color = raw/m.meta>=0.95?'#059669':raw/m.meta>=0.80?'#D97706':'#EF4444';
-                tH += '<td>'+fmtV(m, m.meta)+'</td>';
+                tH += '<td>'+escaparHTML(fmtV(m, m.meta))+'</td>';
                 tH += '<td style="color:'+color+';font-weight:700;">'+ratio+'%</td>';
               }
               tH += '</tr>';

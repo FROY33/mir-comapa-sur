@@ -411,7 +411,7 @@ body {
       var estadoLbl  = _estadoLabels[g.periodoEstado] || g.periodoEstado;
       var pctCorte   = _pctSafe(g.indicadoresConCorte, g.totalIndicadores);
       var pctAprobPct = _pctSafe(g.aprobados + g.validados, g.indicadoresConCorte || 1);
-      var url = 'validacion-gerencia-detalle.html?ger=' + g.id + '&periodo=' + _periodo;
+      var url = 'validacion-gerencia-detalle.html?ger=' + encodeURIComponent(g.id) + '&periodo=' + encodeURIComponent(_periodo);
 
       var semaforoDetail = '';
       if (g.rojo > 0)    semaforoDetail = g.rojo + ' en incumplimiento';
@@ -428,16 +428,16 @@ body {
       var accentColor = g.color || '#8B1D3A';
 
       return [
-        '<a class="g-card" href="' + url + '">',
+        '<a class="g-card" href="' + escaparHTML(url) + '">',
         '  <div class="g-body">',
 
         // Header: name + estado badge
         '    <div class="g-header">',
         '      <div>',
-        '        <div class="g-name">' + g.nombre.replace('Gerencia de ', '').replace('Gerencia ', '') + '</div>',
+        '        <div class="g-name">' + escaparHTML(g.nombre.replace('Gerencia de ', '').replace('Gerencia ', '')) + '</div>',
         '        <div class="g-meta">' + g.numUnidades + ' unidades · ' + g.totalIndicadores + ' indicadores total</div>',
         '      </div>',
-        '      <span class="g-estado-badge ' + g.periodoEstado + '"><span class="badge-dot"></span>' + estadoLbl + '</span>',
+        '      <span class="g-estado-badge ' + escaparHTML(g.periodoEstado) + '"><span class="badge-dot"></span>' + escaparHTML(estadoLbl) + '</span>',
         '    </div>',
 
         // Fraction: indicadores este mes
@@ -448,7 +448,7 @@ body {
         '        <span class="g-fraction-total">' + g.totalIndicadores + '</span>',
         '      </div>',
         '      <div class="g-fraction-label">indicadores con corte este mes</div>',
-        '      <div class="g-progress-bar"><div class="g-progress-fill" style="width:' + pctCorte + '%;background:' + accentColor + '80"></div></div>',
+        '      <div class="g-progress-bar"><div class="g-progress-fill" style="width:' + pctCorte + '%;background:' + escaparHTML(accentColor) + '80"></div></div>',
         '    </div>',
 
         // Semaforo row

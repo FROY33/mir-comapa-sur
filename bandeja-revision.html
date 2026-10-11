@@ -527,7 +527,7 @@ tbody td {padding:12px 14px;font-size:13px;vertical-align:middle;}
 
   function renderRow(a) {
     const _ecfg = (typeof ESTADO_CFG_MIR !== 'undefined' ? ESTADO_CFG_MIR : (typeof ESTADO_CFG !== 'undefined' ? ESTADO_CFG : {}));
-    const cfg  = _ecfg[a.estado] || { label: a.estado, cls: a.estado };
+    const cfg  = _ecfg[a.estado] || { label: a.estado, cls: escaparHTML(a.estado) };
     const niv  = (typeof NIVEL_CFG !== 'undefined' && NIVEL_CFG[a.nivel]) || { label: a.nivel || '—', cls: 'nivel-actividad' };
     const dias = diasRestantes(a.fechaLimite);
     const dCls = dias < 0 ? 'pasado' : dias <= 7 ? 'urgente' : dias <= 14 ? 'proximo' : 'normal';
@@ -536,22 +536,23 @@ tbody td {padding:12px 14px;font-size:13px;vertical-align:middle;}
     const btnCls = a.estado === 'corregido' ? 'purple' : isEditable ? 'blue' : 'green';
     const btnLbl = a.estado === 'corregido' ? 'Revisar corrección' : isEditable ? 'Revisar' : 'Ver detalle';
 
-    return `<tr style="cursor:pointer" onclick="window.location.href='detalle-actividad.html?id=${a.id}&rol=revisor'">
+    const url = 'detalle-actividad.html?id=' + encodeURIComponent(a.id) + '&amp;rol=revisor';
+    return `<tr style="cursor:pointer" data-href="${url}" onclick="window.location.href=this.dataset.href">
       <td style="min-width:200px;max-width:260px;">
-        <p class="act-id">${a.id}</p>
-        <p class="act-name">${isoBadge(a)}${a.nombreIndicador}</p>
-        <p class="act-sub"><span class="nivel-badge ${niv.cls}">${niv.label}</span> · ${a.periodo}</p>
+        <p class="act-id">${escaparHTML(a.id)}</p>
+        <p class="act-name">${isoBadge(a)}${escaparHTML(a.nombreIndicador)}</p>
+        <p class="act-sub"><span class="nivel-badge ${niv.cls}">${escaparHTML(niv.label)}</span> · ${escaparHTML(a.periodo)}</p>
       </td>
-      <td style="font-size:12px;white-space:nowrap;">${a.responsableEnlace}<br><span style="color:var(--color-text-secondary);">${a.gerencia}</span></td>
-      <td style="font-size:11px;color:var(--color-text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${a.medioVerificacion}">${a.medioVerificacion}</td>
+      <td style="font-size:12px;white-space:nowrap;">${escaparHTML(a.responsableEnlace)}<br><span style="color:var(--color-text-secondary);">${escaparHTML(a.gerencia)}</span></td>
+      <td style="font-size:11px;color:var(--color-text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escaparHTML(a.medioVerificacion)}">${escaparHTML(a.medioVerificacion)}</td>
       <td class="td-fecha">
-        <p class="fecha-val">${formatFecha(a.fechaLimite)}</p>
+        <p class="fecha-val">${escaparHTML(formatFecha(a.fechaLimite))}</p>
         <p class="fecha-dias ${dCls}">${dTxt}</p>
       </td>
-      <td><span class="estado-badge ${cfg.cls}">${cfg.label}</span></td>
-      <td style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap;">${formatFecha(fechaEnvio(a))}</td>
+      <td><span class="estado-badge ${cfg.cls}">${escaparHTML(cfg.label)}</span></td>
+      <td style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap;">${escaparHTML(formatFecha(fechaEnvio(a)))}</td>
       <td class="td-action">
-        <a class="btn-act ${btnCls}" href="detalle-actividad.html?id=${a.id}&rol=revisor" onclick="event.stopPropagation()">
+        <a class="btn-act ${btnCls}" href="${url}" onclick="event.stopPropagation()">
           ${btnLbl}
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
         </a>
@@ -594,7 +595,7 @@ tbody td {padding:12px 14px;font-size:13px;vertical-align:middle;}
       '<div>'
       + '<p class="modal-section-label">Información del reporte</p>'
       + '<div class="cm-period-row">'
-      +   '<strong>' + ger + '</strong>'
+      +   '<strong>' + escaparHTML(ger) + '</strong>'
       +   '<span class="cm-period-dot"></span>'
       +   '<span>Ejercicio fiscal 2026</span>'
       +   '<span class="cm-period-dot"></span>'
@@ -716,7 +717,8 @@ tbody td {padding:12px 14px;font-size:13px;vertical-align:middle;}
     renderCierreStats();
     const urlChip = new URLSearchParams(window.location.search).get('chip');
     if (urlChip) {
-      const el = document.querySelector(`[data-chip="${urlChip}"]`);
+      // El parámetro viene de la URL: se compara, no se mete en el selector CSS
+      const el = Array.from(document.querySelectorAll('[data-chip]')).find(b => b.dataset.chip === urlChip);
       if (el) setChip(el, urlChip);
       else { highlightKPI('todas'); applyFilters(); }
     } else {

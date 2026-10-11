@@ -375,7 +375,7 @@ function updateKpis() {
   ALL_PLANS.forEach(function(p){ gCounts[p.gerencia]=(gCounts[p.gerencia]||{total:0,bloqueado:0}); gCounts[p.gerencia].total++; if(p.estado==='bloqueado') gCounts[p.gerencia].bloqueado++; });
   document.getElementById('rpGerencias').innerHTML = Object.keys(gCounts).map(function(g){
     var c2=gCounts[g], col=GERENCIA_COLORS[g]||'#6B7280';
-    return '<div class="rp-stat-row"><span class="rp-stat-label" style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:'+col+';display:inline-block;"></span>'+(GERENCIA_NAMES[g]||g)+'</span><span class="rp-stat-val" style="font-size:11px;">'+c2.bloqueado+'/'+c2.total+'</span></div>';
+    return '<div class="rp-stat-row"><span class="rp-stat-label" style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:'+col+';display:inline-block;"></span>'+escaparHTML(GERENCIA_NAMES[g]||g)+'</span><span class="rp-stat-val" style="font-size:11px;">'+c2.bloqueado+'/'+c2.total+'</span></div>';
   }).join('');
 }
 
@@ -392,17 +392,17 @@ function renderTable() {
     var gc  = GERENCIA_COLORS[plan.gerencia]||'#6B7280';
     var gn  = GERENCIA_NAMES[plan.gerencia]||plan.gerencia;
     var btn = '';
-    if (plan.estado==='aprobado') btn='<button class="btn-action approve" onclick="event.stopPropagation();quickApprove(\''+plan.id+'\')">Aprobar definitivo</button>';
-    else if (plan.estado==='bloqueado') btn='<button class="btn-action unlock" onclick="event.stopPropagation();openModal(\''+plan.id+'\')">Ver / Admin</button>';
-    else btn='<button class="btn-action view" onclick="event.stopPropagation();openModal(\''+plan.id+'\')">Ver</button>';
-    return '<tr onclick="openModal(\''+plan.id+'\')">'+
-      '<td><span class="td-id">'+plan.id+'</span></td>'+
-      '<td><span class="td-nombre">'+(ind.nombre||plan.id)+'</span></td>'+
-      '<td><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+gc+'18;color:'+gc+';">'+gn+'</span></td>'+
-      '<td><span class="pill freq">'+(plan.frecuencia||'—')+'</span></td>'+
+    if (plan.estado==='aprobado') btn='<button class="btn-action approve" data-id="'+escaparHTML(plan.id)+'" onclick="event.stopPropagation();quickApprove(this.dataset.id)">Aprobar definitivo</button>';
+    else if (plan.estado==='bloqueado') btn='<button class="btn-action unlock" data-id="'+escaparHTML(plan.id)+'" onclick="event.stopPropagation();openModal(this.dataset.id)">Ver / Admin</button>';
+    else btn='<button class="btn-action view" data-id="'+escaparHTML(plan.id)+'" onclick="event.stopPropagation();openModal(this.dataset.id)">Ver</button>';
+    return '<tr data-id="'+escaparHTML(plan.id)+'" onclick="openModal(this.dataset.id)">'+
+      '<td><span class="td-id">'+escaparHTML(plan.id)+'</span></td>'+
+      '<td><span class="td-nombre">'+escaparHTML(ind.nombre||plan.id)+'</span></td>'+
+      '<td><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+gc+'18;color:'+gc+';">'+escaparHTML(gn)+'</span></td>'+
+      '<td><span class="pill freq">'+escaparHTML(plan.frecuencia||'—')+'</span></td>'+
       '<td><span class="estado-pill" style="background:'+ec.bg+';color:'+ec.color+'">'+ec.label+'</span></td>'+
-      '<td style="font-size:11px;color:var(--color-text-secondary)">'+(plan.fechaEnvio||'—')+'</td>'+
-      '<td style="font-size:11px;color:var(--color-text-secondary)">'+(plan.fechaRevision||'—')+'</td>'+
+      '<td style="font-size:11px;color:var(--color-text-secondary)">'+escaparHTML(plan.fechaEnvio||'—')+'</td>'+
+      '<td style="font-size:11px;color:var(--color-text-secondary)">'+escaparHTML(plan.fechaRevision||'—')+'</td>'+
       '<td>'+btn+'</td>'+
     '</tr>';
   }).join('');
@@ -433,8 +433,8 @@ function openModal(id) {
   document.getElementById('mTitle').textContent    = ind.nombre||id;
   document.getElementById('mSubtitle').textContent = id+' · '+(plan.frecuencia||'—')+' · '+gn;
   document.getElementById('mMeta').innerHTML =
-    '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+gc+'18;color:'+gc+'">'+gn+'</span>'+
-    '<span class="pill freq">'+(plan.frecuencia||'—')+'</span>'+
+    '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+gc+'18;color:'+gc+'">'+escaparHTML(gn)+'</span>'+
+    '<span class="pill freq">'+escaparHTML(plan.frecuencia||'—')+'</span>'+
     '<span style="font-size:10px;font-weight:600;padding:2px 10px;border-radius:999px;background:'+ec.bg+';color:'+ec.color+'">'+ec.label+'</span>';
 
   var periods = PERIODOS_LABELS[plan.frecuencia]||[];
@@ -452,7 +452,7 @@ function openModal(id) {
   html += '<div class="timeline">'+tlSteps.map(function(s, i){
     var cls = s.done ? 'done' : (i===tlSteps.findIndex(function(x){ return !x.done; }) ? 'active' : 'pending');
     var icon = s.done ? '✓' : (cls==='active'?'→':'○');
-    return '<div class="tl-item"><div class="tl-dot '+cls+'">'+icon+'</div><div class="tl-content"><p class="tl-title">'+s.label+'</p><p class="tl-sub">'+s.sub+'</p></div></div>';
+    return '<div class="tl-item"><div class="tl-dot '+cls+'">'+icon+'</div><div class="tl-content"><p class="tl-title">'+s.label+'</p><p class="tl-sub">'+escaparHTML(s.sub)+'</p></div></div>';
   }).join('')+'</div>';
 
   // Metas table
@@ -460,25 +460,25 @@ function openModal(id) {
   html += '<table class="metas-table"><thead><tr><th>Período</th><th>Meta</th><th>Unidad</th></tr></thead><tbody>';
   periods.forEach(function(p,i){
     var v = metas[i]!=null ? metas[i] : '—';
-    html += '<tr><td>'+p+'</td><td class="meta-val">'+(v!=='—'?Number(v).toLocaleString('es-MX'):'—')+'</td><td style="color:var(--color-text-secondary)">'+(ind.unidad||'')+'</td></tr>';
+    html += '<tr><td>'+escaparHTML(p)+'</td><td class="meta-val">'+(v!=='—'?Number(v).toLocaleString('es-MX'):'—')+'</td><td style="color:var(--color-text-secondary)">'+escaparHTML(ind.unidad||'')+'</td></tr>';
   });
   if (ind.acumulable && metas.length) {
     var tot = metas.reduce(function(s,v){ return s+(parseFloat(v)||0); },0);
-    html += '<tr style="background:var(--color-success-tint);"><td style="font-weight:700;color:var(--color-success-strong);">Total acumulado</td><td class="meta-val" style="color:var(--color-success-strong);">'+tot.toLocaleString('es-MX')+'</td><td style="color:var(--color-success-strong);">'+(ind.unidad||'')+'</td></tr>';
+    html += '<tr style="background:var(--color-success-tint);"><td style="font-weight:700;color:var(--color-success-strong);">Total acumulado</td><td class="meta-val" style="color:var(--color-success-strong);">'+tot.toLocaleString('es-MX')+'</td><td style="color:var(--color-success-strong);">'+escaparHTML(ind.unidad||'')+'</td></tr>';
   }
   html += '</tbody></table>';
 
   if (plan.comentariosEnlace) {
     html += '<p class="section-title">Comentarios del enlace</p>';
-    html += '<div class="comment-block">'+plan.comentariosEnlace+'</div>';
+    html += '<div class="comment-block">'+escaparHTML(plan.comentariosEnlace)+'</div>';
   }
   if (plan.obsRevisor) {
     html += '<p class="section-title">Comentarios del revisor</p>';
-    html += '<div class="comment-block approved">'+plan.obsRevisor+'</div>';
+    html += '<div class="comment-block approved">'+escaparHTML(plan.obsRevisor)+'</div>';
   }
   if (plan.obsAdmin) {
     html += '<p class="section-title">Resolución del administrador</p>';
-    html += '<div class="comment-block approved">'+plan.obsAdmin+'</div>';
+    html += '<div class="comment-block approved">'+escaparHTML(plan.obsAdmin)+'</div>';
   }
 
   // Admin action
@@ -486,15 +486,15 @@ function openModal(id) {
     html += '<div class="approval-box">'+
       '<p class="approval-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg> Aprobación final del administrador</p>'+
       '<textarea class="approval-comment" id="adminComment" placeholder="Comentario opcional para el expediente…"></textarea>'+
-      '<button class="btn-approve-final" onclick="approveFinal(\''+id+'\')">'+
+      '<button class="btn-approve-final" onclick="approveFinal(EDITING_ID)">'+
         '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>'+
         'Aprobar definitivamente y fijar metas'+
       '</button>'+
     '</div>';
   } else if (plan.estado==='bloqueado') {
     html += '<div class="locked-notice"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>'+
-      '<div>Metas fijadas el '+( plan.fechaAprobacion||'—')+'. Solo el administrador puede modificarlas en casos excepcionales. '+
-      '<br><button style="margin-top:8px;font-size:11px;font-weight:600;font-family:inherit;padding:4px 12px;border-radius:999px;background:var(--color-warning-tint);color:var(--color-warning-text);border:1px solid #FDE68A;cursor:pointer;" onclick="unlockPlan(\''+id+'\')">Desbloquear (caso excepcional)</button></div>'+
+      '<div>Metas fijadas el '+escaparHTML(plan.fechaAprobacion||'—')+'. Solo el administrador puede modificarlas en casos excepcionales. '+
+      '<br><button style="margin-top:8px;font-size:11px;font-weight:600;font-family:inherit;padding:4px 12px;border-radius:999px;background:var(--color-warning-tint);color:var(--color-warning-text);border:1px solid #FDE68A;cursor:pointer;" onclick="unlockPlan(EDITING_ID)">Desbloquear (caso excepcional)</button></div>'+
     '</div>';
   }
 

@@ -379,6 +379,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
   var _hoy    = new Date();
   var _maxPer = _hoy.getFullYear() + '-' + String(_hoy.getMonth() + 1).padStart(2, '0');
   var _periodo = _params.get('periodo') || ValidationAdminStore.DEMO_PERIODO;
+  // Viene de la URL: solo se acepta AAAA-MM, que es lo único que sabe pintar la página
+  if (!/^\d{4}-\d{2}$/.test(_periodo)) _periodo = ValidationAdminStore.DEMO_PERIODO;
 
   function _parsePer(p) { return { year: parseInt(p.slice(0,4),10), month: parseInt(p.slice(5,7),10) }; }
   function _addMonths(p, d) {
@@ -526,9 +528,9 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
           '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h6l3 3v9a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M10 2v3h3"/><path d="M5.5 9h5M5.5 11.5h3"/></svg>' +
         '</div>' +
         '<div class="doc-file-info">' +
-          '<p class="doc-file-name">' + fileName + '</p>' +
-          '<p class="doc-file-meta">Enviado el ' + fechaEnvio + ' · 1.4 MB</p>' +
-          '<p class="doc-file-meta" style="margin-top:2px">Por ' + revisorName + '</p>' +
+          '<p class="doc-file-name">' + escaparHTML(fileName) + '</p>' +
+          '<p class="doc-file-meta">Enviado el ' + escaparHTML(fechaEnvio) + ' · 1.4 MB</p>' +
+          '<p class="doc-file-meta" style="margin-top:2px">Por ' + escaparHTML(revisorName) + '</p>' +
         '</div>' +
       '</div>' +
       '<button class="doc-btn" onclick="return false;">' +
@@ -579,12 +581,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       return [
         '<label class="modal-ind-row" for="chk-ind-' + i + '">',
         '  <input type="checkbox" class="modal-ind-check ind-checkbox" id="chk-ind-' + i + '"',
-        '    value="' + item.indicador.id + '" checked onchange="updateRegresarCount()">',
+        '    value="' + escaparHTML(item.indicador.id) + '" checked onchange="updateRegresarCount()">',
         '  <div class="modal-ind-info">',
-        '    <div class="modal-ind-nombre">' + isoBadge(item.indicador) + item.indicador.nombre + '</div>',
-        '    <div class="modal-ind-unidad">' + (item.unidadNombre || '—') + '</div>',
+        '    <div class="modal-ind-nombre">' + isoBadge(item.indicador) + escaparHTML(item.indicador.nombre) + '</div>',
+        '    <div class="modal-ind-unidad">' + escaparHTML(item.unidadNombre || '—') + '</div>',
         '  </div>',
-        '  <span class="modal-ind-badge ' + estado + '">' + (BADGE[estado] || estado) + '</span>',
+        '  <span class="modal-ind-badge ' + escaparHTML(estado) + '">' + escaparHTML(BADGE[estado] || estado) + '</span>',
         '</label>',
       ].join('');
     });
@@ -716,12 +718,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     document.getElementById('gerHeader').innerHTML = [
       // 1. Nombre + estado
       '<div class="ger-hdr-top">',
-      '  <div class="ger-icon" style="background:' + (g.color || 'var(--color-primary)') + '">',
+      '  <div class="ger-icon" style="background:' + escaparHTML(g.color || 'var(--color-primary)') + '">',
       '    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/></svg>',
       '  </div>',
       '  <div class="ger-hdr-name">',
-      '    <div class="ger-title">' + g.nombre + '</div>',
-      '    <span class="g-estado-badge ' + estadoKey + '"><span class="bdot"></span>' + estadoLbl + '</span>',
+      '    <div class="ger-title">' + escaparHTML(g.nombre) + '</div>',
+      '    <span class="g-estado-badge ' + escaparHTML(estadoKey) + '"><span class="bdot"></span>' + escaparHTML(estadoLbl) + '</span>',
       '  </div>',
       '</div>',
       // 2. Período
@@ -858,7 +860,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       avanceTxt = 'Sin datos';
       avanceCls = 'nd';
     } else {
-      avanceTxt = rip.avancePeriodo + '%';
+      avanceTxt = escaparHTML(rip.avancePeriodo) + '%';
       avanceCls = sem;
     }
 
@@ -866,7 +868,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     var acumBlock = '';
     if (ind.aplicaAcumulado && hasC) {
       var acumVal = (rip && rip.avanceAcumulado !== null && rip.avanceAcumulado !== undefined)
-        ? rip.avanceAcumulado + '%'
+        ? escaparHTML(rip.avanceAcumulado) + '%'
         : 'Sin datos';
       acumBlock = '<div class="ind-acum-block"><div class="ind-acum-val">' + acumVal + '</div><div class="ind-acum-lbl">acumulado</div></div>';
     }
@@ -879,20 +881,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     // Corte tag (only if no corte this period)
     var corteTag = !hasC
       ? '<span class="no-corte-tag">Sin corte este mes</span>'
-      : '<span class="freq-tag">' + (ind.frecuencia || 'Mensual') + '</span>';
+      : '<span class="freq-tag">' + escaparHTML(ind.frecuencia || 'Mensual') + '</span>';
 
-    var url = 'validacion-indicador-detalle.html?id=' + encodeURIComponent(ind.id) + '&periodo=' + periodo + '&ger=' + ger.id;
+    var url = 'validacion-indicador-detalle.html?id=' + encodeURIComponent(ind.id) + '&periodo=' + encodeURIComponent(periodo) + '&ger=' + encodeURIComponent(ger.id);
 
     return [
-      '<a class="ind-card" href="' + url + '">',
+      '<a class="ind-card" href="' + escaparHTML(url) + '">',
       '  <div class="sem-dot-badge"><div class="sem-dot" style="background:' + barColor + '"></div><span class="sem-dot-label">' + semLabel + '</span></div>',
       '  <div class="ind-body">',
       '    <div class="ind-head-row">',
-      '      <span class="ind-estado-badge ' + estadoKey + '">' + estadoLbl + '</span>',
+      '      <span class="ind-estado-badge ' + escaparHTML(estadoKey) + '">' + escaparHTML(estadoLbl) + '</span>',
       '      ' + forzadoTag,
       '    </div>',
-      '    <div class="ind-nombre">' + isoBadge(ind) + ind.nombre + '</div>',
-      '    <div class="ind-unidad">' + (item.unidadNombre || '—') + '</div>',
+      '    <div class="ind-nombre">' + isoBadge(ind) + escaparHTML(ind.nombre) + '</div>',
+      '    <div class="ind-unidad">' + escaparHTML(item.unidadNombre || '—') + '</div>',
       '    <div class="ind-avance-row">',
       '      <div class="ind-pct-block">',
       '        <div class="ind-pct ' + avanceCls + '">' + avanceTxt + '</div>',

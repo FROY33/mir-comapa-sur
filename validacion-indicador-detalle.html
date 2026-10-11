@@ -229,6 +229,8 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
   var _params  = new URLSearchParams(window.location.search);
   var _indId   = _params.get('id')     || '';
   var _periodo = _params.get('periodo')|| ValidationAdminStore.DEMO_PERIODO;
+  // Viene de la URL: solo se acepta AAAA-MM, que es lo único que sabe pintar _perLabel
+  if (!/^\d{4}-\d{2}$/.test(_periodo)) _periodo = ValidationAdminStore.DEMO_PERIODO;
   var _gerId   = _params.get('ger')    || '';
 
   // ── DATA ──────────────────────────────────────────────────────────────────
@@ -246,7 +248,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 
   if (!_d) {
     document.getElementById('mainContent').innerHTML =
-      '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + _indId + '</p>';
+      '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + escaparHTML(_indId) + '</p>';
     return;
   }
 
@@ -273,7 +275,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
   function _frCls(f) { return ({Mensual:'mensual',Trimestral:'trimestral',Semestral:'semestral',Anual:'anual',Bimestral:'bimestral'})[f]||''; }
 
   function pend(v) {
-    if (v !== null && v !== undefined && v !== '') return String(v);
+    if (v !== null && v !== undefined && v !== '') return escaparHTML(v);
     return '<span class="pending-tag"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="11" height="11"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Pendiente de captura</span>';
   }
 
@@ -287,7 +289,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 
     var perLabel = _perLabel(_periodo);
     var gerName  = d.gerencia ? d.gerencia.nombre : ind.gerenciaId;
-    var backUrl  = 'validacion-gerencia-detalle.html?ger=' + _gerId + '&periodo=' + _periodo;
+    var backUrl  = 'validacion-gerencia-detalle.html?ger=' + encodeURIComponent(_gerId) + '&periodo=' + encodeURIComponent(_periodo);
     var sem      = d.semaforo;
 
     // Summary strip: Frecuencia, Unidad, Meta, Semáforo
@@ -315,33 +317,33 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       +   '<span class="sep">›</span>'
       +   '<a href="validacion-admin-dashboard.html">Validación</a>'
       +   '<span class="sep">›</span>'
-      +   '<a href="' + backUrl + '">' + gerName.replace('Gerencia de ','') + '</a>'
+      +   '<a href="' + escaparHTML(backUrl) + '">' + escaparHTML(gerName.replace('Gerencia de ','')) + '</a>'
       +   '<span class="sep">›</span>'
-      +   '<span class="current">' + ind.id + '</span>'
+      +   '<span class="current">' + escaparHTML(ind.id) + '</span>'
       + '</div>'
 
-      + '<div class="ind-header" style="border-top-color:' + (d.gerencia ? d.gerencia.color : 'var(--color-primary)') + '">'
+      + '<div class="ind-header" style="border-top-color:' + escaparHTML(d.gerencia ? d.gerencia.color : 'var(--color-primary)') + '">'
       +   '<div class="ind-meta-row">'
-      +     '<span class="ind-id">' + ind.id + '</span>'
-      +     '<span class="level-tag ' + _lvCls(ind.nivel||'Actividad') + '">' + (ind.nivel||'Actividad') + '</span>'
-      +     '<span class="g-chip">' + gerName + '</span>'
-      +     '<span class="freq-tag ' + _frCls(ind.frecuencia) + '">' + ind.frecuencia + '</span>'
+      +     '<span class="ind-id">' + escaparHTML(ind.id) + '</span>'
+      +     '<span class="level-tag ' + _lvCls(ind.nivel||'Actividad') + '">' + escaparHTML(ind.nivel||'Actividad') + '</span>'
+      +     '<span class="g-chip">' + escaparHTML(gerName) + '</span>'
+      +     '<span class="freq-tag ' + _frCls(ind.frecuencia) + '">' + escaparHTML(ind.frecuencia) + '</span>'
       +     (r && r.valorForzado ? '<span class="forzado-tag"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>Ajustado por administrador</span>' : '')
       +   '</div>'
-      +   '<h1 class="ind-title">' + ind.nombre + '</h1>'
+      +   '<h1 class="ind-title">' + escaparHTML(ind.nombre) + '</h1>'
       +   '<div class="ind-back-row">'
-      +     '<a class="btn btn-ghost" href="' + backUrl + '">'
+      +     '<a class="btn btn-ghost" href="' + escaparHTML(backUrl) + '">'
       +       '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>'
-      +       backLabel
+      +       escaparHTML(backLabel)
       +     '</a>'
       +     '<span style="font-size:12px;color:var(--color-text-secondary);">Período: <strong>' + perLabel + '</strong></span>'
       +   '</div>'
       + '</div>'
 
       + '<div class="summary-strip">'
-      +   '<div class="sum-card"><p class="sum-label">Frecuencia</p><p class="sum-value" style="font-size:14px">' + ind.frecuencia + '</p><p class="sum-sub">' + frecN + ' reporte' + (frecN!=='1'?'s':'') + ' al año</p></div>'
-      +   '<div class="sum-card"><p class="sum-label">Unidad de medida</p><p class="sum-value" style="font-size:16px">' + (uMedida==='Porcentaje'?'%':uMedida) + '</p><p class="sum-sub">' + uMedida + '</p></div>'
-      +   '<div class="sum-card"><p class="sum-label">Meta anual</p>' + (metaVal!==null?'<p class="sum-value" style="color:var(--color-primary)">'+metaVal+'</p>':'<div style="margin:8px 0">'+pend(null)+'</div>') + '<p class="sum-sub">' + (act&&act.lineaBase!==null?'Línea base: '+act.lineaBase:'Línea base pendiente') + '</p></div>'
+      +   '<div class="sum-card"><p class="sum-label">Frecuencia</p><p class="sum-value" style="font-size:14px">' + escaparHTML(ind.frecuencia) + '</p><p class="sum-sub">' + frecN + ' reporte' + (frecN!=='1'?'s':'') + ' al año</p></div>'
+      +   '<div class="sum-card"><p class="sum-label">Unidad de medida</p><p class="sum-value" style="font-size:16px">' + escaparHTML(uMedida==='Porcentaje'?'%':uMedida) + '</p><p class="sum-sub">' + escaparHTML(uMedida) + '</p></div>'
+      +   '<div class="sum-card"><p class="sum-label">Meta anual</p>' + (metaVal!==null?'<p class="sum-value" style="color:var(--color-primary)">'+escaparHTML(metaVal)+'</p>':'<div style="margin:8px 0">'+pend(null)+'</div>') + '<p class="sum-sub">' + (act&&act.lineaBase!==null?'Línea base: '+escaparHTML(act.lineaBase):'Línea base pendiente') + '</p></div>'
       +   sumSem
       + '</div>'
 
@@ -382,16 +384,16 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     return ''
       + '<div class="section-card">'
       +   '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Objetivo del indicador</p>'
-      +   '<div class="obj-highlight" style="margin-bottom:14px"><p>' + obj + '</p></div>'
+      +   '<div class="obj-highlight" style="margin-bottom:14px"><p>' + escaparHTML(obj) + '</p></div>'
       + '</div>'
       + '<div class="section-card">'
       +   '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6Z"/></svg>Ubicación en la MIR</p>'
       +   '<div class="field-row">'
-      +     '<div class="field"><span class="field-label">Gerencia</span><span class="field-value"><span class="g-chip">' + gerName + '</span></span></div>'
-      +     '<div class="field"><span class="field-label">Nivel MIR</span><span class="field-value"><span class="level-tag ' + _lvCls(d.indicador.nivel||'Actividad') + '">' + (d.indicador.nivel||'Actividad') + '</span></span></div>'
-      +     '<div class="field"><span class="field-label">Unidad responsable</span><span class="field-value">' + (d.unidad ? d.unidad.nombre : pend(null)) + '</span></div>'
-      +     '<div class="field"><span class="field-label">Revisor asignado</span><span class="field-value">' + (d.revisor ? d.revisor.nombre : pend(null)) + '</span></div>'
-      +     '<div class="field"><span class="field-label">Enlace asignado</span><span class="field-value">' + (d.enlace ? d.enlace.nombre : pend(null)) + '</span></div>'
+      +     '<div class="field"><span class="field-label">Gerencia</span><span class="field-value"><span class="g-chip">' + escaparHTML(gerName) + '</span></span></div>'
+      +     '<div class="field"><span class="field-label">Nivel MIR</span><span class="field-value"><span class="level-tag ' + _lvCls(d.indicador.nivel||'Actividad') + '">' + escaparHTML(d.indicador.nivel||'Actividad') + '</span></span></div>'
+      +     '<div class="field"><span class="field-label">Unidad responsable</span><span class="field-value">' + (d.unidad ? escaparHTML(d.unidad.nombre) : pend(null)) + '</span></div>'
+      +     '<div class="field"><span class="field-label">Revisor asignado</span><span class="field-value">' + (d.revisor ? escaparHTML(d.revisor.nombre) : pend(null)) + '</span></div>'
+      +     '<div class="field"><span class="field-label">Enlace asignado</span><span class="field-value">' + (d.enlace ? escaparHTML(d.enlace.nombre) : pend(null)) + '</span></div>'
       +   '</div>'
       + '</div>';
   }
@@ -403,12 +405,12 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     var numDenHTML;
     if (tieneDen) {
       numDenHTML = '<div class="num-den-grid">'
-        + '<div class="nd-item"><span class="nd-label num">Numerador (X)</span><p class="nd-value">' + (act.numerador||'No especificado') + '</p></div>'
+        + '<div class="nd-item"><span class="nd-label num">Numerador (X)</span><p class="nd-value">' + escaparHTML(act.numerador||'No especificado') + '</p></div>'
         + '<div class="nd-operator">÷</div>'
-        + '<div class="nd-item"><span class="nd-label den">Denominador (Y)</span><p class="nd-value">' + (act.denominador||'No especificado') + '</p></div>'
+        + '<div class="nd-item"><span class="nd-label den">Denominador (Y)</span><p class="nd-value">' + escaparHTML(act.denominador||'No especificado') + '</p></div>'
         + '</div>';
     } else {
-      numDenHTML = '<div class="nd-item"><span class="nd-label num">Variable (X)</span><p class="nd-value">' + (act && act.numerador ? act.numerador : 'No especificado') + '</p></div>';
+      numDenHTML = '<div class="nd-item"><span class="nd-label num">Variable (X)</span><p class="nd-value">' + escaparHTML(act && act.numerador ? act.numerador : 'No especificado') + '</p></div>';
     }
     var frecN = ({Mensual:'12',Trimestral:'4',Semestral:'2',Anual:'1',Bimestral:'6'})[ind.frecuencia]||'—';
     return ''
@@ -421,7 +423,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       +   '<div class="divider" style="margin:20px 0"></div>'
       +   '<div class="field-row">'
       +     '<div class="field"><span class="field-label">Unidad de medida</span><span class="field-value">' + pend(ind.unidadMedida) + '</span></div>'
-      +     '<div class="field"><span class="field-label">Frecuencia de medición</span><span class="field-value"><span class="freq-tag ' + _frCls(ind.frecuencia) + '">' + ind.frecuencia + '</span> <span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px">→ ' + frecN + ' reporte' + (frecN!=='1'?'s':'') + ' al año</span></span></div>'
+      +     '<div class="field"><span class="field-label">Frecuencia de medición</span><span class="field-value"><span class="freq-tag ' + _frCls(ind.frecuencia) + '">' + escaparHTML(ind.frecuencia) + '</span> <span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px">→ ' + frecN + ' reporte' + (frecN!=='1'?'s':'') + ' al año</span></span></div>'
       +     '<div class="field"><span class="field-label">Aplica acumulado</span><span class="field-value">' + (ind.aplicaAcumulado ? 'Sí — se mide avance acumulado' : 'No — solo valor del período') + '</span></div>'
       +   '</div>'
       + '</div>';
@@ -439,7 +441,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       avanceSection = '<div class="no-corte-notice">'
         + '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20" height="20" style="margin:0 auto 8px;display:block;color:var(--color-text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>'
         + 'Este indicador no tiene corte de reporte en ' + _perLabel(_periodo) + '.<br>'
-        + '<small style="font-size:11px">Frecuencia <strong>' + ind.frecuencia + '</strong> — el próximo corte corresponde a un período posterior.</small>'
+        + '<small style="font-size:11px">Frecuencia <strong>' + escaparHTML(ind.frecuencia) + '</strong> — el próximo corte corresponde a un período posterior.</small>'
         + '</div>';
     } else {
       var avancePct = (r && r.avancePeriodo !== null && r.avancePeriodo !== undefined) ? r.avancePeriodo : null;
@@ -448,13 +450,13 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 
       var bigNum, bigCls;
       if (avancePct === null) { bigNum = 'Sin dato'; bigCls = 'nd'; }
-      else { bigNum = avancePct + '%'; bigCls = sem; }
+      else { bigNum = escaparHTML(avancePct) + '%'; bigCls = sem; }
 
       avanceSection = '<div class="avance-big">'
         + '<div>'
         +   '<div class="avance-big-num ' + bigCls + '">' + bigNum + '</div>'
         +   '<div class="avance-big-label">avance en ' + _perLabel(_periodo) + '</div>'
-        +   (forzado ? '<div class="avance-original">Original: ' + origVal + '% <em style="font-size:10px">(valor reportado por el enlace)</em></div>' : '')
+        +   (forzado ? '<div class="avance-original">Original: ' + escaparHTML(origVal) + '% <em style="font-size:10px">(valor reportado por el enlace)</em></div>' : '')
         + '</div>'
         + '<div>'
         +   '<span class="sem-badge" style="background:' + SEM_BG[sem] + ';color:' + SEM_COLOR[sem] + '">'
@@ -466,7 +468,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
         + '</div>';
 
       if (ind.aplicaAcumulado && r) {
-        var acumVal = (r.avanceAcumulado !== null && r.avanceAcumulado !== undefined) ? r.avanceAcumulado + '%' : 'Sin datos';
+        var acumVal = (r.avanceAcumulado !== null && r.avanceAcumulado !== undefined) ? escaparHTML(r.avanceAcumulado) + '%' : 'Sin datos';
         avanceSection += '<div class="avance-acum-block">'
           + '<div class="avance-acum-lbl">Avance acumulado del ejercicio</div>'
           + '<div class="avance-acum-num">' + acumVal + '</div>'
@@ -483,9 +485,9 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       + '<div class="rangos-form">'
       +   '<p style="font-size:11px;color:var(--color-text-secondary);margin-bottom:12px">Configura los umbrales de cumplimiento para este indicador. El semáforo se recalcula automáticamente al guardar.</p>'
       +   '<div class="rangos-row">'
-      +     '<div class="rangos-field"><label class="field-label" style="color:var(--color-success)">Verde ≥</label><div style="display:flex;align-items:center;gap:4px"><input class="rangos-input" id="rangoVerde" type="number" min="1" max="100" value="' + vMin + '"><span style="font-weight:700">%</span></div></div>'
-      +     '<div class="rangos-field"><label class="field-label" style="color:var(--color-warning-dark)">Amarillo ≥</label><div style="display:flex;align-items:center;gap:4px"><input class="rangos-input" id="rangoAmarillo" type="number" min="1" max="100" value="' + aMin + '"><span style="font-weight:700">%</span></div></div>'
-      +     '<div class="rangos-field"><label class="field-label" style="color:var(--color-danger)">Rojo</label><div style="padding:8px 12px;font-size:13px;font-weight:700;color:var(--color-danger)">< <span id="rojoMin">' + aMin + '</span>%</div></div>'
+      +     '<div class="rangos-field"><label class="field-label" style="color:var(--color-success)">Verde ≥</label><div style="display:flex;align-items:center;gap:4px"><input class="rangos-input" id="rangoVerde" type="number" min="1" max="100" value="' + escaparHTML(vMin) + '"><span style="font-weight:700">%</span></div></div>'
+      +     '<div class="rangos-field"><label class="field-label" style="color:var(--color-warning-dark)">Amarillo ≥</label><div style="display:flex;align-items:center;gap:4px"><input class="rangos-input" id="rangoAmarillo" type="number" min="1" max="100" value="' + escaparHTML(aMin) + '"><span style="font-weight:700">%</span></div></div>'
+      +     '<div class="rangos-field"><label class="field-label" style="color:var(--color-danger)">Rojo</label><div style="padding:8px 12px;font-size:13px;font-weight:700;color:var(--color-danger)">< <span id="rojoMin">' + escaparHTML(aMin) + '</span>%</div></div>'
       +   '</div>'
       +   '<div class="rangos-visual"><div class="rangos-seg verde"></div><div class="rangos-seg amarillo"></div><div class="rangos-seg rojo"></div></div>'
       +   '<p style="font-size:10px;color:var(--color-text-secondary);margin-bottom:12px">Verde ≥ ' + vMin + '% · Amarillo ' + aMin + '–' + (vMin-0.1).toFixed(1) + '% · Rojo < ' + aMin + '%</p>'
@@ -513,15 +515,15 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       + '<div class="section-card">'
       +   '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>Línea base y meta anual</p>'
       +   '<div class="meta-visual">'
-      +     '<div class="meta-item"><p class="meta-lbl" style="margin-bottom:8px">Línea base</p>' + (lb!==null?'<p class="meta-num">'+lb+'</p>':pend(null)) + '</div>'
-      +     '<div class="meta-item"><p class="meta-lbl" style="margin-bottom:8px">Meta anual</p>' + (ma!==null?'<p class="meta-num accent">'+ma+'</p>':pend(null)) + '</div>'
+      +     '<div class="meta-item"><p class="meta-lbl" style="margin-bottom:8px">Línea base</p>' + (lb!==null?'<p class="meta-num">'+escaparHTML(lb)+'</p>':pend(null)) + '</div>'
+      +     '<div class="meta-item"><p class="meta-lbl" style="margin-bottom:8px">Meta anual</p>' + (ma!==null?'<p class="meta-num accent">'+escaparHTML(ma)+'</p>':pend(null)) + '</div>'
       +   '</div>'
       + '</div>'
       + '<div class="section-card">'
       +   '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>Supuestos</p>'
-      +   (sup ? '<p class="field-value" style="line-height:1.7">' + sup + '</p>' : pend(null))
+      +   (sup ? '<p class="field-value" style="line-height:1.7">' + escaparHTML(sup) + '</p>' : pend(null))
       + '</div>'
-      + (obs ? '<div class="section-card"><p class="section-title">Observaciones MIR</p><p class="field-value" style="line-height:1.7">' + obs + '</p></div>' : '');
+      + (obs ? '<div class="section-card"><p class="section-title">Observaciones MIR</p><p class="field-value" style="line-height:1.7">' + escaparHTML(obs) + '</p></div>' : '');
   }
 
   // ── TAB: ACCIONES ─────────────────────────────────────────────────────────
@@ -549,6 +551,8 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 
     var revisorNombre = d.revisor ? d.revisor.nombre : 'el revisor';
     var enlaceNombre  = d.enlace  ? d.enlace.nombre  : 'el enlace';
+    revisorNombre = escaparHTML(revisorNombre);
+    enlaceNombre  = escaparHTML(enlaceNombre);
 
     var uMedida = ind.unidadMedida || '';
     var indUnit = uMedida === 'Porcentaje' ? '%' : '';
@@ -574,10 +578,10 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       +   '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>Forzar valor de cumplimiento</p>'
       +   '<div class="action-section">'
       +     '<p class="action-sub">Sobrescribe el valor de avance reportado por el enlace. El valor original queda registrado en el historial con trazabilidad completa. El <strong>comentario es obligatorio</strong> para aplicar el override.</p>'
-      +     (r && r.valorForzado ? '<div class="info-block" style="margin-bottom:4px"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg><p>Ya existe un valor forzado: <strong>' + (r.avancePeriodo||'—') + indUnit + '</strong>. El valor original era <strong><s>' + r.valorOriginal + indUnit + '</s></strong>. Puedes aplicar un nuevo override; quedará registrado en el historial.</p></div>' : '')
+      +     (r && r.valorForzado ? '<div class="info-block" style="margin-bottom:4px"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg><p>Ya existe un valor forzado: <strong>' + escaparHTML(r.avancePeriodo||'—') + indUnit + '</strong>. El valor original era <strong><s>' + escaparHTML(r.valorOriginal) + indUnit + '</s></strong>. Puedes aplicar un nuevo override; quedará registrado en el historial.</p></div>' : '')
       +     '<p class="action-label">Nuevo valor de avance</p>'
       +     '<div class="action-input-row" style="margin-bottom:10px">'
-      +       '<input class="action-input" id="forzarInput" type="number" min="0" max="200" placeholder="Ej: 78" value="' + curAvance + '" ' + (disabled ? 'disabled' : '') + '>'
+      +       '<input class="action-input" id="forzarInput" type="number" min="0" max="200" placeholder="Ej: 78" value="' + escaparHTML(curAvance) + '" ' + (disabled ? 'disabled' : '') + '>'
       +       (indUnit ? '<span class="action-unit">' + indUnit + '</span>' : '')
       +     '</div>'
       +     '<p class="action-label">Justificación / comentario</p>'
@@ -614,13 +618,13 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       };
       var svg = svgMap[accionKey] || svgMap['agregar_observacion'];
       return '<div class="hist-entry">'
-        + '<div class="hist-dot ' + accionKey + '"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">' + svg + '</svg></div>'
+        + '<div class="hist-dot ' + escaparHTML(accionKey) + '"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">' + svg + '</svg></div>'
         + '<div class="hist-meta">'
-        +   '<div class="hist-action">' + label + '</div>'
-        +   '<div class="hist-user">' + usuNombre + '</div>'
-        +   (h.comentario ? '<div class="hist-comment">' + h.comentario + '</div>' : '')
+        +   '<div class="hist-action">' + escaparHTML(label) + '</div>'
+        +   '<div class="hist-user">' + escaparHTML(usuNombre) + '</div>'
+        +   (h.comentario ? '<div class="hist-comment">' + escaparHTML(h.comentario) + '</div>' : '')
         + '</div>'
-        + '<div class="hist-date">' + fechaDisp + '</div>'
+        + '<div class="hist-date">' + escaparHTML(fechaDisp) + '</div>'
         + '</div>';
     }).join('');
   }

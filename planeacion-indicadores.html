@@ -894,7 +894,7 @@ function calcKPIs(){
     var pct=total?Math.round(val/total*100):0;
     var c=GER_COLORS[g]||{bar:'#9CA3AF'};
     rpHtml+='<div class="rp-gerencia-item">';
-    rpHtml+='<div class="rp-ger-name">'+g.replace('Gerencia ','')+'</div>';
+    rpHtml+='<div class="rp-ger-name">'+escaparHTML(g.replace('Gerencia ',''))+'</div>';
     rpHtml+='<div class="rp-bar"><div class="rp-bar-fill" style="width:'+pct+'%;background:'+c.bar+'"></div></div>';
     rpHtml+='<div class="rp-ger-stat"><span>'+val+'/'+total+' validados</span><span>'+pct+'%</span></div>';
     rpHtml+='</div>';
@@ -952,15 +952,15 @@ function buildIndCard(ind){
   var eyeSvg='<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>';
   var est=cfg[ind.estado]||{label:ind.estado,cls:'pendiente'};
   var gc=GER_COLORS[ind.gerencia]||{bg:'#F3F4F6',color:'#374151'};
-  var h='<div class="ind-card" onclick="openDetalle(\''+ind.id+'\')">';
-  h+='<div class="ind-card-top"><span class="ind-card-id">'+ind.id+'</span><span class="estado-badge '+est.cls+'">'+est.label+'</span></div>';
-  h+='<div><div class="ind-card-name">'+ind.nombre+'</div><div class="ind-card-sub">'+ind.unidad+' · '+ind.frecuencia+'</div></div>';
-  h+='<div class="ind-card-pills"><span class="tipo-pill">'+ind.tipo+'</span></div>';
+  var h='<div class="ind-card" data-id="'+escaparHTML(ind.id)+'" onclick="openDetalle(this.dataset.id)">';
+  h+='<div class="ind-card-top"><span class="ind-card-id">'+escaparHTML(ind.id)+'</span><span class="estado-badge '+escaparHTML(est.cls)+'">'+escaparHTML(est.label)+'</span></div>';
+  h+='<div><div class="ind-card-name">'+escaparHTML(ind.nombre)+'</div><div class="ind-card-sub">'+escaparHTML(ind.unidad)+' · '+escaparHTML(ind.frecuencia)+'</div></div>';
+  h+='<div class="ind-card-pills"><span class="tipo-pill">'+escaparHTML(ind.tipo)+'</span></div>';
   if(ind.meta){
-    h+='<div class="ind-card-meta-row"><span class="ind-card-meta-label">Línea base</span><span class="ind-card-meta-val">'+ind.meta.linea+'</span><span class="ind-card-meta-sep">→</span><span class="ind-card-meta-label">Objetivo</span><span class="ind-card-meta-val">'+ind.meta.objetivo+'</span></div>';
+    h+='<div class="ind-card-meta-row"><span class="ind-card-meta-label">Línea base</span><span class="ind-card-meta-val">'+escaparHTML(ind.meta.linea)+'</span><span class="ind-card-meta-sep">→</span><span class="ind-card-meta-label">Objetivo</span><span class="ind-card-meta-val">'+escaparHTML(ind.meta.objetivo)+'</span></div>';
   }
-  h+='<div class="ind-card-footer"><div class="person-chip"><div class="person-avatar" style="background:'+ind.responsable.color+'">'+ind.responsable.iniciales+'</div><span class="person-name">'+ind.responsable.nombre+'</span></div>';
-  h+='<button class="action-btn" onclick="event.stopPropagation();openDetalle(\''+ind.id+'\')">'+eyeSvg+'Ver detalle</button></div>';
+  h+='<div class="ind-card-footer"><div class="person-chip"><div class="person-avatar" style="background:'+escaparHTML(ind.responsable.color)+'">'+escaparHTML(ind.responsable.iniciales)+'</div><span class="person-name">'+escaparHTML(ind.responsable.nombre)+'</span></div>';
+  h+='<button class="action-btn" data-id="'+escaparHTML(ind.id)+'" onclick="event.stopPropagation();openDetalle(this.dataset.id)">'+eyeSvg+'Ver detalle</button></div>';
   h+='</div>';
   return h;
 }
@@ -995,7 +995,7 @@ function renderIndicadores(){
     html+='<div class="ger-section" id="gerSec_'+slug+'">';
     html+='<div class="ger-section-header" onclick="toggleGer(\''+slug+'\')">';
     html+='<div class="ger-header-left">';
-    html+='<span class="ger-section-name" style="color:'+gc.color+'">'+ger+'</span>';
+    html+='<span class="ger-section-name" style="color:'+gc.color+'">'+escaparHTML(ger)+'</span>';
     html+='<span class="ger-section-count">'+inds.length+' indicador'+(inds.length===1?'':'es')+'</span>';
     html+='</div>';
     html+=chevronSvg;
@@ -1034,25 +1034,25 @@ function buildSolCard(sol){
   var sc=SOL_CFG[sol.estado]||{label:sol.estado,cls:'pendiente_admin'};
   var eyeSvg='<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>';
   var isPending=sol.estado==='pendiente_admin';
-  var h='<div class="ind-card" onclick="openSolicitud(\''+sol.id+'\')">';
+  var h='<div class="ind-card" data-id="'+escaparHTML(sol.id)+'" onclick="openSolicitud(this.dataset.id)">';
   // Top: ID + estado
-  h+='<div class="ind-card-top"><span class="ind-card-id">'+sol.id+'</span><span class="estado-badge '+sc.cls+'">'+sc.label+'</span></div>';
+  h+='<div class="ind-card-top"><span class="ind-card-id">'+escaparHTML(sol.id)+'</span><span class="estado-badge '+escaparHTML(sc.cls)+'">'+escaparHTML(sc.label)+'</span></div>';
   // Indicator name + motivo
-  h+='<div><div class="ind-card-name">'+sol.indicadorNombre+'</div><div class="ind-card-sub">'+sol.motivo+'</div></div>';
+  h+='<div><div class="ind-card-name">'+escaparHTML(sol.indicadorNombre)+'</div><div class="ind-card-sub">'+escaparHTML(sol.motivo)+'</div></div>';
   // Meta comparison
   h+='<div class="sol-meta-compare">';
   h+='<div class="sol-meta-col"><div class="sol-meta-head">Meta actual</div>';
-  h+='<div class="ind-card-meta-row"><span class="ind-card-meta-label">LB</span><span class="ind-card-meta-val">'+sol.metaActual.linea+'</span><span class="ind-card-meta-sep">→</span><span class="ind-card-meta-label">Obj</span><span class="ind-card-meta-val">'+sol.metaActual.objetivo+'</span></div></div>';
+  h+='<div class="ind-card-meta-row"><span class="ind-card-meta-label">LB</span><span class="ind-card-meta-val">'+escaparHTML(sol.metaActual.linea)+'</span><span class="ind-card-meta-sep">→</span><span class="ind-card-meta-label">Obj</span><span class="ind-card-meta-val">'+escaparHTML(sol.metaActual.objetivo)+'</span></div></div>';
   h+='<div class="sol-meta-arrow">→</div>';
   h+='<div class="sol-meta-col"><div class="sol-meta-head sol-meta-head-new">Nueva propuesta</div>';
-  h+='<div class="ind-card-meta-row"><span class="ind-card-meta-label">LB</span><span class="ind-card-meta-val">'+sol.nuevaMeta.linea+'</span><span class="ind-card-meta-sep">→</span><span class="ind-card-meta-label">Obj</span><span class="ind-card-meta-val">'+sol.nuevaMeta.objetivo+'</span></div></div>';
+  h+='<div class="ind-card-meta-row"><span class="ind-card-meta-label">LB</span><span class="ind-card-meta-val">'+escaparHTML(sol.nuevaMeta.linea)+'</span><span class="ind-card-meta-sep">→</span><span class="ind-card-meta-label">Obj</span><span class="ind-card-meta-val">'+escaparHTML(sol.nuevaMeta.objetivo)+'</span></div></div>';
   h+='</div>';
   // Footer: solicitante + action
   h+='<div class="ind-card-footer">';
-  h+='<div class="person-chip"><div class="person-avatar" style="background:'+sol.solicitante.color+'">'+sol.solicitante.iniciales+'</div><span class="person-name">'+sol.solicitante.nombre+'</span></div>';
+  h+='<div class="person-chip"><div class="person-avatar" style="background:'+escaparHTML(sol.solicitante.color)+'">'+escaparHTML(sol.solicitante.iniciales)+'</div><span class="person-name">'+escaparHTML(sol.solicitante.nombre)+'</span></div>';
   var btnCls=isPending?'action-btn approve':'action-btn';
   var btnLabel=isPending?'Resolver':'Ver detalle';
-  h+='<button class="'+btnCls+'" onclick="event.stopPropagation();openSolicitud(\''+sol.id+'\')">'+eyeSvg+btnLabel+'</button>';
+  h+='<button class="'+btnCls+'" data-id="'+escaparHTML(sol.id)+'" onclick="event.stopPropagation();openSolicitud(this.dataset.id)">'+eyeSvg+btnLabel+'</button>';
   h+='</div>';
   h+='</div>';
   return h;
@@ -1084,7 +1084,7 @@ function renderSolicitudes(){
     var slug=GER_SLUG[ger]||ger.replace(/\s+/g,'_');
     html+='<div class="ger-section" id="solGerSec_'+slug+'">';
     html+='<div class="ger-section-header" onclick="toggleSolGer(\''+slug+'\')">';
-    html+='<div class="ger-header-left"><span class="ger-section-name" style="color:'+gc.color+'">'+ger+'</span>';
+    html+='<div class="ger-header-left"><span class="ger-section-name" style="color:'+gc.color+'">'+escaparHTML(ger)+'</span>';
     html+='<span class="ger-section-count">'+sols.length+' solicitud'+(sols.length===1?'':'es')+'</span></div>';
     html+=chevronSvg;
     html+='</div>';
@@ -1132,15 +1132,15 @@ function renderDetTab(n,ind){
   var body=document.getElementById('mDetBody');
   if(n===0){
     body.innerHTML='<div class="detail-grid">'+
-      '<div class="detail-item full"><p class="detail-label">Descripción</p><p class="detail-val" style="font-weight:400;font-size:13px;line-height:1.6">'+ind.desc+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Tipo de indicador</p><p class="detail-val">'+ind.tipo+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Unidad de medida</p><p class="detail-val">'+ind.unidad+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Frecuencia</p><p class="detail-val">'+ind.frecuencia+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Gerencia</p><p class="detail-val">'+ind.gerencia+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Enlace responsable</p><p class="detail-val">'+ind.responsable.nombre+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Revisor asignado</p><p class="detail-val">'+ind.revisor.nombre+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Fecha de creación</p><p class="detail-val">'+ind.creado+'</p></div>'+
-      '<div class="detail-item"><p class="detail-label">Última actualización</p><p class="detail-val">'+ind.actualizado+'</p></div>'+
+      '<div class="detail-item full"><p class="detail-label">Descripción</p><p class="detail-val" style="font-weight:400;font-size:13px;line-height:1.6">'+escaparHTML(ind.desc)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Tipo de indicador</p><p class="detail-val">'+escaparHTML(ind.tipo)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Unidad de medida</p><p class="detail-val">'+escaparHTML(ind.unidad)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Frecuencia</p><p class="detail-val">'+escaparHTML(ind.frecuencia)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Gerencia</p><p class="detail-val">'+escaparHTML(ind.gerencia)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Enlace responsable</p><p class="detail-val">'+escaparHTML(ind.responsable.nombre)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Revisor asignado</p><p class="detail-val">'+escaparHTML(ind.revisor.nombre)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Fecha de creación</p><p class="detail-val">'+escaparHTML(ind.creado)+'</p></div>'+
+      '<div class="detail-item"><p class="detail-label">Última actualización</p><p class="detail-val">'+escaparHTML(ind.actualizado)+'</p></div>'+
     '</div>';
   } else if(n===1){
     var estados_sin_meta=['pendiente'];
@@ -1151,16 +1151,16 @@ function renderDetTab(n,ind){
       var rec='';
       if(ind.estado==='rechazado'){
         var lastRej=ind.historial.filter(function(h){return h.accion.toLowerCase().indexOf('rechaz')>=0;}).pop();
-        if(lastRej&&lastRej.comentario) rec='<div class="callout error" style="margin-bottom:14px"><strong>Motivo del rechazo</strong>'+lastRej.comentario+'</div>';
+        if(lastRej&&lastRej.comentario) rec='<div class="callout error" style="margin-bottom:14px"><strong>Motivo del rechazo</strong>'+escaparHTML(lastRej.comentario)+'</div>';
       }
       body.innerHTML=rec+
         '<div class="meta-card">'+
         '<div class="meta-header"><p class="meta-title">Meta 2026</p></div>'+
         '<div class="meta-row">'+
-        '<div class="meta-box"><p class="meta-box-label">Línea base</p><p class="meta-box-val">'+ind.meta.linea+'</p></div>'+
-        '<div class="meta-box"><p class="meta-box-label">Objetivo 2026</p><p class="meta-box-val" style="color:var(--color-primary)">'+ind.meta.objetivo+'</p></div>'+
+        '<div class="meta-box"><p class="meta-box-label">Línea base</p><p class="meta-box-val">'+escaparHTML(ind.meta.linea)+'</p></div>'+
+        '<div class="meta-box"><p class="meta-box-label">Objetivo 2026</p><p class="meta-box-val" style="color:var(--color-primary)">'+escaparHTML(ind.meta.objetivo)+'</p></div>'+
         '</div>'+
-        '<p class="meta-desc">'+ind.meta.descripcion+'</p>'+
+        '<p class="meta-desc">'+escaparHTML(ind.meta.descripcion)+'</p>'+
         '</div>';
     }
   } else {
@@ -1177,9 +1177,9 @@ function renderDetTab(n,ind){
       html+='<div class="tl-item">';
       html+='<div class="tl-dot-wrap '+rc+'">'+icon+'</div>';
       html+='<div class="tl-content">';
-      html+='<div class="tl-header"><span class="tl-actor">'+h.usuario+'</span><span class="tl-date">'+h.fecha+'</span></div>';
-      html+='<div class="tl-accion">'+h.accion+' · '+h.rol+'</div>';
-      if(h.comentario) html+='<div class="tl-comment">'+h.comentario+'</div>';
+      html+='<div class="tl-header"><span class="tl-actor">'+escaparHTML(h.usuario)+'</span><span class="tl-date">'+escaparHTML(h.fecha)+'</span></div>';
+      html+='<div class="tl-accion">'+escaparHTML(h.accion)+' · '+escaparHTML(h.rol)+'</div>';
+      if(h.comentario) html+='<div class="tl-comment">'+escaparHTML(h.comentario)+'</div>';
       html+='</div></div>';
     });
     html+='</div>';
@@ -1212,11 +1212,11 @@ function buildSolPeriodGrid(sol){
     html+='<p style="font-size:9px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px">'+MES_LABELS[i]+'</p>';
     // Current
     html+='<div style="background:var(--color-surface);border-radius:6px;padding:5px 3px;margin-bottom:3px">';
-    html+='<p style="font-size:11px;font-weight:600;color:var(--color-text-secondary);'+(changed?'text-decoration:line-through;opacity:.6':'')+'">'+c+'</p>';
+    html+='<p style="font-size:11px;font-weight:600;color:var(--color-text-secondary);'+(changed?'text-decoration:line-through;opacity:.6':'')+'">'+escaparHTML(c)+'</p>';
     html+='</div>';
     // New
     html+='<div style="background:'+(changed?'var(--color-info-tint)':'var(--color-surface)')+';border-radius:6px;padding:5px 3px;'+(changed?'outline:1px solid var(--color-info-tint)':'')+';">';
-    html+='<p style="font-size:11px;font-weight:700;color:'+(changed?'var(--color-info)':'var(--color-text-secondary)')+'">'+n+'</p>';
+    html+='<p style="font-size:11px;font-weight:700;color:'+(changed?'var(--color-info)':'var(--color-text-secondary)')+'">'+escaparHTML(n)+'</p>';
     html+='</div>';
     html+='</div>';
   }
@@ -1237,26 +1237,26 @@ function openSolicitud(id){
   // ── Panel izquierdo ──────────────────────────────────────────────────
   var left='';
   left+='<div style="margin-bottom:14px">';
-  left+='<p style="font-family:monospace;font-size:10px;font-weight:700;color:var(--color-text-secondary);letter-spacing:.03em;margin-bottom:5px">'+sol.indicadorId+'</p>';
-  left+='<p style="font-size:13px;font-weight:700;color:var(--color-text-primary);line-height:1.45;margin-bottom:8px">'+sol.indicadorNombre+'</p>';
-  left+='<span class="estado-badge '+solCfg.cls+'">'+solCfg.label+'</span>';
+  left+='<p style="font-family:monospace;font-size:10px;font-weight:700;color:var(--color-text-secondary);letter-spacing:.03em;margin-bottom:5px">'+escaparHTML(sol.indicadorId)+'</p>';
+  left+='<p style="font-size:13px;font-weight:700;color:var(--color-text-primary);line-height:1.45;margin-bottom:8px">'+escaparHTML(sol.indicadorNombre)+'</p>';
+  left+='<span class="estado-badge '+escaparHTML(solCfg.cls)+'">'+escaparHTML(solCfg.label)+'</span>';
   left+='</div>';
   left+='<div class="info-divider"></div>';
-  left+='<div style="margin-bottom:12px"><span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:'+gc.bg+';color:'+gc.color+'">'+sol.gerencia+'</span></div>';
+  left+='<div style="margin-bottom:12px"><span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:'+gc.bg+';color:'+gc.color+'">'+escaparHTML(sol.gerencia)+'</span></div>';
   left+='<div class="info-divider"></div>';
   left+='<div style="margin-bottom:11px"><p class="info-label">Enlace solicitante</p>';
-  left+='<div class="person-chip" style="margin-top:4px"><div class="person-avatar" style="background:'+sol.solicitante.color+'">'+sol.solicitante.iniciales+'</div><span class="person-name">'+sol.solicitante.nombre+'</span></div></div>';
+  left+='<div class="person-chip" style="margin-top:4px"><div class="person-avatar" style="background:'+escaparHTML(sol.solicitante.color)+'">'+escaparHTML(sol.solicitante.iniciales)+'</div><span class="person-name">'+escaparHTML(sol.solicitante.nombre)+'</span></div></div>';
   left+='<div style="margin-bottom:11px"><p class="info-label">Revisor que autorizó</p>';
-  left+='<div class="person-chip" style="margin-top:4px"><div class="person-avatar" style="background:'+sol.revisorAutorizo.color+'">'+sol.revisorAutorizo.iniciales+'</div><span class="person-name">'+sol.revisorAutorizo.nombre+'</span></div></div>';
+  left+='<div class="person-chip" style="margin-top:4px"><div class="person-avatar" style="background:'+escaparHTML(sol.revisorAutorizo.color)+'">'+escaparHTML(sol.revisorAutorizo.iniciales)+'</div><span class="person-name">'+escaparHTML(sol.revisorAutorizo.nombre)+'</span></div></div>';
   left+='<div class="info-divider"></div>';
-  left+='<div style="margin-bottom:11px"><p class="info-label">Fecha de solicitud</p><p class="info-value" style="margin-top:3px">'+sol.fecha+'</p></div>';
-  left+='<div><p class="info-label">Motivo</p><p style="font-size:12px;color:var(--color-text-primary);line-height:1.5;margin-top:3px">'+sol.motivo+'</p></div>';
+  left+='<div style="margin-bottom:11px"><p class="info-label">Fecha de solicitud</p><p class="info-value" style="margin-top:3px">'+escaparHTML(sol.fecha)+'</p></div>';
+  left+='<div><p class="info-label">Motivo</p><p style="font-size:12px;color:var(--color-text-primary);line-height:1.5;margin-top:3px">'+escaparHTML(sol.motivo)+'</p></div>';
 
   // ── Panel derecho ────────────────────────────────────────────────────
   var right='';
   // Justificación
   right+='<p style="font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Justificación del cambio</p>';
-  right+='<p style="font-size:13px;color:var(--color-text-primary);line-height:1.6;background:var(--color-surface);border-radius:10px;padding:12px;margin-bottom:18px">'+sol.descripcion+'</p>';
+  right+='<p style="font-size:13px;color:var(--color-text-primary);line-height:1.6;background:var(--color-surface);border-radius:10px;padding:12px;margin-bottom:18px">'+escaparHTML(sol.descripcion)+'</p>';
 
   // Comparación visual de metas
   right+='<p style="font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Cambio propuesto</p>';
@@ -1265,9 +1265,9 @@ function openSolicitud(id){
   right+='<div>';
   right+='<p style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-secondary);margin-bottom:6px">Meta actual</p>';
   right+='<div class="meta-cmp-box">';
-  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl">Línea base</p><p class="meta-cmp-val strikethrough">'+sol.metaActual.linea+'</p></div>';
+  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl">Línea base</p><p class="meta-cmp-val strikethrough">'+escaparHTML(sol.metaActual.linea)+'</p></div>';
   right+='<span style="color:var(--color-text-secondary);opacity:.3;font-size:16px;padding:0 2px">→</span>';
-  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl">Objetivo</p><p class="meta-cmp-val strikethrough">'+sol.metaActual.objetivo+'</p></div>';
+  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl">Objetivo</p><p class="meta-cmp-val strikethrough">'+escaparHTML(sol.metaActual.objetivo)+'</p></div>';
   right+='</div></div>';
   // Flecha central
   right+='<div class="meta-cmp-arrow">→</div>';
@@ -1275,9 +1275,9 @@ function openSolicitud(id){
   right+='<div>';
   right+='<p style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--color-info);margin-bottom:6px">Nueva propuesta</p>';
   right+='<div class="meta-cmp-box new-box">';
-  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl blue">Línea base</p><p class="meta-cmp-val blue">'+sol.nuevaMeta.linea+'</p></div>';
+  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl blue">Línea base</p><p class="meta-cmp-val blue">'+escaparHTML(sol.nuevaMeta.linea)+'</p></div>';
   right+='<span style="color:var(--color-info);opacity:.4;font-size:16px;padding:0 2px">→</span>';
-  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl blue">Objetivo</p><p class="meta-cmp-val blue">'+sol.nuevaMeta.objetivo+'</p></div>';
+  right+='<div class="meta-cmp-col"><p class="meta-cmp-lbl blue">Objetivo</p><p class="meta-cmp-val blue">'+escaparHTML(sol.nuevaMeta.objetivo)+'</p></div>';
   right+='</div></div>';
   right+='</div>'; // end .meta-cmp-grid
 
@@ -1294,10 +1294,10 @@ function openSolicitud(id){
            '<button class="btn-action red" onclick="resolverSolicitud(\'rechazada\')">Rechazar solicitud</button>'+
            '<button class="btn-action green" onclick="resolverSolicitud(\'aprobada\')">Aprobar solicitud</button>';
   } else if(sol.estado==='aprobada'){
-    right+='<div class="callout success"><strong>Solicitud aprobada — '+sol.fechaResolucion+'</strong>'+sol.comentarioAdmin+'</div>';
+    right+='<div class="callout success"><strong>Solicitud aprobada — '+escaparHTML(sol.fechaResolucion)+'</strong>'+escaparHTML(sol.comentarioAdmin)+'</div>';
     footer='<button class="btn btn-secondary" onclick="closeModal(\'modalSolicitud\')">Cerrar</button>';
   } else {
-    right+='<div class="callout error"><strong>Solicitud rechazada — '+sol.fechaResolucion+'</strong>'+sol.comentarioAdmin+'</div>';
+    right+='<div class="callout error"><strong>Solicitud rechazada — '+escaparHTML(sol.fechaResolucion)+'</strong>'+escaparHTML(sol.comentarioAdmin)+'</div>';
     footer='<button class="btn btn-secondary" onclick="closeModal(\'modalSolicitud\')">Cerrar</button>';
   }
 
@@ -1401,7 +1401,7 @@ function onGerenciaChangeNuevo(){
   } else {
     var units=GER_UNITS[ger]||[];
     sel.innerHTML='<option value="">Selecciona un área…</option>'+
-      units.map(function(u){return '<option value="'+u+'">'+u+'</option>';}).join('');
+      units.map(function(u){return '<option value="'+escaparHTML(u)+'">'+escaparHTML(u)+'</option>';}).join('');
     grp.style.display='';
   }
   updateClave();

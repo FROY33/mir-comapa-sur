@@ -445,17 +445,17 @@ function renderTable(rows) {
     return;
   }
   tbody.innerHTML = rows.map(r => `
-    <tr class="${state.selected===r.id?'selected':''}" onclick="openDetail('${r.id}')">
-      <td><span class="row-id">${r.id}</span></td>
-      <td><span class="g-chip ${gClass(r.gerencia)}">${gShort(r.gerencia)}</span></td>
-      <td><span class="level-tag ${lvClass(r.nivel)}">${r.nivel}</span></td>
-      <td class="td-ind"><p>${isoBadge(r)}${r.nombreIndicador}</p></td>
-      <td class="td-obj"><p>${r.resumenNarrativo || r.objetivo}</p></td>
-      <td><span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${r.frecuenciaMedicion}</span></td>
-      <td style="font-size:11px;color:var(--color-text-secondary)">${r.unidadMedida}</td>
-      <td class="td-mv"><p>${r.medioVerificacionNombre}</p></td>
-      <td class="td-fuente"><p>${r.medioVerificacionFuente || '—'}</p></td>
-      <td><button class="btn-detail" onclick="event.stopPropagation();window.location='detalle-indicador.html?id=${r.id}'">Ver detalle</button></td>
+    <tr class="${state.selected===r.id?'selected':''}" data-id="${escaparHTML(r.id)}" onclick="openDetail(this.dataset.id)">
+      <td><span class="row-id">${escaparHTML(r.id)}</span></td>
+      <td><span class="g-chip ${gClass(r.gerencia)}">${escaparHTML(gShort(r.gerencia))}</span></td>
+      <td><span class="level-tag ${lvClass(r.nivel)}">${escaparHTML(r.nivel)}</span></td>
+      <td class="td-ind"><p>${isoBadge(r)}${escaparHTML(r.nombreIndicador)}</p></td>
+      <td class="td-obj"><p>${escaparHTML(r.resumenNarrativo || r.objetivo)}</p></td>
+      <td><span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${escaparHTML(r.frecuenciaMedicion)}</span></td>
+      <td style="font-size:11px;color:var(--color-text-secondary)">${escaparHTML(r.unidadMedida)}</td>
+      <td class="td-mv"><p>${escaparHTML(r.medioVerificacionNombre)}</p></td>
+      <td class="td-fuente"><p>${escaparHTML(r.medioVerificacionFuente || '—')}</p></td>
+      <td><button class="btn-detail" data-id="${escaparHTML(r.id)}" onclick="event.stopPropagation();window.location='detalle-indicador.html?id='+encodeURIComponent(this.dataset.id)">Ver detalle</button></td>
     </tr>`).join('');
 }
 
@@ -475,21 +475,21 @@ function renderTree(rows) {
     const count = Object.values(grouped[g]).flat().length;
     const items = NIVEL_ORDER.filter(n => grouped[g][n]).map(n =>
       grouped[g][n].map(r => `
-        <div class="tree-item ${lvIndent(r.nivel)}${state.selected===r.id?' selected':''}" onclick="openDetail('${r.id}')">
+        <div class="tree-item ${lvIndent(r.nivel)}${state.selected===r.id?' selected':''}" data-id="${escaparHTML(r.id)}" onclick="openDetail(this.dataset.id)">
           <div class="tree-item-content">
-            <p class="tree-item-name">${isoBadge(r)}${r.nombreIndicador}</p>
+            <p class="tree-item-name">${isoBadge(r)}${escaparHTML(r.nombreIndicador)}</p>
             <div class="tree-item-meta">
-              <span class="level-tag ${lvClass(r.nivel)}">${r.nivel}</span>
-              <span class="tree-item-id">${r.id}</span>
-              <span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${r.frecuenciaMedicion}</span>
-              <span class="mv-tag ${mvClass(r.medioVerificacionTipo)}">${r.medioVerificacionTipo}</span>
+              <span class="level-tag ${lvClass(r.nivel)}">${escaparHTML(r.nivel)}</span>
+              <span class="tree-item-id">${escaparHTML(r.id)}</span>
+              <span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${escaparHTML(r.frecuenciaMedicion)}</span>
+              <span class="mv-tag ${mvClass(r.medioVerificacionTipo)}">${escaparHTML(r.medioVerificacionTipo)}</span>
             </div>
           </div>
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14" style="color:var(--color-text-secondary);flex-shrink:0;margin-top:3px"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
         </div>`).join('')).join('');
-    return `<div class="tree-gerencia" data-g="${g}">
+    return `<div class="tree-gerencia" data-g="${escaparHTML(g)}">
       <div class="tree-g-header" onclick="toggleTree(this.closest('.tree-gerencia'))">
-        <span class="g-chip ${gClass(g)}">${g}</span>
+        <span class="g-chip ${gClass(g)}">${escaparHTML(g)}</span>
         <span class="tree-g-count">${count} indicadores</span>
         <svg class="tree-chevron" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
       </div>
@@ -514,7 +514,7 @@ function updateFiltersBar(rows) {
   bar.classList.remove('hidden');
   bar.innerHTML = countHtml + chips.map((c,i)=>`
     <span class="filter-chip" onclick="(${c[1].toString()})()">
-      ${c[0]}
+      ${escaparHTML(c[0])}
       <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
     </span>`).join('');
 }
@@ -535,19 +535,19 @@ function openDetail(id) {
   render();
   document.getElementById('drawerBody').innerHTML = `
     <div class="drawer-id-row">
-      <span class="d-id">${r.id}</span>
-      <span class="level-tag ${lvClass(r.nivel)}">${r.nivel}</span>
-      <span class="g-chip ${gClass(r.gerencia)}">${gShort(r.gerencia)}</span>
+      <span class="d-id">${escaparHTML(r.id)}</span>
+      <span class="level-tag ${lvClass(r.nivel)}">${escaparHTML(r.nivel)}</span>
+      <span class="g-chip ${gClass(r.gerencia)}">${escaparHTML(gShort(r.gerencia))}</span>
     </div>
-    <p class="drawer-name">${isoBadge(r)}${r.nombreIndicador}</p>
+    <p class="drawer-name">${isoBadge(r)}${escaparHTML(r.nombreIndicador)}</p>
     <div class="d-divider"></div>
     <div class="d-field">
       <span class="d-label">Gerencia</span>
-      <span class="d-value">${r.gerencia}</span>
+      <span class="d-value">${escaparHTML(r.gerencia)}</span>
     </div>
     <div class="d-field">
       <span class="d-label">Objetivo resumido</span>
-      <span class="d-value">${r.resumenNarrativo || r.objetivo}</span>
+      <span class="d-value">${escaparHTML(r.resumenNarrativo || r.objetivo)}</span>
     </div>
     <div class="d-field">
       <span class="d-label">
@@ -555,7 +555,7 @@ function openDetail(id) {
           <span class="tip-icon" data-tip="Fórmula o procedimiento para obtener el valor del indicador">?</span>
         </span>
       </span>
-      <span class="d-value code">${r.metodoCalculo}</span>
+      <span class="d-value code">${escaparHTML(r.metodoCalculo)}</span>
     </div>
     <div class="d-field">
       <span class="d-label">
@@ -563,11 +563,11 @@ function openDetail(id) {
           <span class="tip-icon" data-tip="Periodicidad con la que se mide y reporta el indicador">?</span>
         </span>
       </span>
-      <span class="d-value"><span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${r.frecuenciaMedicion}</span></span>
+      <span class="d-value"><span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${escaparHTML(r.frecuenciaMedicion)}</span></span>
     </div>
     <div class="d-field">
       <span class="d-label">Unidad de medida</span>
-      <span class="d-value">${r.unidadMedida}</span>
+      <span class="d-value">${escaparHTML(r.unidadMedida)}</span>
     </div>
     <div class="d-field">
       <span class="d-label">
@@ -575,12 +575,12 @@ function openDetail(id) {
           <span class="tip-icon" data-tip="Fuente o documento que permite comprobar el valor reportado">?</span>
         </span>
       </span>
-      <span class="d-value">${r.medioVerificacionNombre}</span>
-      <span class="mv-tag ${mvClass(r.medioVerificacionTipo)}" style="margin-top:6px;display:inline-block">${r.medioVerificacionTipo}</span>
+      <span class="d-value">${escaparHTML(r.medioVerificacionNombre)}</span>
+      <span class="mv-tag ${mvClass(r.medioVerificacionTipo)}" style="margin-top:6px;display:inline-block">${escaparHTML(r.medioVerificacionTipo)}</span>
     </div>
     <div class="d-field">
       <span class="d-label">Fuente</span>
-      <span class="d-value">${r.medioVerificacionFuente}</span>
+      <span class="d-value">${escaparHTML(r.medioVerificacionFuente)}</span>
     </div>
     <div class="d-field">
       <span class="d-label">Tiene denominador</span>

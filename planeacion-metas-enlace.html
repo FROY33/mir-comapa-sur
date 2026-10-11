@@ -430,20 +430,20 @@ function buildCardHtml(i) {
   var ec  = ESTADO_CFG[est]||ESTADO_CFG.pendiente;
   var btn = getBtnForEstado(est);
   var isDemo = i.id.indexOf('DEMO-')===0;
-  return '<div class="ind-card '+est+'" onclick="openModal(\''+i.id+'\')">'+
+  return '<div class="ind-card '+escaparHTML(est)+'" data-id="'+escaparHTML(i.id)+'" onclick="openModal(this.dataset.id)">'+
     '<div class="card-top">'+
-      '<span class="card-clave'+(isDemo?' demo-label':'')+'">'+i.id+'</span>'+
+      '<span class="card-clave'+(isDemo?' demo-label':'')+'">'+escaparHTML(i.id)+'</span>'+
       '<span class="estado-badge" style="background:'+ec.bg+';color:'+ec.color+'">'+ec.label+'</span>'+
     '</div>'+
-    '<p class="card-nombre">'+i.nombre+'</p>'+
+    '<p class="card-nombre">'+escaparHTML(i.nombre)+'</p>'+
     '<div class="card-meta-row">'+
-      '<span class="nivel-pill '+i.nivel+'">'+i.nivel+'</span>'+
-      '<span class="freq-pill">'+i.frecuencia+'</span>'+
+      '<span class="nivel-pill '+escaparHTML(i.nivel)+'">'+escaparHTML(i.nivel)+'</span>'+
+      '<span class="freq-pill">'+escaparHTML(i.frecuencia)+'</span>'+
       (i.acumulable?'<span class="freq-pill" style="background:var(--color-success-tint);color:var(--color-success-strong)">Acumulable</span>':'')+
     '</div>'+
     '<div class="card-footer">'+
-      (i.plan.fechaEnvio?'<span style="font-size:10px;color:var(--color-text-muted)">Enviado '+i.plan.fechaEnvio+'</span>':'<span style="font-size:10px;color:var(--color-text-muted)">'+(est==='pendiente'?'Sin iniciar':'')+'</span>')+
-      '<button class="btn-card '+btn.cls+'" onclick="event.stopPropagation();openModal(\''+i.id+'\')">'+btn.label+'</button>'+
+      (i.plan.fechaEnvio?'<span style="font-size:10px;color:var(--color-text-muted)">Enviado '+escaparHTML(i.plan.fechaEnvio)+'</span>':'<span style="font-size:10px;color:var(--color-text-muted)">'+(est==='pendiente'?'Sin iniciar':'')+'</span>')+
+      '<button class="btn-card '+btn.cls+'" data-id="'+escaparHTML(i.id)+'" onclick="event.stopPropagation();openModal(this.dataset.id)">'+btn.label+'</button>'+
     '</div>'+
   '</div>';
 }
@@ -490,15 +490,15 @@ function getImpactMessage(frecuencia) {
   var repNames = labels.slice(0, reported).join(', ');
   var pending  = total - reported;
   var penNames = pending>0 ? labels.slice(reported).join(', ') : '';
-  return '<strong>'+reported+' período'+(reported>1?'s':'')+' ya reportado'+(reported>1?'s':'')+': </strong>'+repNames+'. Cambiar estas metas recalculará el cumplimiento retroactivamente.'+
-    (penNames?' <strong>'+pending+' pendiente'+(pending>1?'s':'')+':</strong> '+penNames+'.':'');
+  return '<strong>'+reported+' período'+(reported>1?'s':'')+' ya reportado'+(reported>1?'s':'')+': </strong>'+escaparHTML(repNames)+'. Cambiar estas metas recalculará el cumplimiento retroactivamente.'+
+    (penNames?' <strong>'+pending+' pendiente'+(pending>1?'s':'')+':</strong> '+escaparHTML(penNames)+'.':'');
 }
 
 // ── Cambio en revisión — timeline ─────────────────────────────────────────────
 function renderCambioTimeline(cambio) {
   var chk = '<svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="white" width="10" height="10"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
   var steps = [
-    {label:'Solicitud enviada',       sub:'Enviada el '+(cambio.fecha||'2026-07-28'), st:'done'},
+    {label:'Solicitud enviada',       sub:'Enviada el '+escaparHTML(cambio.fecha||'2026-07-28'), st:'done'},
     {label:'Revisión por Revisor',    sub:'Esperando revisión del revisor',           st:'active'},
     {label:'Aprobación Administrador',sub:'Pendiente',                                st:'pending'},
     {label:'Meta actualizada',        sub:'Pendiente',                                st:'pending'},
@@ -513,7 +513,7 @@ function renderCambioTimeline(cambio) {
   }).join('');
   return '<div class="cambio-status-box">'+
     '<p class="cambio-status-title">↩ Solicitud de cambio en revisión</p>'+
-    (cambio.motivo?'<div class="cambio-motivo">"'+cambio.motivo+'"</div>':'')+
+    (cambio.motivo?'<div class="cambio-motivo">"'+escaparHTML(cambio.motivo)+'"</div>':'')+
     '<div class="sol-timeline">'+stepsHtml+'</div></div>';
 }
 
@@ -523,8 +523,8 @@ function buildMetaComparison(item, cambio) {
   var original = cambio.metasOriginales||item.plan.metas||[];
   var nueva    = cambio.nuevasMetas||[];
   function row(lbl, val, changed) {
-    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">'+lbl+'</span>'+
-      '<span class="meta-compare-val'+(changed?' changed':'')+'">'+val+'</span></div>';
+    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">'+escaparHTML(lbl)+'</span>'+
+      '<span class="meta-compare-val'+(changed?' changed':'')+'">'+escaparHTML(val)+'</span></div>';
   }
   var origRows = labels.map(function(lbl,i){ return row(lbl, original[i]!=null?original[i]:'—', false); }).join('');
   var newRows  = labels.map(function(lbl,i){
@@ -549,11 +549,11 @@ function openModal(id) {
   document.getElementById('modalSubtitle').textContent = item.id+' · '+item.frecuencia+(item.acumulable?' · Acumulable':'');
   var ec = ESTADO_CFG[est]||ESTADO_CFG.pendiente;
   document.getElementById('modalMeta').innerHTML =
-    '<span class="nivel-pill '+item.nivel+'" style="font-size:10px;font-weight:800;width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;">'+item.nivel+'</span>'+
-    '<span class="freq-pill">'+item.frecuencia+'</span>'+
+    '<span class="nivel-pill '+escaparHTML(item.nivel)+'" style="font-size:10px;font-weight:800;width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;">'+escaparHTML(item.nivel)+'</span>'+
+    '<span class="freq-pill">'+escaparHTML(item.frecuencia)+'</span>'+
     '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+ec.bg+';color:'+ec.color+'">'+ec.label+'</span>'+
-    (item.unidad?'<span class="freq-pill">Unidad: '+item.unidad+'</span>':'')+
-    (item.metaAnual!=null?'<span class="freq-pill">Meta anual: '+item.metaAnual+'</span>':'');
+    (item.unidad?'<span class="freq-pill">Unidad: '+escaparHTML(item.unidad)+'</span>':'')+
+    (item.metaAnual!=null?'<span class="freq-pill">Meta anual: '+escaparHTML(item.metaAnual)+'</span>':'');
 
   var html = '';
 
@@ -566,11 +566,11 @@ function openModal(id) {
     html += '<div class="impact-callout"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg><span>'+getImpactMessage(item.frecuencia)+'</span></div>';
 
   } else if (est==='observado') {
-    if (item.plan.obsRevisor) html += '<div class="obs-callout"><p class="obs-callout-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg> Observaciones del revisor</p><p class="obs-callout-body">'+item.plan.obsRevisor+'</p></div>';
+    if (item.plan.obsRevisor) html += '<div class="obs-callout"><p class="obs-callout-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg> Observaciones del revisor</p><p class="obs-callout-body">'+escaparHTML(item.plan.obsRevisor)+'</p></div>';
 
   } else if (est==='aprobado') {
     html += '<div class="readonly-notice" style="background:var(--color-success-tint);border-color:var(--color-success-tint);color:var(--color-success-strong);"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Metas aprobadas por el revisor, pendientes de aprobación final del administrador.</div>';
-    if (item.plan.obsRevisor) html += '<div class="readonly-notice" style="background:var(--color-success-tint);border-color:var(--color-success-tint);color:var(--color-success-strong);margin-top:8px;"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Revisor: '+item.plan.obsRevisor+'</div>';
+    if (item.plan.obsRevisor) html += '<div class="readonly-notice" style="background:var(--color-success-tint);border-color:var(--color-success-tint);color:var(--color-success-strong);margin-top:8px;"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Revisor: '+escaparHTML(item.plan.obsRevisor)+'</div>';
 
   } else if (est==='enviado') {
     html += '<div class="readonly-notice"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>Metas enviadas al revisor. No se pueden editar mientras están en revisión.</div>';
@@ -580,20 +580,20 @@ function openModal(id) {
     var periods = PERIODOS_LABELS[item.frecuencia]||[];
     var n = periods.length;
     var cols = n>=10?'cols-4':n>=6?'cols-3':n>=3?'cols-2':'';
-    html += '<p class="period-section-title">Metas por período · '+item.frecuencia+'</p>';
+    html += '<p class="period-section-title">Metas por período · '+escaparHTML(item.frecuencia)+'</p>';
     html += '<div class="period-grid '+cols+'">';
     periods.forEach(function(p,i){
       var val = item.plan.metas[i]!=null ? item.plan.metas[i] : '';
-      html += '<div class="period-item"><span class="period-label">'+p+'</span>'+
-        '<input class="period-input'+(val!==''?' filled':'')+'" type="number" min="0" step="any" id="pg_'+i+'" value="'+val+'" placeholder="0"'+(IS_READONLY?' readonly':'')+' oninput="onMetaInput('+i+')"></div>';
+      html += '<div class="period-item"><span class="period-label">'+escaparHTML(p)+'</span>'+
+        '<input class="period-input'+(val!==''?' filled':'')+'" type="number" min="0" step="any" id="pg_'+i+'" value="'+escaparHTML(val)+'" placeholder="0"'+(IS_READONLY?' readonly':'')+' oninput="onMetaInput('+i+')"></div>';
     });
     html += '</div>';
     if (item.acumulable) {
       var tot = (item.plan.metas||[]).reduce(function(s,v){ return s+(parseFloat(v)||0); }, 0);
-      html += '<div class="acum-total"><span class="acum-total-label">Total acumulado</span><span class="acum-total-val" id="acumTotal">'+tot.toLocaleString('es-MX')+(item.unidad?' '+item.unidad:'')+'</span></div>';
+      html += '<div class="acum-total"><span class="acum-total-label">Total acumulado</span><span class="acum-total-val" id="acumTotal">'+tot.toLocaleString('es-MX')+(item.unidad?' '+escaparHTML(item.unidad):'')+'</span></div>';
     }
     html += '<label class="comment-label" style="margin-top:4px;">Comentarios de justificación</label>'+
-      '<textarea class="comment-textarea" id="commentTA" placeholder="Justifica tus metas proyectadas: base histórica, factores externos, supuestos…"'+(IS_READONLY?' readonly':'')+'>'+( item.plan.comentariosEnlace||'')+'</textarea>';
+      '<textarea class="comment-textarea" id="commentTA" placeholder="Justifica tus metas proyectadas: base histórica, factores externos, supuestos…"'+(IS_READONLY?' readonly':'')+'>'+escaparHTML(item.plan.comentariosEnlace||'')+'</textarea>';
   }
 
   document.getElementById('modalBody').innerHTML = html;
@@ -605,7 +605,7 @@ function openModal(id) {
       'Solicitar cambio en la meta</button>';
   } else if (est==='cambio_en_revision') {
     footer = '<span style="font-size:12px;color:var(--color-corregido);font-weight:600;">Solicitud enviada el '+
-      ((item.plan.cambioMeta&&item.plan.cambioMeta.fecha)||'2026-07-28')+'</span>';
+      escaparHTML((item.plan.cambioMeta&&item.plan.cambioMeta.fecha)||'2026-07-28')+'</span>';
   } else if (!IS_READONLY) {
     footer = '<button class="btn-draft" onclick="saveDraft()">Guardar borrador</button>'+
       '<button class="btn btn-primary" onclick="submitPlan()">'+
@@ -626,7 +626,7 @@ function showMetaChangeForm() {
   var reported = PERIODOS_REPORTADOS[item.frecuencia]||0;
 
   var html = '<div class="change-form-header">'+
-    '<button class="change-form-back" onclick="openModal(\''+EDITING_ID+'\')">'+
+    '<button class="change-form-back" onclick="openModal(EDITING_ID)">'+
     '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg> Volver</button>'+
     '<span style="font-size:13px;font-weight:700;">Solicitar cambio en la meta</span></div>';
 
@@ -637,8 +637,8 @@ function showMetaChangeForm() {
   periods.forEach(function(p,i){
     var val = item.plan.metas[i]!=null ? item.plan.metas[i] : '';
     var dot = i<reported ? ' <span style="color:var(--color-observado);font-size:9px;vertical-align:middle;">●</span>' : '';
-    html += '<div class="period-item"><span class="period-label">'+p+dot+'</span>'+
-      '<input class="period-input'+(val!==''?' filled':'')+'" type="number" min="0" step="any" id="pg_'+i+'" value="'+val+'" placeholder="0"></div>';
+    html += '<div class="period-item"><span class="period-label">'+escaparHTML(p)+dot+'</span>'+
+      '<input class="period-input'+(val!==''?' filled':'')+'" type="number" min="0" step="any" id="pg_'+i+'" value="'+escaparHTML(val)+'" placeholder="0"></div>';
   });
   html += '</div>';
   if (reported>0) html += '<p style="font-size:11px;color:var(--color-observado);margin-bottom:14px;"><span style="font-weight:700;">●</span> Los períodos marcados ya tienen reportes. Cambiar estas metas afecta el cálculo de cumplimiento retroactivamente.</p>';
@@ -768,7 +768,7 @@ function cicloEnlaceGate() {
   document.getElementById('cardsGrid').innerHTML = '<div style="text-align:center;padding:64px 24px 48px;">'
     +'<div style="font-size:40px;margin-bottom:16px;">'+info.icon+'</div>'
     +'<h2 style="font-size:18px;font-weight:700;color:var(--color-text-primary);margin-bottom:8px;">'+info.title+'</h2>'
-    +'<p style="font-size:13px;color:var(--color-text-secondary);max-width:420px;margin:0 auto;line-height:1.6;">'+info.body+'</p>'
+    +'<p style="font-size:13px;color:var(--color-text-secondary);max-width:420px;margin:0 auto;line-height:1.6;">'+escaparHTML(info.body)+'</p>'
     +'</div>';
   // Disable modal interactions
   window.openModal = function() {};

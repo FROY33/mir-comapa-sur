@@ -391,8 +391,12 @@
       '<path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877' +
       'M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l5.654-4.654' +
       'm5.656-4.656 4.24-4.24a1.5 1.5 0 0 1 2.12 2.12l-4.24 4.24m-5.656 4.656-1.477-1.477M6 20.25h.008v.008H6V20.25Z"/>' +
-      '</svg><span>Dev</span>' +
-      '<span class="devt-page-name">' + pageName + '</span>';
+      '</svg><span>Dev</span>';
+    // El nombre sale de la URL: como texto, nunca como HTML
+    var pageNameEl = document.createElement('span');
+    pageNameEl.className = 'devt-page-name';
+    pageNameEl.textContent = pageName;
+    badge.appendChild(pageNameEl);
 
     var toggleBtn = document.createElement('button');
     toggleBtn.className = 'devt-toggle-btn';

@@ -347,18 +347,18 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       'borrador':         ['badge-gray',      'Borrador'],
     };
     const cfg = map[estado] || ['badge-gray', estado];
-    return `<span class="badge ${cfg[0]}">${cfg[1]}</span>`;
+    return `<span class="badge ${cfg[0]}">${escaparHTML(cfg[1])}</span>`;
   }
 
   function nivelBadge(nivel) {
     const labels = { F:'Fin', P:'Propósito', C:'Componente', A:'Actividad' };
-    return `<span class="nivel-badge nivel-${nivel}">${labels[nivel]||nivel}</span>`;
+    return `<span class="nivel-badge nivel-${escaparHTML(nivel)}">${escaparHTML(labels[nivel]||nivel)}</span>`;
   }
 
   function formatResultado(act) {
     if (!act.avanceReportado) return '<span class="td-resultado empty">—</span>';
     const ar = act.avanceReportado;
-    if (ar.resultado != null) return `<span class="td-resultado">${ar.resultado}%</span>`;
+    if (ar.resultado != null) return `<span class="td-resultado">${escaparHTML(ar.resultado)}%</span>`;
     if (ar.valor != null) return `<span class="td-resultado">${ar.valor.toLocaleString('es-MX')}</span>`;
     return '<span class="td-resultado empty">—</span>';
   }
@@ -370,12 +370,12 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     pendingValidarId = id;
     const dias = diasRestantes(act.fechaLimite);
     document.getElementById('validarSummary').innerHTML = [
-      { l: 'Indicador',    v: isoBadge(act) + act.nombreIndicador },
-      { l: 'ID',           v: act.id },
-      { l: 'Enlace',       v: act.responsableEnlace },
-      { l: 'Revisor',      v: act.responsableRevisor },
-      { l: 'Período',      v: act.periodo },
-      { l: 'Fecha límite', v: formatFecha(act.fechaLimite) + (dias < 0 ? ' (vencida)' : '') },
+      { l: 'Indicador',    v: isoBadge(act) + escaparHTML(act.nombreIndicador) },
+      { l: 'ID',           v: escaparHTML(act.id) },
+      { l: 'Enlace',       v: escaparHTML(act.responsableEnlace) },
+      { l: 'Revisor',      v: escaparHTML(act.responsableRevisor) },
+      { l: 'Período',      v: escaparHTML(act.periodo) },
+      { l: 'Fecha límite', v: escaparHTML(formatFecha(act.fechaLimite)) + (dias < 0 ? ' (vencida)' : '') },
     ].map(r => `<div class="ms-row"><span class="ms-label">${r.l}</span><span class="ms-value">${r.v}</span></div>`).join('');
     document.getElementById('validarModal').classList.add('open');
   }
@@ -415,22 +415,22 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
         <div class="validar-card">
           <div class="vc-top">
             <div>
-              <p class="vc-id">${act.id}</p>
-              <p class="vc-nombre">${isoBadge(act)}${act.nombreIndicador}</p>
+              <p class="vc-id">${escaparHTML(act.id)}</p>
+              <p class="vc-nombre">${isoBadge(act)}${escaparHTML(act.nombreIndicador)}</p>
             </div>
-            <span class="nivel-badge nivel-${act.nivelCodigo}" style="flex-shrink:0">${{F:'Fin',P:'Propósito',C:'Componente',A:'Actividad'}[act.nivelCodigo]||act.nivelCodigo}</span>
+            <span class="nivel-badge nivel-${escaparHTML(act.nivelCodigo)}" style="flex-shrink:0">${escaparHTML({F:'Fin',P:'Propósito',C:'Componente',A:'Actividad'}[act.nivelCodigo]||act.nivelCodigo)}</span>
           </div>
           <div class="vc-meta">
-            <span class="vc-freq">${act.frecuenciaMedicion}</span>
-            <span class="vc-deadline ${dl.cls}">⏱ ${formatFecha(act.fechaLimite)} · ${dl.text}</span>
-            <span class="vc-resultado">Resultado: <strong>${res}</strong></span>
+            <span class="vc-freq">${escaparHTML(act.frecuenciaMedicion)}</span>
+            <span class="vc-deadline ${dl.cls}">⏱ ${escaparHTML(formatFecha(act.fechaLimite))} · ${dl.text}</span>
+            <span class="vc-resultado">Resultado: <strong>${escaparHTML(res)}</strong></span>
           </div>
           <div class="vc-actions">
-            <button class="btn-validar" onclick="openValidarModal('${act.id}')">
+            <button class="btn-validar" data-id="${escaparHTML(act.id)}" onclick="openValidarModal(this.dataset.id)">
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
               Validar indicador
             </button>
-            <a href="detalle-actividad.html?id=${act.id}" class="btn-ver">
+            <a href="detalle-actividad.html?id=${encodeURIComponent(act.id)}" class="btn-ver">
               <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
               Ver
             </a>
@@ -472,15 +472,15 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       const isValidar = ind.estado === 'listo_validar';
       const isCerrado = ind.estado === 'cerrado';
       const actionBtn = isValidar
-        ? `<button class="btn-tbl teal" onclick="openValidarModal('${ind.id}')"><svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Validar</button>`
-        : `<a href="detalle-actividad.html?id=${ind.id}" class="btn-tbl neutral"><svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>Ver</a>`;
+        ? `<button class="btn-tbl teal" data-id="${escaparHTML(ind.id)}" onclick="openValidarModal(this.dataset.id)"><svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Validar</button>`
+        : `<a href="detalle-actividad.html?id=${encodeURIComponent(ind.id)}" class="btn-tbl neutral"><svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>Ver</a>`;
       return `<tr>
-        <td class="td-id">${ind.id}</td>
-        <td><span class="td-nombre">${ind.nombre}</span></td>
+        <td class="td-id">${escaparHTML(ind.id)}</td>
+        <td><span class="td-nombre">${escaparHTML(ind.nombre)}</span></td>
         <td>${nivelBadge(ind.nivelCodigo)}</td>
-        <td><span class="freq-tag">${ind.frecuenciaMedicion}</span></td>
+        <td><span class="freq-tag">${escaparHTML(ind.frecuenciaMedicion)}</span></td>
         <td class="td-fecha">
-          <p class="fecha-val">${formatFecha(ind.fechaLimite)}</p>
+          <p class="fecha-val">${escaparHTML(formatFecha(ind.fechaLimite))}</p>
           <p class="fecha-dias ${dl.cls}">${dl.text}</p>
         </td>
         <td>${estadoBadge(ind.estado)}</td>
@@ -559,20 +559,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
 
   // ── Render gerencia header ──────────────────────────────────────────────────
   function renderHeader(g) {
-    const freqTags = g.frecuencias.map(f => `<span class="gh-tag">${f}</span>`).join('');
+    const freqTags = g.frecuencias.map(f => `<span class="gh-tag">${escaparHTML(f)}</span>`).join('');
     return `<div class="gh-left">
-        <p class="gh-name">${g.nombre}</p>
-        <p class="gh-desc">${g.descripcion}</p>
+        <p class="gh-name">${escaparHTML(g.nombre)}</p>
+        <p class="gh-desc">${escaparHTML(g.descripcion)}</p>
         <div class="gh-tags">
-          <span class="gh-tag" style="background:var(--color-primary-tint);color:var(--color-primary);font-weight:700;">${g.periodo}</span>
+          <span class="gh-tag" style="background:var(--color-primary-tint);color:var(--color-primary);font-weight:700;">${escaparHTML(g.periodo)}</span>
           <span class="gh-tag">${ACTIVIDADES_ENLACE.filter(a => a.gerencia === g.gerenciaName).length} indicadores</span>
           ${freqTags}
         </div>
       </div>
       <div class="gh-right">
         <p class="gh-team-label">Equipo</p>
-        <span class="person-chip"><span class="person-avatar" style="background:${g.color}">${g.enlace.iniciales}</span><span>${g.enlace.nombre}<br><span class="person-role">Enlace</span></span></span>
-        <span class="person-chip"><span class="person-avatar" style="background:var(--color-text-secondary)">${g.revisor.iniciales}</span><span>${g.revisor.nombre}<br><span class="person-role">Revisor</span></span></span>
+        <span class="person-chip"><span class="person-avatar" style="background:${escaparHTML(g.color)}">${escaparHTML(g.enlace.iniciales)}</span><span>${escaparHTML(g.enlace.nombre)}<br><span class="person-role">Enlace</span></span></span>
+        <span class="person-chip"><span class="person-avatar" style="background:var(--color-text-secondary)">${escaparHTML(g.revisor.iniciales)}</span><span>${escaparHTML(g.revisor.nombre)}<br><span class="person-role">Revisor</span></span></span>
       </div>`;
   }
 

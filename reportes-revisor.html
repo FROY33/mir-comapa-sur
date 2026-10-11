@@ -522,10 +522,10 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     }
     return '<div class="db-card">'+
       '<div class="db-card-top">'+
-        '<span class="db-proceso-chip" title="'+ind.p+'">'+ind.p+'</span>'+
+        '<span class="db-proceso-chip" title="'+escaparHTML(ind.p)+'">'+escaparHTML(ind.p)+'</span>'+
         '<span class="db-status '+stCls+'">'+stLabel+'</span>'+
       '</div>'+
-      '<div class="db-card-name">'+ind.n+'</div>'+
+      '<div class="db-card-name">'+escaparHTML(ind.n)+'</div>'+
       '<div class="db-val-row">'+
         '<div class="db-val-big">'+fmtVal(val, ind.pct, ind.unit||'')+'</div>'+
         '<div>'+
@@ -539,9 +539,9 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
           MESES_SHORT.map(function(l){ return '<span class="db-spark-lbl">'+l[0]+'</span>'; }).join('')+
         '</div>'+
       '</div>'+
-      (ind.obs ? '<div class="db-card-obs"><b>Obs:</b> '+ind.obs+'</div>' : '')+
+      (ind.obs ? '<div class="db-card-obs"><b>Obs:</b> '+escaparHTML(ind.obs)+'</div>' : '')+
       '<div class="db-card-footer">'+
-        '<span class="db-period-tag">'+ind.per+'</span>'+
+        '<span class="db-period-tag">'+escaparHTML(ind.per)+'</span>'+
       '</div>'+
     '</div>';
   }
@@ -551,7 +551,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     inds.forEach(function(ind){ if (!byP[ind.p]) byP[ind.p]=[]; byP[ind.p].push(ind); });
     var html = '';
     Object.keys(byP).forEach(function(proc) {
-      html += '<div class="db-proceso-hdr">'+proc+'</div>';
+      html += '<div class="db-proceso-hdr">'+escaparHTML(proc)+'</div>';
       html += '<div class="db-grid">';
       byP[proc].forEach(function(ind){ html += buildCard(ind); });
       html += '</div>';
@@ -578,7 +578,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     var colsHtml = MESES_FULL.map(function(m){ return '<th class="th-month">'+m.substring(0,3)+'</th>'; }).join('');
     var rowsHtml = '';
     Object.keys(byP).forEach(function(proc) {
-      rowsHtml += '<tr class="tr-proceso-hdr"><td colspan="'+(3+12)+'">'+proc+'</td></tr>';
+      rowsHtml += '<tr class="tr-proceso-hdr"><td colspan="'+(3+12)+'">'+escaparHTML(proc)+'</td></tr>';
       byP[proc].forEach(function(ind) {
         var cells = ind.m.map(function(v) {
           if (v === null) return '<td class="td-mes td-nd">—</td>';
@@ -587,16 +587,16 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
           return '<td class="'+cls+'">'+fmtCell(v,ind)+'</td>';
         }).join('');
         rowsHtml += '<tr>'+
-          '<td class="td-indicador col-s1">'+ind.n+'</td>'+
+          '<td class="td-indicador col-s1">'+escaparHTML(ind.n)+'</td>'+
           '<td class="td-meta col-s2">'+fmtMetaCell(ind)+'</td>'+
-          '<td class="td-per">'+ind.per+'</td>'+
+          '<td class="td-per">'+escaparHTML(ind.per)+'</td>'+
           cells+
         '</tr>';
       });
     });
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 14px;gap:12px;">'+
       '<div>'+
-        '<div style="font-size:14px;font-weight:700;color:var(--color-text-primary);">'+gerLabel+'</div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--color-text-primary);">'+escaparHTML(gerLabel)+'</div>'+
         '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:1px;">'+inds.length+' indicadores · Enero–Diciembre 2026</div>'+
       '</div>'+
     '</div>'+
@@ -694,23 +694,22 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     var _iS = 'max-width:100px;max-height:60px;object-fit:contain;border-radius:4px;';
     var _wS = 'width:100px;height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
     var logoL = _membreteConfig.logoLeft
-      ? '<div style="'+_wS+'"><img src="'+_membreteConfig.logoLeft+'" style="'+_iS+'"></div>'
+      ? '<div style="'+_wS+'"><img src="'+escaparHTML(_membreteConfig.logoLeft)+'" style="'+_iS+'"></div>'
       : '<div class="mbr-logo">Escudo<br>Tamaulipas</div>';
     var logoR = _membreteConfig.logoRight
-      ? '<div style="'+_wS+'"><img src="'+_membreteConfig.logoRight+'" style="'+_iS+'"></div>'
+      ? '<div style="'+_wS+'"><img src="'+escaparHTML(_membreteConfig.logoRight)+'" style="'+_iS+'"></div>'
       : '<div class="mbr-logo">Logo<br>COMAPA Sur</div>';
-    var mbrTit = (_membreteConfig.title || 'Tablero de Desempeño · Indicadores MIR COMAPA Sur')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var mbrTit = escaparHTML(_membreteConfig.title || 'Tablero de Desempeño · Indicadores MIR COMAPA Sur');
     var membrete = '<div class="membrete">'+logoL
       +'<div class="mbr-center"><div class="mbr-title">'+mbrTit+'</div>'
-      +'<div class="mbr-ger">'+gerLabel+'</div>'
+      +'<div class="mbr-ger">'+escaparHTML(gerLabel)+'</div>'
       +'<div class="mbr-fecha">Generado el '+_fecha+'</div></div>'+logoR+'</div>';
     var byP = {};
     inds.forEach(function(ind){ if(!byP[ind.p]) byP[ind.p]=[]; byP[ind.p].push(ind); });
     var colsHtml = MESES_FULL.map(function(m){ return '<th>'+m.substring(0,3)+'</th>'; }).join('');
     var rowsHtml = '';
     Object.keys(byP).forEach(function(proc) {
-      rowsHtml += '<tr class="proc-hdr"><td colspan="15">'+proc+'</td></tr>';
+      rowsHtml += '<tr class="proc-hdr"><td colspan="15">'+escaparHTML(proc)+'</td></tr>';
       byP[proc].forEach(function(ind) {
         var cells = ind.m.map(function(v) {
           if (v === null) return '<td class="c-nd">—</td>';
@@ -720,9 +719,9 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
         }).join('');
         var isoTag = isISOInd(ind.n) ? '<span class="iso-tag">ISO</span>' : '';
         rowsHtml += '<tr>'
-          +'<td class="c-ind">'+isoTag+ind.n+'</td>'
+          +'<td class="c-ind">'+isoTag+escaparHTML(ind.n)+'</td>'
           +'<td class="c-meta">'+fmtMetaCell(ind)+'</td>'
-          +'<td class="c-per">'+ind.per+'</td>'
+          +'<td class="c-per">'+escaparHTML(ind.per)+'</td>'
           +cells+'</tr>';
       });
     });
@@ -738,7 +737,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       +'<div class="signature-inner">'
       +'<hr class="signature-line">'
       +'<div class="signature-name">Nombre y Firma</div>'
-      +'<div class="signature-cargo">'+cargo+'</div>'
+      +'<div class="signature-cargo">'+escaparHTML(cargo)+'</div>'
       +'</div></div>';
     return '<div class="page"><div class="page-content">'+membrete
       +'<table class="ex-table">'+thead+'<tbody>'+rowsHtml+'</tbody></table>'
