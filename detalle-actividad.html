@@ -535,28 +535,6 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 .correction-alert {display:flex;align-items:flex-start;gap:8px;background:var(--color-corregido-tint);border:1px solid #DDD6FE;border-radius:10px;padding:11px 12px;margin-bottom:10px;font-size:12px;color:var(--color-corregido);line-height:1.5;}
 .correction-alert svg {width:14px;height:14px;flex-shrink:0;margin-top:2px;color:var(--color-corregido);}
 </style>
-  <script>
-  (function (m, a, z, e) {
-    var s, t, u, v;
-    try { t = m.sessionStorage.getItem('maze-us'); } catch (err) {}
-    if (!t) {
-      t = new Date().getTime();
-      try { m.sessionStorage.setItem('maze-us', t); } catch (err) {}
-    }
-    u = document.currentScript || (function () {
-      var w = document.getElementsByTagName('script');
-      return w[w.length - 1];
-    })();
-    v = u && u.nonce;
-    s = a.createElement('script');
-    s.src = z + '?apiKey=' + e;
-    s.async = true;
-    if (v) s.setAttribute('nonce', v);
-    a.getElementsByTagName('head')[0].appendChild(s);
-    m.mazeUniversalSnippetApiKey = e;
-  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
-  </script>
-  <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
 </head>
 <body class="has-topnav">
 
@@ -695,15 +673,15 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
   // ── State ─────────────────────────────────────────────────────────────────
   (function() {
     try {
-      var s = JSON.parse(localStorage.getItem('comapa_mir_session') || 'null');
-      if (s && s.rol === 'Revisor') {
+      var s = Session.getUser();
+      if (s && s.rolClave === 'revisor') {
         var home = document.querySelector('.sidebar-nav a[title="Inicio"]');
         if (home) home.href = 'dashboard-revisor.html';
       }
     } catch(e) {}
   })();
-  const isRevisor   = new URLSearchParams(location.search).get('rol') === 'revisor'
-    || (function(){ try { var s = JSON.parse(localStorage.getItem('comapa_mir_session')||'null'); return s && s.rol === 'Revisor'; } catch(e){ return false; } })();
+  // La vista de Revisor la decide la sesión, no la URL ni localStorage (que cualquiera puede cambiar)
+  const isRevisor   = (function(){ var s = Session.getUser(); return !!(s && s.rolClave === 'revisor'); })();
   let actividad     = null;
   let obsRevisorText = '';
   let obsCategoria   = '';

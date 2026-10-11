@@ -236,14 +236,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (tnName)   tnName.textContent   = user.nombre;
   if (tnAvatar) tnAvatar.textContent = user.iniciales;
   if (tnRole) {
-    var _tnDisplay = null;
-    try {
-      _tnDisplay = localStorage.getItem('userUnidad')
-                || localStorage.getItem('userGerencia')
-                || user.unidadResponsable
-                || user.gerencia;
-    } catch(e) { _tnDisplay = user.gerencia; }
-    tnRole.textContent = _tnDisplay || user.gerencia;
+    // De la sesión, no de localStorage: lo que se muestra no debe poder cambiarlo el navegador
+    tnRole.textContent = user.unidadResponsable || user.gerencia || '';
   }
 
   // ── EVENTOS: NOTIFICACIONES ──────────────────────────────────────────────

@@ -187,28 +187,6 @@ tbody td {padding:12px 14px;font-size:13px;vertical-align:middle;}
 @keyframes spin {to{transform:rotate(360deg);}}
 .spin {animation:spin .7s linear infinite;}
 </style>
-  <script>
-  (function (m, a, z, e) {
-    var s, t, u, v;
-    try { t = m.sessionStorage.getItem('maze-us'); } catch (err) {}
-    if (!t) {
-      t = new Date().getTime();
-      try { m.sessionStorage.setItem('maze-us', t); } catch (err) {}
-    }
-    u = document.currentScript || (function () {
-      var w = document.getElementsByTagName('script');
-      return w[w.length - 1];
-    })();
-    v = u && u.nonce;
-    s = a.createElement('script');
-    s.src = z + '?apiKey=' + e;
-    s.async = true;
-    if (v) s.setAttribute('nonce', v);
-    a.getElementsByTagName('head')[0].appendChild(s);
-    m.mazeUniversalSnippetApiKey = e;
-  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
-  </script>
-  <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
 </head>
 <body class="has-topnav">
 
@@ -565,8 +543,8 @@ tbody td {padding:12px 14px;font-size:13px;vertical-align:middle;}
 
   function _getGerencia() {
     var user = Session.getUser();
-    try { return localStorage.getItem('userGerencia') || (user && user.gerencia) || 'Gerencia'; }
-    catch(e) { return (user && user.gerencia) || 'Gerencia'; }
+    // La gerencia sale de la sesión, nunca de localStorage, que el usuario puede cambiar
+    return (user && user.gerencia) || 'Gerencia';
   }
 
   function renderCierreStats() {

@@ -4,9 +4,11 @@
  * Persiste las selecciones en sessionStorage para sobrevivir recargas.
  */
 (function () {
-  var isDev =
+  // Solo en un equipo de desarrollo: en un servidor real, ?dev=1 no debe cambiar lo que se ve
+  var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var isDev = local && (
     sessionStorage.getItem('comapa-demo') === '1' ||
-    new URLSearchParams(location.search).get('dev') === '1';
+    new URLSearchParams(location.search).get('dev') === '1');
   if (!isDev) return;
 
   // ── Constantes ─────────────────────────────────────────────────────────────

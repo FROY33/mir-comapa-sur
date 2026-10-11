@@ -442,28 +442,6 @@ body {
 .g-stat-val { font-size:18px; font-weight:700; line-height:1; color:var(--color-text-primary); }
 .g-stat-lbl { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--color-text-secondary); margin-top:4px; }
 </style>
-  <script>
-  (function (m, a, z, e) {
-    var s, t, u, v;
-    try { t = m.sessionStorage.getItem('maze-us'); } catch (err) {}
-    if (!t) {
-      t = new Date().getTime();
-      try { m.sessionStorage.setItem('maze-us', t); } catch (err) {}
-    }
-    u = document.currentScript || (function () {
-      var w = document.getElementsByTagName('script');
-      return w[w.length - 1];
-    })();
-    v = u && u.nonce;
-    s = a.createElement('script');
-    s.src = z + '?apiKey=' + e;
-    s.async = true;
-    if (v) s.setAttribute('nonce', v);
-    a.getElementsByTagName('head')[0].appendChild(s);
-    m.mazeUniversalSnippetApiKey = e;
-  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
-  </script>
-  <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
 </head>
 <body>
 

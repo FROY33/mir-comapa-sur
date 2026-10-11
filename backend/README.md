@@ -71,8 +71,19 @@ npm ci && npm run build
 NODE_ENV=production DATABASE_URL=... PORT=... npm start
 ```
 
-El usuario de base de la app no debe ser dueño de las tablas. Necesita `SELECT, INSERT, UPDATE` sobre las
-tablas de negocio y solo `SELECT, INSERT` sobre `bitacora`. Las migraciones se corren con otro usuario.
+**El usuario de base de la app no debe ser dueño de las tablas:** el dueño puede desactivar triggers, vaciar
+o borrar tablas, incluida la bitácora. Las migraciones y la carga inicial corren con el dueño. La app usa otro
+rol, con los permisos de `db/permisos.sql` (exactamente lo que el código usa, tabla por tabla):
+
+```bash
+# con el usuario dueño, después de migrar; el rol comapa_app lo crea antes el DBA, con LOGIN y contraseña
+psql "$DATABASE_URL_DUEÑO" -v app=comapa_app -f db/permisos.sql
+```
+
+`pruebas/permisos.test.ts` levanta la app con ese rol y recorre login, consultas, gestión de usuarios, ventanas
+y ciclos. También comprueba que el rol no puede borrar ni vaciar la bitácora, desactivar triggers ni crear tablas.
+En PostgreSQL 14 cualquier rol podía crear tablas en `public`; el script lo cierra. Una HU que necesite un permiso
+nuevo lo agrega ahí, con su prueba.
 
 ### Cabeceras de seguridad del sitio
 
@@ -81,7 +92,7 @@ en cada respuesta las mismas cabeceras que `dev/servir.ts` (`CABECERAS_SEGURIDAD
 
 | Cabecera | Valor |
 |---|---|
-| `Content-Security-Policy` | la de `CSP` en `dev/servir.ts`: `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'` y solo los dominios externos que usan las páginas |
+| `Content-Security-Policy` | la de `CSP` en `dev/servir.ts`: todo de `'self'` (scripts, conexiones, imágenes, marcos), `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`; el único externo es Google Fonts en `style-src` y `font-src` |
 | `X-Content-Type-Options` | `nosniff` |
 | `X-Frame-Options` | `DENY` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
@@ -91,6 +102,11 @@ Límite conocido: la CSP lleva `'unsafe-inline'` en `script-src` porque las pág
 `onclick=` en línea. Por eso no detiene un XSS que logre inyectar HTML; la defensa contra eso es
 escapar los datos (`escaparHTML` en `session.js`). Para quitarlo hay que mover los scripts en línea
 a archivos y los `onclick=` a `addEventListener`.
+
+**Sin scripts de terceros.** Chart.js 4.4.3 y SheetJS (xlsx) 0.20.3 se sirven desde `vendor/` (la 0.18.5 del
+CDN tenía vulnerabilidades conocidas). Se quitó la analítica de maze.co y contentsquare: grababa sesiones con
+datos reales, incluida la página de login. Si diseño la necesita para pruebas de usabilidad, que sea en un
+entorno de demostración con datos ficticios, nunca en el que usan las personas.
 
 ## Pruebas
 

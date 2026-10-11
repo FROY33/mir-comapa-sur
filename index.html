@@ -4,28 +4,6 @@
   <meta charset="UTF-8">
   <title>MIR COMAPA Sur</title>
   <script>
-  (function (m, a, z, e) {
-    var s, t, u, v;
-    try { t = m.sessionStorage.getItem('maze-us'); } catch (err) {}
-    if (!t) {
-      t = new Date().getTime();
-      try { m.sessionStorage.setItem('maze-us', t); } catch (err) {}
-    }
-    u = document.currentScript || (function () {
-      var w = document.getElementsByTagName('script');
-      return w[w.length - 1];
-    })();
-    v = u && u.nonce;
-    s = a.createElement('script');
-    s.src = z + '?apiKey=' + e;
-    s.async = true;
-    if (v) s.setAttribute('nonce', v);
-    a.getElementsByTagName('head')[0].appendChild(s);
-    m.mazeUniversalSnippetApiKey = e;
-  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
-  </script>
-  <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
-  <script>
     // HU-R7-02 CA_2: la raíz manda a cada quien a su dashboard. Quién es lo dice el
     // servidor, no el navegador: se consulta la sesión y se redirige según el rol.
     // Sin sesión, al login. Si el servidor no responde, también al login, que es el

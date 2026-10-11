@@ -60,19 +60,20 @@ const TIPOS: Record<string, string> = {
  * La CSP lleva 'unsafe-inline' en script-src porque las páginas tienen scripts y manejadores
  * en línea (onclick=...): sin él no funcionaría ninguna. Eso significa que la CSP NO frena un
  * XSS que logre inyectar HTML; esa defensa es escapar los datos (escaparHTML en session.js).
- * Lo que sí hace: impide cargar scripts de otros dominios, enviar datos a servidores no
- * listados, incrustar la página en un iframe ajeno (clickjacking) y usar <base> u <object>.
- * Los dominios de terceros son los que hoy usan las páginas: Google Fonts, Chart.js y xlsx
- * desde CDN, y los scripts de analítica de maze.co y contentsquare.
+ * Lo que sí hace: impide cargar scripts de cualquier otro dominio (todo lo que corre sale de
+ * este sitio; Chart.js y xlsx viven en vendor/), enviar datos fuera, incrustar la página en un
+ * iframe ajeno (clickjacking) y usar <base> u <object>. Solo se permite Google Fonts para
+ * estilos y fuentes. Sin analítica de terceros: grababa sesiones con datos reales, incluida la
+ * página donde se teclea la contraseña (auditoría del 11/10/2026).
  */
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://snippet.maze.co https://*.maze.co https://t.contentsquare.net",
+  "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://*.maze.co https://*.contentsquare.net",
-  "connect-src 'self' https://*.maze.co https://*.contentsquare.net https://*.contentsquare.com",
-  "frame-src https://*.maze.co",
+  "img-src 'self' data: blob:",
+  "connect-src 'self'",
+  "frame-src 'self'",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",

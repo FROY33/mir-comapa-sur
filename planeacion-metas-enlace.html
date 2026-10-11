@@ -135,28 +135,6 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 .sol-step-sub {font-size:11px;color:var(--color-text-secondary);margin-top:1px;line-height:1.4;}
 .sol-motivo-chip {font-size:11px;color:#0369A1;margin-bottom:12px;background:var(--color-info-tint);border-radius:8px;padding:6px 10px;line-height:1.5;}
 </style>
-  <script>
-  (function (m, a, z, e) {
-    var s, t, u, v;
-    try { t = m.sessionStorage.getItem('maze-us'); } catch (err) {}
-    if (!t) {
-      t = new Date().getTime();
-      try { m.sessionStorage.setItem('maze-us', t); } catch (err) {}
-    }
-    u = document.currentScript || (function () {
-      var w = document.getElementsByTagName('script');
-      return w[w.length - 1];
-    })();
-    v = u && u.nonce;
-    s = a.createElement('script');
-    s.src = z + '?apiKey=' + e;
-    s.async = true;
-    if (v) s.setAttribute('nonce', v);
-    a.getElementsByTagName('head')[0].appendChild(s);
-    m.mazeUniversalSnippetApiKey = e;
-  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
-  </script>
-  <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
 </head>
 <body class="has-topnav">
 

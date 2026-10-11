@@ -153,28 +153,6 @@ tr:last-child td { border-bottom: none; }
       50%       { opacity: .25; transform: scale(.6); }
     }
 </style>
-  <script>
-  (function (m, a, z, e) {
-    var s, t, u, v;
-    try { t = m.sessionStorage.getItem('maze-us'); } catch (err) {}
-    if (!t) {
-      t = new Date().getTime();
-      try { m.sessionStorage.setItem('maze-us', t); } catch (err) {}
-    }
-    u = document.currentScript || (function () {
-      var w = document.getElementsByTagName('script');
-      return w[w.length - 1];
-    })();
-    v = u && u.nonce;
-    s = a.createElement('script');
-    s.src = z + '?apiKey=' + e;
-    s.async = true;
-    if (v) s.setAttribute('nonce', v);
-    a.getElementsByTagName('head')[0].appendChild(s);
-    m.mazeUniversalSnippetApiKey = e;
-  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '9da16a9c-d16b-42b8-837b-4ba698f5135d');
-  </script>
-  <script src="https://t.contentsquare.net/uxa/65746f564a7b3.js" defer></script>
 </head>
 <body>
 
@@ -416,8 +394,10 @@ function _syntheticReportes(metas, freq, h) {
 
 // ── Build list — revisor sees indicators filtered by their gerencia ────────────
 function buildRealList() {
-  var ger = '';
-  try { ger = localStorage.getItem('userGerencia') || ''; } catch(e) {}
+  // La gerencia sale de la sesión, nunca de localStorage, que el usuario puede cambiar.
+  // Al conectar la API este filtro lo hará el servidor (HU-R7-03 RN_2).
+  var _u = (typeof Session !== 'undefined') ? Session.getUser() : null;
+  var ger = (_u && _u.gerencia) || '';
   var src = (typeof ACTIVIDADES_ENLACE !== 'undefined' ? ACTIVIDADES_ENLACE : []);
   if (ger) src = src.filter(function(a) { return a.gerencia === ger; });
   return src.map(function(a) {

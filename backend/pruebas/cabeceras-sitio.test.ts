@@ -6,6 +6,9 @@ import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { createServer } from 'node:net'
 import { after, before, describe, test } from 'node:test'
+import { readdirSync, readFileSync } from 'node:fs'
+import path from 'node:path'
+import { RAIZ } from './apoyo-frontend.js'
 
 /** Un puerto libre: se abre en 0, se anota y se cierra. */
 const puertoLibre = () => new Promise<number>((ok) => {
@@ -55,5 +58,33 @@ describe('dev/servir.ts: cabeceras de seguridad', () => {
     const scriptSrc = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith('script-src')) ?? ''
     assert.ok(!/\s(\*|https:|http:)(\s|$)/.test(scriptSrc), `script-src demasiado abierto: ${scriptSrc}`)
     assert.ok(!scriptSrc.includes("'unsafe-eval'"))
+    assert.equal(scriptSrc, "script-src 'self' 'unsafe-inline'", 'script-src no debe permitir ningún dominio externo')
+  })
+})
+
+describe('sin terceros ni identidad en el navegador (auditoría 11/10/2026)', () => {
+  const paginas = readdirSync(RAIZ).filter((f) => f.endsWith('.html') || f.endsWith('.js'))
+
+  test('ninguna página carga scripts de otro dominio ni analítica de terceros', () => {
+    const externos = paginas.filter((f) => /<script[^>]+src=["']https?:\/\//i.test(readFileSync(path.join(RAIZ, f), 'utf8')))
+    const analitica = paginas.filter((f) => /maze\.co|contentsquare/i.test(readFileSync(path.join(RAIZ, f), 'utf8')))
+    assert.deepEqual([externos, analitica], [[], []])
+  })
+
+  test('ninguna vista decide gerencia, unidad o rol con localStorage (el usuario puede cambiarlo)', () => {
+    const lectores = paginas
+      .filter((f) => !f.startsWith('demo-'))      // las páginas demo solo escriben, nadie lo lee
+      .filter((f) => /localStorage\.getItem\(\s*['"](userGerencia|userUnidad|comapa_mir_session)['"]/.test(readFileSync(path.join(RAIZ, f), 'utf8')))
+    assert.deepEqual(lectores, [])
+  })
+
+  test('dev-toolbar no se activa fuera de un equipo local, aunque la URL traiga ?dev=1', () => {
+    const codigo = readFileSync(path.join(RAIZ, 'dev-toolbar.js'), 'utf8')
+    // Si se activara, tocaría el documento o la ventana (ahora o en un listener): basta con que no los toque
+    const tocados: string[] = []
+    const espia = (nombre: string) => new Proxy({}, { get: (_, prop) => { tocados.push(`${nombre}.${String(prop)}`); return () => ({}) } })
+    new Function('location', 'sessionStorage', 'document', 'window', codigo)(
+      { hostname: 'mir.comapasur.gob.mx', search: '?dev=1' }, { getItem: () => '1', setItem() {} }, espia('document'), espia('window'))
+    assert.deepEqual(tocados, [])
   })
 })
