@@ -53,6 +53,41 @@ const TIPOS: Record<string, string> = {
   '.woff2': 'font/woff2',
 }
 
+/**
+ * Cabeceras de seguridad para todo lo que sirve este servidor (no para /api, que pone las
+ * suyas). Producción debe enviar las mismas: ver «Cabeceras de seguridad» en backend/README.md.
+ *
+ * La CSP lleva 'unsafe-inline' en script-src porque las páginas tienen scripts y manejadores
+ * en línea (onclick=...): sin él no funcionaría ninguna. Eso significa que la CSP NO frena un
+ * XSS que logre inyectar HTML; esa defensa es escapar los datos (escaparHTML en session.js).
+ * Lo que sí hace: impide cargar scripts de otros dominios, enviar datos a servidores no
+ * listados, incrustar la página en un iframe ajeno (clickjacking) y usar <base> u <object>.
+ * Los dominios de terceros son los que hoy usan las páginas: Google Fonts, Chart.js y xlsx
+ * desde CDN, y los scripts de analítica de maze.co y contentsquare.
+ */
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://snippet.maze.co https://*.maze.co https://t.contentsquare.net",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https://*.maze.co https://*.contentsquare.net",
+  "connect-src 'self' https://*.maze.co https://*.contentsquare.net https://*.contentsquare.com",
+  "frame-src https://*.maze.co",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ')
+
+const CABECERAS_SEGURIDAD: Record<string, string> = {
+  'content-security-policy': CSP,
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()',
+}
+
 /** Reenvía la petición al backend tal cual, con sus cabeceras y su cuerpo. */
 function reenviar(req: IncomingMessage, res: ServerResponse): void {
   const destino = pedirAlBackend(
@@ -148,6 +183,9 @@ const servidor = createServer((req, res) => {
     reenviar(req, res)
     return
   }
+
+  // Todo lo estático (páginas, scripts, 404, 302 y 403) sale con las cabeceras de seguridad
+  for (const [nombre, valor] of Object.entries(CABECERAS_SEGURIDAD)) res.setHeader(nombre, valor)
 
   void archivoDe(url.pathname).then(async (archivo) => {
     if (archivo === null) {

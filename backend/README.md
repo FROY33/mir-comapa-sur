@@ -74,6 +74,24 @@ NODE_ENV=production DATABASE_URL=... PORT=... npm start
 El usuario de base de la app no debe ser dueño de las tablas. Necesita `SELECT, INSERT, UPDATE` sobre las
 tablas de negocio y solo `SELECT, INSERT` sobre `bitacora`. Las migraciones se corren con otro usuario.
 
+### Cabeceras de seguridad del sitio
+
+El servidor web que entrega las páginas, scripts y estilos (nginx o la plataforma) debe mandar
+en cada respuesta las mismas cabeceras que `dev/servir.ts` (`CABECERAS_SEGURIDAD`):
+
+| Cabecera | Valor |
+|---|---|
+| `Content-Security-Policy` | la de `CSP` en `dev/servir.ts`: `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'` y solo los dominios externos que usan las páginas |
+| `X-Content-Type-Options` | `nosniff` |
+| `X-Frame-Options` | `DENY` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()` |
+
+Límite conocido: la CSP lleva `'unsafe-inline'` en `script-src` porque las páginas tienen scripts y
+`onclick=` en línea. Por eso no detiene un XSS que logre inyectar HTML; la defensa contra eso es
+escapar los datos (`escaparHTML` en `session.js`). Para quitarlo hay que mover los scripts en línea
+a archivos y los `onclick=` a `addEventListener`.
+
 ## Pruebas
 
 ```bash
