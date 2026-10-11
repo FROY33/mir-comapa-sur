@@ -15,6 +15,7 @@ import {
   consultarYRenovar, crear, revocar, type SesionActiva,
 } from './datos/sesiones.js'
 import type { CookieSalida, Respuesta, Solicitud } from './http.js'
+import { crearLimitePorIp, type LimitePorIp } from './limitePorIp.js'
 import { DASHBOARD, destinoTrasLogin } from './rutas.js'
 
 /** RN_4: un solo mensaje para cuenta inexistente, contraseña mala y cuenta inactiva. */
@@ -111,8 +112,18 @@ export const cookiesBorradas = (produccion: boolean): CookieSalida[] => [
 ]
 
 /** POST /api/auth/login */
-export function login(bd: BD, produccion: boolean) {
+export function login(bd: BD, produccion: boolean, limite: LimitePorIp = crearLimitePorIp()) {
   return async (s: Solicitud): Promise<Respuesta> => {
+    // Antes que nada (ni JSON ni bcrypt): demasiados fallos desde esta IP → 429
+    const espera = limite.reservar(s.ip)
+    if (espera > 0) {
+      return {
+        status: 429,
+        cuerpo: { error: 'demasiados_intentos', mensaje: 'Demasiados intentos fallidos desde tu red. Espera unos minutos e intenta de nuevo.' },
+        cabeceras: { 'retry-after': String(espera) },
+      }
+    }
+
     const cuerpo = await s.json()
     const email = typeof cuerpo.email === 'string' ? cuerpo.email.trim() : ''
     const password = typeof cuerpo.password === 'string' ? cuerpo.password : ''
@@ -151,7 +162,8 @@ export function login(bd: BD, produccion: boolean) {
     if (!coincide) return rechazar('credenciales')
     if (!usuario.activo) return rechazar('cuenta_inactiva')
 
-    // Credenciales buenas: se limpia el contador (R7-06 CA_5) y se abre la sesión
+    // Credenciales buenas: se limpian los contadores de la cuenta (R7-06 CA_5) y de la IP, y se abre la sesión
+    limite.liberar(s.ip)
     await reiniciar(bd, email)
     const token = await crear(bd, usuario.id, { ip: s.ip, userAgent: s.req.headers['user-agent'] })
     const sesion = await consultarYRenovar(bd, token)

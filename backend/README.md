@@ -82,7 +82,7 @@ npm test
 ```
 
 `npm test` borra y recrea la base de `.env.test` (su nombre tiene que terminar en `_test`; si no, se niega a
-correr), le aplica las migraciones y corre 228 pruebas:
+correr), le aplica las migraciones y corre las pruebas:
 
 | Archivo | Qué demuestra |
 |---|---|
@@ -111,6 +111,16 @@ petición. El Administrador conserva el acceso global.
 `GET /api/auth/acceso?pagina=x.html` dice si la sesión puede abrir una página (tabla de
 `src/rutas.ts`, lista blanca). La consultan la guardia de `session.js` y `dev/servir.ts`; en
 producción, el servidor web debe hacer lo mismo antes de servir una página protegida.
+
+## Límite por IP y cabeceras de seguridad
+
+- **Logins fallidos por IP:** 30 en 15 minutos; después, `429 demasiados_intentos` con `Retry-After`
+  (`src/limitePorIp.ts`). Complementa el bloqueo por cuenta de HU-R7-06: frena a quien prueba una contraseña
+  contra muchas cuentas y las ráfagas que saturan la CPU con bcrypt. Los logins correctos no cuentan, para no
+  bloquear a una oficina que sale por la misma IP. Está en memoria, por instancia.
+- **Toda respuesta de la API** lleva `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+  `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`, `Referrer-Policy: no-referrer` y
+  `Cross-Origin-Resource-Policy: same-origin` (`CABECERAS_SEGURIDAD` en `src/http.ts`).
 
 ## Cómo responde la API a los errores
 

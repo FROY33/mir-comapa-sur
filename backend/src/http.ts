@@ -47,6 +47,8 @@ export interface Respuesta {
   cuerpo: unknown
   /** Cookies a poner o borrar (maxEdadSegundos 0 la borra). */
   cookies?: CookieSalida[]
+  /** Cabeceras adicionales, p. ej. retry-after en un 429. */
+  cabeceras?: Record<string, string>
 }
 
 export type Manejador = (s: Solicitud) => Promise<Respuesta>
@@ -66,13 +68,13 @@ export function crearManejador(
 
     try {
       if (!encontrada) return enviar(res, id, 404, { error: 'no_encontrado', mensaje: 'Ruta no encontrada' })
-      const { status, cuerpo, cookies } = await encontrada.manejador({
+      const { status, cuerpo, cookies, cabeceras } = await encontrada.manejador({
         id, url, req, ip,
         params: encontrada.params,
         cookies: leerCookies(req.headers.cookie),
         json: () => leerJson(req),
       })
-      enviar(res, id, status, cuerpo, cookies)
+      enviar(res, id, status, cuerpo, cookies, cabeceras)
     } catch (err) {
       const e = err instanceof ErrorBD || err instanceof ErrorSolicitud ? err : null
       const status = e?.status ?? 500
@@ -207,8 +209,25 @@ function serializarCookie(c: CookieSalida): string {
   return partes.join('; ')
 }
 
-function enviar(res: ServerResponse, id: string, status: number, cuerpo: unknown, cookies?: CookieSalida[]): void {
+/**
+ * Cabeceras de seguridad de toda respuesta de la API. Son JSON, nunca páginas: no deben
+ * interpretarse como otro tipo, cargar nada ni incrustarse en un marco.
+ */
+export const CABECERAS_SEGURIDAD = {
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+  'referrer-policy': 'no-referrer',
+  'cross-origin-resource-policy': 'same-origin',
+}
+
+function enviar(
+  res: ServerResponse, id: string, status: number, cuerpo: unknown,
+  cookies?: CookieSalida[], cabeceras: Record<string, string> = {},
+): void {
   res.writeHead(status, {
+    ...cabeceras,
+    ...CABECERAS_SEGURIDAD,
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
     'x-request-id': id,
