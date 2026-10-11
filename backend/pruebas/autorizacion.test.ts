@@ -29,8 +29,8 @@ async function crearGerencia(org: string, clave: string) {
 
 async function crearUsuario(nombre: string, rol: Rol, ger: { gerencia: string; unidad: string }) {
   const [u] = await bd.consultar<{ id: string }>(
-    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol)
-     VALUES ($1, $2, $3, $4, 'x', $5) RETURNING id`,
+    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, debe_cambiar_password)
+     VALUES ($1, $2, $3, $4, 'x', $5, false) RETURNING id`,
     [ger.gerencia, ger.unidad, nombre, `${nombre}-${randomUUID()}@comapasur.gob.mx`, rol])
   usuario[nombre] = u!.id
   cookie[nombre] = `${COOKIE_SESION}=${await crear(bd, u!.id)}`

@@ -43,8 +43,8 @@ export function prepararLogin() {
     const email = `login-${randomUUID()}@comapasur.gob.mx`
     const hash = await bcrypt.hash(PASSWORD, 12)
     const [u] = await bd.consultar<{ id: string }>(
-      `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, activo)
-       VALUES ($1, $2, 'Quien inicia sesión', $3, $4, $5, $6) RETURNING id`,
+      `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, activo, debe_cambiar_password)
+       VALUES ($1, $2, 'Quien inicia sesión', $3, $4, $5, $6, false) RETURNING id`,
       [gerenciaId, unidadId, email, hash, rol, activo])
     return { id: u!.id, email }
   }

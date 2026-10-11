@@ -161,7 +161,7 @@ describe('cookie del token (HU-R7-01 RN_2)', () => {
       `INSERT INTO unidades (gerencia_id, nombre, es_coord_general) VALUES ($1, 'Coordinación', true) RETURNING id`, [g!.id])
     email = `cookie-${sufijo}@comapasur.gob.mx`
     await bd.consultar(
-      `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol) VALUES ($1, $2, 'Ana', $3, $4, 'enlace')`,
+      `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, debe_cambiar_password) VALUES ($1, $2, 'Ana', $3, $4, 'enlace', false)`,
       [g!.id, n!.id, email, await bcrypt.hash('Contrasena-Valida-2026', 12)])
   })
   after(async () => { await app.cerrar(); await bd.cerrar() })

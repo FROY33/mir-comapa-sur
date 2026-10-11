@@ -24,6 +24,17 @@ export const sinSesion = (produccion: boolean): Respuesta => ({
   cookies: cookiesBorradas(produccion),
 })
 
+/** HU-R7-07 CA_3: con contraseña temporal, la sesión solo sirve para cambiarla. */
+export const PAGINA_CAMBIO_PASSWORD = 'cambiar-password.html'
+const cambioPendiente: Respuesta = {
+  status: 403,
+  cuerpo: {
+    error: 'cambio_password_requerido',
+    mensaje: 'Debes cambiar tu contraseña temporal antes de continuar',
+    redirigirA: PAGINA_CAMBIO_PASSWORD,
+  },
+}
+
 export const prohibido = (rol: Rol): Respuesta => ({
   status: 403,
   cuerpo: { error: 'prohibido', mensaje: MENSAJE_PROHIBIDO, redirigirA: DASHBOARD[rol] },
@@ -38,6 +49,7 @@ export function crearProtegida(bd: BD, produccion: boolean) {
     async (s) => {
       const sesion = await consultarYRenovar(bd, s.cookies[COOKIE_SESION])
       if (!sesion) return sinSesion(produccion)
+      if (sesion.debeCambiarPassword) return cambioPendiente
       if (!roles.includes(sesion.rol)) return prohibido(sesion.rol)
       return manejador({ ...s, sesion })
     }
@@ -54,6 +66,7 @@ export function acceso(bd: BD, produccion: boolean) {
     const sesion = await consultarYRenovar(bd, s.cookies[COOKIE_SESION])
     if (!sesion) return sinSesion(produccion)
     const pagina = s.url.searchParams.get('pagina') ?? ''
+    if (sesion.debeCambiarPassword && pagina !== PAGINA_CAMBIO_PASSWORD) return cambioPendiente
     if (!puedeAbrir(sesion.rol, pagina)) return prohibido(sesion.rol)
     return { status: 200, cuerpo: { permitido: true } }
   }

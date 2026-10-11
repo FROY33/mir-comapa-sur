@@ -38,8 +38,8 @@ async function usuario(rol: Rol) {
   const email = `redir-${randomUUID()}@comapasur.gob.mx`
   const { gerenciaId, unidadId } = unidadPorGerencia.get('PLA')!
   await bd.consultar(
-    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol)
-     VALUES ($1, $2, 'Quien navega', $3, $4, $5)`,
+    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, debe_cambiar_password)
+     VALUES ($1, $2, 'Quien navega', $3, $4, $5, false)`,
     [gerenciaId, unidadId, email, await bcrypt.hash(PASSWORD, 12), rol])
   return email
 }

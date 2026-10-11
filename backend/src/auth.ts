@@ -64,7 +64,8 @@ export function datosSesion(s: SesionActiva, destino?: string) {
       unidad: s.unidadNombre,
       debeCambiarPassword: s.debeCambiarPassword,
     },
-    redirigirA: destino ?? DASHBOARD[s.rol],
+    // Con contraseña temporal, lo primero es cambiarla (HU-R7-07 CA_3)
+    redirigirA: s.debeCambiarPassword ? 'cambiar-password.html' : destino ?? DASHBOARD[s.rol],
     expiraAt: s.expiraAt,
   }
 }
@@ -157,6 +158,7 @@ export function login(bd: BD, produccion: boolean) {
     if (!sesion) throw new Error('La sesión recién creada no se pudo leer')
 
     await auditarAcceso.loginExitoso(bd, usuario.email, { id: usuario.id, rol: usuario.rol }, s.ip)
+    await bd.consultar('UPDATE usuarios SET ultimo_acceso = now() WHERE id = $1', [usuario.id])
 
     // CA_4: vuelve a donde iba, si el rol puede abrirlo; si no, a su dashboard (RN_1).
     // La validación es del servidor: una cookie manipulada simplemente se descarta.

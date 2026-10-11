@@ -61,6 +61,9 @@ const ACCESO: Record<string, Rol[]> = {
   'planeacion-indicadores.html': ['admin'],
   'planeacion-metas-admin.html': ['admin'],
   'configuracion.html': ['admin'],
+
+  // Cambio de la contraseña temporal (HU-R7-07 CA_3)
+  'cambiar-password.html': TODOS,
 }
 
 /** Páginas que nunca son un destino válido tras iniciar sesión. */

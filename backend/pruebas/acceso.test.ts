@@ -42,8 +42,8 @@ before(async () => {
     `INSERT INTO unidades (gerencia_id, nombre) VALUES ($1, 'Coordinación General') RETURNING id`, [ger!.id])
   emailUsuario = correoNuevo()
   const [u] = await bd.consultar<{ id: string }>(
-    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol)
-     VALUES ($1, $2, 'Quien accede', $3, 'x', 'admin') RETURNING id`,
+    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, debe_cambiar_password)
+     VALUES ($1, $2, 'Quien accede', $3, 'x', 'admin', false) RETURNING id`,
     [ger!.id, uni!.id, emailUsuario])
   usuario = { id: u!.id, rol: 'admin' }
 })

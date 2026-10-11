@@ -124,7 +124,7 @@ export async function revocar(bd: Ejecutor, token: string | undefined): Promise<
  * Revoca todas las sesiones vigentes de un usuario. La necesita el restablecimiento
  * de contraseña del Administrador (HU-R7-07) y la baja de una cuenta.
  */
-export async function revocarTodas(bd: BD, usuarioId: string): Promise<number> {
+export async function revocarTodas(bd: Ejecutor, usuarioId: string): Promise<number> {
   const filas = await bd.consultar<{ id: string }>(
     `UPDATE sesiones SET revocada_at = now()
       WHERE usuario_id = $1 AND revocada_at IS NULL AND expira_at > now()

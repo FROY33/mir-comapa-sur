@@ -125,8 +125,11 @@ var Session = {
     return this._user;
   },
 
-  /** Alias histórico; algunas vistas llaman Session.get(). */
-  get: function () { return this._user; },
+  /**
+   * Alias histórico; configuracion.html y planeacion-indicadores.html llaman Session.get().
+   * Devolvía solo la caché en memoria, que esas páginas nunca llenan: el Admin salía expulsado al login.
+   */
+  get: function () { return this.getUser(); },
 
   /**
    * Trae la sesión del servidor. Devuelve el usuario o null. Se memoiza, así que

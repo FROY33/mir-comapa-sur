@@ -38,8 +38,8 @@ async function usuarioNuevo(rol: 'admin' | 'revisor' | 'enlace' = 'enlace') {
   const email = `logout-${randomUUID()}@comapasur.gob.mx`
   const hash = await bcrypt.hash(PASSWORD, 12)
   const [u] = await bd.consultar<{ id: string }>(
-    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol)
-     VALUES ($1, $2, 'Quien cierra sesión', $3, $4, $5) RETURNING id`,
+    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, debe_cambiar_password)
+     VALUES ($1, $2, 'Quien cierra sesión', $3, $4, $5, false) RETURNING id`,
     [gerenciaId, unidadId, email, hash, rol])
   return { id: u!.id, email }
 }

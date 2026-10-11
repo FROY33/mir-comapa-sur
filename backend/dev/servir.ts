@@ -159,7 +159,15 @@ const servidor = createServer((req, res) => {
     if (pagina.endsWith('.html') && !PUBLICAS.has(pagina)) {
       const veredicto = await verificarAcceso(pagina, req.headers.cookie)
       if (veredicto.status === 401) {
-        res.writeHead(302, { location: '/login.html', 'cache-control': 'no-store' })
+        // Si traía cookie de sesión, la sesión expiró: el login lo dice (HU-R7-05 CA_1) y la
+        // página se recuerda para volver a ella tras iniciar sesión (CA_3), igual que hace
+        // guardia.js cuando el 401 llega a una página ya abierta.
+        const expirada = /(?:^|;\s*)comapa_sesion=/.test(req.headers.cookie ?? '')
+        res.writeHead(302, {
+          location: expirada ? '/login.html?sesion=expirada' : '/login.html',
+          'cache-control': 'no-store',
+          'set-cookie': `comapa_destino=${encodeURIComponent(pagina)}; Path=/; Max-Age=600; SameSite=Strict`,
+        })
         res.end()
         return
       }
