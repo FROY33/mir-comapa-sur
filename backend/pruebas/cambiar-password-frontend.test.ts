@@ -19,6 +19,7 @@ function cargar(respuesta: { status: number; cuerpo: unknown } = { status: 200, 
     ...campos, errorMsg,
     errorBox: { classList: { add: (c: string) => clases.add(c), remove: (c: string) => clases.delete(c) } },
     btnGuardar: { disabled: false },
+    linkCerrarSesion: { addEventListener: () => {} },
     formPassword: { addEventListener: (_: string, fn: typeof alEnviar) => { alEnviar = fn } },
   }
   const peticiones: unknown[] = []

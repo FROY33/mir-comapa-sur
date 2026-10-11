@@ -98,7 +98,12 @@ en cada respuesta las mismas cabeceras que `dev/servir.ts` (`CABECERAS_SEGURIDAD
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()` |
 
-Límite conocido: la CSP lleva `'unsafe-inline'` en `script-src` porque las páginas tienen scripts y
+**CSP estricta en las páginas de contraseña.** `index.html`, `login.html` y `cambiar-password.html` no tienen
+scripts ni manejadores en línea y se sirven con `script-src 'self'`, sin `'unsafe-inline'` (`PAGINAS_CSP_ESTRICTA`
+en `dev/servir.ts`). Ahí un XSS no puede ejecutar código aunque lograra inyectar HTML. Una página entra a esa lista
+cuando ya no tiene `<script>` en línea ni atributos `on*=`; la prueba lo verifica.
+
+Límite conocido: en las demás páginas la CSP lleva `'unsafe-inline'` en `script-src` porque tienen scripts y
 `onclick=` en línea. Por eso no detiene un XSS que logre inyectar HTML; la defensa contra eso es
 escapar los datos (`escaparHTML` en `session.js`). Para quitarlo hay que mover los scripts en línea
 a archivos y los `onclick=` a `addEventListener`.

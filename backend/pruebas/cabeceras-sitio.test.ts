@@ -54,7 +54,8 @@ describe('dev/servir.ts: cabeceras de seguridad', () => {
   }
 
   test('la CSP no deja cargar scripts de cualquier dominio ni usar eval', async () => {
-    const csp = (await fetch(`${base}/login.html`)).headers.get('content-security-policy') ?? ''
+    // La CSP general (la de login.html es aún más estricta, ver abajo)
+    const csp = (await fetch(`${base}/dashboard-admin.html`)).headers.get('content-security-policy') ?? ''
     const scriptSrc = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith('script-src')) ?? ''
     assert.ok(!/\s(\*|https:|http:)(\s|$)/.test(scriptSrc), `script-src demasiado abierto: ${scriptSrc}`)
     assert.ok(!scriptSrc.includes("'unsafe-eval'"))
@@ -86,5 +87,31 @@ describe('sin terceros ni identidad en el navegador (auditoría 11/10/2026)', ()
     new Function('location', 'sessionStorage', 'document', 'window', codigo)(
       { hostname: 'mir.comapasur.gob.mx', search: '?dev=1' }, { getItem: () => '1', setItem() {} }, espia('document'), espia('window'))
     assert.deepEqual(tocados, [])
+  })
+})
+
+describe('CSP estricta en las páginas que reciben contraseñas', () => {
+  test('login, cambio de contraseña y la raíz se sirven sin \'unsafe-inline\' en script-src', async () => {
+    for (const ruta of ['/login.html', '/cambiar-password.html', '/']) {
+      const r = await fetch(`${base}${ruta}`, { redirect: 'manual' })
+      await r.arrayBuffer()
+      const csp = r.headers.get('content-security-policy') ?? ''
+      const scriptSrc = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith('script-src'))
+      assert.equal(scriptSrc, "script-src 'self'", `${ruta}: ${csp}`)
+    }
+  })
+
+  test('esas páginas no tienen scripts ni manejadores en línea (si no, la CSP las rompería)', () => {
+    for (const pagina of ['index.html', 'login.html', 'cambiar-password.html']) {
+      const html = readFileSync(path.join(RAIZ, pagina), 'utf8')
+      assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>/i.test(html), `${pagina} tiene un <script> en línea`)
+      assert.ok(!/\son[a-z]+\s*=/i.test(html), `${pagina} tiene un manejador on*= en línea`)
+    }
+  })
+
+  test('las demás siguen con la CSP general', async () => {
+    const r = await fetch(`${base}/dashboard-admin.html`, { redirect: 'manual' })
+    await r.arrayBuffer()
+    assert.match(r.headers.get('content-security-policy') ?? '', /script-src 'self' 'unsafe-inline'/)
   })
 })

@@ -3,19 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>MIR COMAPA Sur</title>
-  <script>
-    // HU-R7-02 CA_2: la raíz manda a cada quien a su dashboard. Quién es lo dice el
-    // servidor, no el navegador: se consulta la sesión y se redirige según el rol.
-    // Sin sesión, al login. Si el servidor no responde, también al login, que es el
-    // destino seguro.
-    (function () {
-      var ir = function (destino) { window.location.replace(destino); };
-      fetch('/api/auth/sesion', { credentials: 'same-origin' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (datos) { ir(datos ? datos.redirigirA : 'login.html'); })
-        .catch(function () { ir('login.html'); });
-    })();
-  </script>
+  <script src="index.js"></script>
 </head>
 <body>
   <p>Redirigiendo... <a href="login.html">Haz clic aquí si no rediriges automáticamente.</a></p>

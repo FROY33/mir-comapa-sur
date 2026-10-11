@@ -9,6 +9,10 @@
   var boton = document.getElementById('btnGuardar');
   var enviando = false;
 
+  // Sin onclick en el HTML: esta página tiene una CSP sin 'unsafe-inline'
+  var cerrar = document.getElementById('linkCerrarSesion');
+  if (cerrar) cerrar.addEventListener('click', function (e) { e.preventDefault(); cerrarSesion(); });
+
   function mostrarError(texto) {
     errorMsg.textContent = texto;
     errorBox.classList.remove('hidden');

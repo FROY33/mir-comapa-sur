@@ -81,6 +81,15 @@ const CSP = [
   "frame-ancestors 'none'",
 ].join('; ')
 
+/**
+ * Páginas sin ningún script ni manejador en línea, con una CSP sin 'unsafe-inline': ahí un XSS
+ * no puede ejecutar código aunque lograra inyectar HTML. Son las que reciben contraseñas. Una
+ * página entra a esta lista cuando ya no tiene <script> sin src ni atributos on*= (lo verifica
+ * pruebas/cabeceras-sitio.test.ts).
+ */
+export const PAGINAS_CSP_ESTRICTA = new Set(['index.html', 'login.html', 'cambiar-password.html'])
+const CSP_ESTRICTA = CSP.replace("script-src 'self' 'unsafe-inline'", "script-src 'self'")
+
 const CABECERAS_SEGURIDAD: Record<string, string> = {
   'content-security-policy': CSP,
   'x-content-type-options': 'nosniff',
@@ -195,6 +204,7 @@ const servidor = createServer((req, res) => {
       return
     }
     const pagina = archivo.slice(RAIZ.length + 1)
+    if (PAGINAS_CSP_ESTRICTA.has(pagina)) res.setHeader('content-security-policy', CSP_ESTRICTA)
     if (pagina.endsWith('.html') && !PUBLICAS.has(pagina)) {
       const veredicto = await verificarAcceso(pagina, req.headers.cookie)
       if (veredicto.status === 401) {
