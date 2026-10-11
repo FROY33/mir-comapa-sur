@@ -10,6 +10,7 @@ import assert from 'node:assert/strict'
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, test } from 'node:test'
+import { codigoSesion } from './apoyo-frontend.js'
 
 const RAIZ = path.resolve(import.meta.dirname, '../..')
 
@@ -20,7 +21,7 @@ interface Llamada { ruta: string; metodo: string | undefined }
  * y el registro de peticiones que hizo, para verificar contra qué ruta llama.
  */
 function cargarSession(cookie: string, respuesta: () => Promise<unknown> = () => Promise.resolve({ ok: true })) {
-  const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
+  const codigo = codigoSesion()
   const llamadas: Llamada[] = []
   const cookies = { valor: cookie }
   const documento = {
@@ -102,7 +103,7 @@ describe('adaptador de perfil', () => {
   })
 
   test('requireAuth manda a login.html cuando no hay sesión', () => {
-    const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
+    const codigo = codigoSesion()
     const location = { href: '' }
     const fn = new Function('window', 'document', 'fetch', `${codigo}\n; return Session`)
     const Session = fn({ location }, { cookie: '' }, () => Promise.reject(new Error('sin red'))) as any
@@ -125,7 +126,7 @@ describe('adaptador de perfil', () => {
   })
 
   test('si la red falla, logout limpia igual en vez de dejar al usuario atrapado', async () => {
-    const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
+    const codigo = codigoSesion()
     const cookies = { valor: perfil(BASE) }
     const documento = {
       get cookie() { return cookies.valor },

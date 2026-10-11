@@ -2,7 +2,7 @@
 // sesión ya verificada contra la base. La gerencia sale de la sesión (de `usuarios`), nunca
 // de la URL ni del cuerpo (RN_2): una ruta que filtra por gerencia usa `s.sesion.gerenciaId`.
 //
-// Esta es la capa de seguridad (RN_1). La guardia de páginas de session.js solo evita
+// Esta es la capa de seguridad (RN_1). La guardia de páginas de guardia.js solo evita
 // mostrar una pantalla que de todos modos no podría pedir sus datos.
 
 import type { BD } from './bd.js'
@@ -45,7 +45,7 @@ export function crearProtegida(bd: BD, produccion: boolean) {
 
 /**
  * GET /api/auth/acceso?pagina=configuracion.html — ¿puede este usuario abrir esa página?
- * Lo consulta la guardia de session.js antes de mostrar cualquier página protegida, y el
+ * Lo consulta la guardia de guardia.js antes de mostrar cualquier página protegida, y el
  * servidor de desarrollo antes de servirla. 200, 401 o 403 con el dashboard de su rol
  * (HU-R7-03 CA_1, CA_2 y CA_6). La tabla de qué rol abre qué página está en rutas.ts.
  */

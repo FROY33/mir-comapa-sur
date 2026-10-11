@@ -107,7 +107,7 @@ async function archivoDe(ruta: string): Promise<string | null> {
   }
 }
 
-/** Páginas que se sirven sin sesión. Las mismas que PAGINAS_PUBLICAS de session.js. */
+/** Páginas que se sirven sin sesión. Las mismas que PAGINAS_PUBLICAS de guardia.js. */
 const PUBLICAS = new Set(['index.html', 'login.html', 'demo-enlace.html', 'demo-revisor.html', 'design-system.html'])
 
 type Veredicto = { status: 200 } | { status: 401 } | { status: 403; redirigirA: string }

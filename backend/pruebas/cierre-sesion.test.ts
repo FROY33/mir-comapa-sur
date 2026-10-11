@@ -4,7 +4,7 @@
 // y la cookie del token sin Max-Age: con 8 h fijas desde el login, el navegador la borraba
 // aunque el usuario siguiera activo (HU-R7-01 RN_2).
 //
-// Como en login-formulario.test.ts, se ejecuta el código real de login.html y session.js
+// Como en login-formulario.test.ts, se ejecuta el código real de login.js y de los scripts de sesión
 // contra un DOM mínimo simulado.
 
 import assert from 'node:assert/strict'
@@ -17,15 +17,14 @@ import { crearBD } from '../src/bd.js'
 import { COOKIE_PERFIL, COOKIE_SESION } from '../src/datos/sesiones.js'
 import { crearLog } from '../src/log.js'
 import { configBD, levantar } from './apoyo.js'
+import { codigoSesion } from './apoyo-frontend.js'
 
 const RAIZ = path.resolve(import.meta.dirname, '../..')
 const esperar = () => new Promise((ok) => setImmediate(ok))
 
-/** El script de login.html con lo mínimo de DOM que usa el aviso. */
+/** login.js con lo mínimo de DOM que usa el aviso. */
 function cargarLogin(search: string) {
-  const html = readFileSync(path.join(RAIZ, 'login.html'), 'utf8')
-  const bloques = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]!)
-  const script = bloques.reduce((a, b) => (b.length > a.length ? b : a), '')
+  const script = readFileSync(path.join(RAIZ, 'login.js'), 'utf8')
 
   const elementos: Record<string, { textContent: string; value: string; clases: Set<string>; [k: string]: unknown }> = {}
   const elemento = () => {
@@ -52,7 +51,7 @@ function cargarLogin(search: string) {
 
 /** session.js con window, document.cookie y fetch simulados. */
 function cargarSession(opciones: { cookie: string; sesionEnServidor: boolean }) {
-  const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
+  const codigo = codigoSesion()
   const cookies = { valor: opciones.cookie }
   const oyentes: Record<string, ((e: unknown) => void)[]> = {}
   const navegaciones: string[] = []

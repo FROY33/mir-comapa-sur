@@ -1,0 +1,189 @@
+/* login.css — estilos de la pantalla de inicio de sesión (antes en línea en login.html). */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      background: #1A4A2A;
+      color: var(--color-text-primary);
+    }
+/* ── BACKGROUND CAROUSEL (full-screen) ─────────────────────────────────── */
+    .bg-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+.bg-scene {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 2.2s ease-in-out;
+      will-change: transform, opacity;
+    }
+.bg-scene.active { opacity: 1; }
+.bg-scene[data-s="1"] {
+      background-color: #1A4A2A;
+      background-image: url('https://i0.wp.com/dumac.org/wp-content/uploads/2024/06/lagunamadrepastos.jpg?fit=1920%2C1080&ssl=1');
+      animation: kb1 26s ease-in-out infinite alternate;
+    }
+.bg-scene[data-s="2"] {
+      background-color: #023E8A;
+      background-image: url('https://images.unsplash.com/photo-1668403778624-d782f7eb2e7d?q=80&w=2575&auto=format&fit=crop');
+      animation: kb2 30s ease-in-out infinite alternate;
+    }
+.bg-scene[data-s="3"] {
+      background-color: #1B4332;
+      background-image: url('https://images.unsplash.com/photo-1510262031125-928d1eeea510?q=80&w=2670&auto=format&fit=crop');
+      animation: kb3 24s ease-in-out infinite alternate;
+    }
+.bg-scene[data-s="4"] {
+      background-color: #264653;
+      background-image: url('https://images.unsplash.com/photo-1693761935581-1f6a0ab16590?q=80&w=2574&auto=format&fit=crop');
+      animation: kb4 28s ease-in-out infinite alternate;
+    }
+.bg-scene[data-s="5"] {
+      background-color: #1A3A2A;
+      background-image: url('https://images.unsplash.com/photo-1552074283-b2de7daab9ae?q=80&w=2670&auto=format&fit=crop');
+      animation: kb5 22s ease-in-out infinite alternate;
+    }
+
+    @keyframes kb1 { from { transform: scale(1.00) translate( 0%,  0%); } to { transform: scale(1.08) translate(-2%, -1%); } }
+    @keyframes kb2 { from { transform: scale(1.06) translate(-1%,  0%); } to { transform: scale(1.00) translate( 1%,  1%); } }
+    @keyframes kb3 { from { transform: scale(1.00) translate( 1%, -1%); } to { transform: scale(1.07) translate(-1%,  0%); } }
+    @keyframes kb4 { from { transform: scale(1.05) translate( 0%,  1%); } to { transform: scale(1.00) translate( 1%, -1%); } }
+    @keyframes kb5 { from { transform: scale(1.03) translate(-1%,  0%); } to { transform: scale(1.00) translate( 1%,  1%); } }/* Gradient overlay — heavier on left where text sits */
+    .bg-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(110deg,
+        rgba(0,0,0,0.62) 0%,
+        rgba(0,0,0,0.38) 48%,
+        rgba(0,0,0,0.10) 100%);
+    }
+/* ── PAGE LAYOUT ─────────────────────────────────────────────────────────── */
+    .page-layout {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: stretch;
+      padding: 28px 28px 28px 44px;
+      gap: 36px;
+    }
+/* ── LEFT CONTENT ────────────────────────────────────────────────────────── */
+    .page-left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px 0 4px;
+    }
+.cl-brand-logo {
+      width: 420px;
+      max-width: 100%;
+      opacity: 0.92;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,.35));
+    }
+.cl-headline-area {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+.cl-heading {
+      font-size: clamp(30px, 3.4vw, 50px);
+      font-weight: 700;
+      line-height: 1.18;
+      color: var(--color-bg);
+      text-shadow: 0 2px 12px rgba(0,0,0,.22);
+      max-width: 560px;
+    }
+.cl-caption {
+      display: flex; align-items: flex-start; gap: 7px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.16);
+    }
+.cl-caption svg { width: 12px; height: 12px; stroke: rgba(255,255,255,0.38); flex-shrink: 0; margin-top: 2px; }
+.caption-place { font-size: 10px; color: rgba(255,255,255,0.38); letter-spacing: .04em; }
+.caption-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); margin-top: 2px; transition: opacity .5s; }
+/* ── RIGHT CARD ──────────────────────────────────────────────────────────── */
+    .page-right {
+      flex-shrink: 0;
+      width: 420px;
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+.login-card {
+      width: 100%;
+      background: var(--color-bg);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.28), 0 0 0 1px rgba(0,0,0,0.04);
+      overflow-y: auto;
+      max-height: calc(100vh - 56px);
+    }
+/* ── LOGIN FORM TYPOGRAPHY ───────────────────────────────────────────────── */
+    .login-system {
+      font-size: 11px; font-weight: 600;
+      color: var(--color-text-muted); text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 6px;
+    }
+.login-title {
+      font-size: 24px; font-weight: 700;
+      color: var(--color-text-primary); margin-bottom: 4px;
+    }
+.login-sub {
+      font-size: 13px; color: var(--color-text-secondary);
+      margin-bottom: 26px; line-height: 1.5;
+    }
+/* ── ERROR BOX ── */
+    .error-box {
+      background: var(--color-danger-tint); border: 1px solid #FECACA; border-radius: 10px;
+      padding: 11px 14px; display: flex; align-items: flex-start; gap: 8px;
+      margin-bottom: 16px; font-size: 12px; color: var(--color-danger-text); line-height: 1.5;
+    }
+.error-box.hidden { display: none; }
+/* Aviso informativo: sesión cerrada (HU-R7-04 CA_4) o expirada (HU-R7-05 CA_1) */
+    .aviso-box {
+      background: var(--color-info-tint); border: 1px solid var(--color-info); border-radius: 10px;
+      padding: 11px 14px; margin-bottom: 16px; font-size: 12px; color: var(--color-text-primary); line-height: 1.5;
+    }
+.aviso-box.hidden { display: none; }
+.error-box svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+.field-error { font-size: 11px; color: var(--color-danger); margin-top: 4px; }
+.field-error.hidden { display: none; }
+.form-footer { display: flex; justify-content: flex-end; margin-top: -2px; margin-bottom: 18px; }
+.forgot-link { font-size: 12px; font-weight: 600; color: var(--color-primary); text-decoration: none; }
+.forgot-link:hover { text-decoration: underline; }
+/* ── BOTÓN ── */
+    .btn-login {
+      width: 100%; padding: 12px;
+      background: var(--color-primary); color: var(--color-bg); border: none; border-radius: 10px;
+      font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+.btn-login:hover:not(:disabled) { background: var(--color-accent-dark); }
+.btn-login:disabled { opacity: .55; cursor: not-allowed; }
+.spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: var(--color-bg); border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+.spinner.hidden { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+/* ── FOOTER ── */
+    .page-footer { margin-top: 20px; padding-top: 18px; font-size: 11px; color: var(--color-neutral-300); text-align: center; }
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+    @media (max-width: 800px) {
+      .page-layout { flex-direction: column; padding: 0; overflow-y: auto; height: auto; gap: 0; }
+      .page-left { min-height: 260px; padding: 24px; flex: none; }
+      .cl-heading { font-size: 26px; }
+      .cl-brand-logo { width: 300px; }
+      .page-right { width: 100%; padding: 0; }
+      .login-card { border-radius: 0; max-height: none; padding: 32px 24px; box-shadow: none; }
+    }

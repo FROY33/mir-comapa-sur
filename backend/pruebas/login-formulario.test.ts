@@ -1,7 +1,7 @@
 // HU-R7-01, el formulario: CA_1 (validación de campos), CA_4 (redirección por rol),
 // CA_5 (sesión existente), CA_6 (spinner y sin doble envío) y RN_3 y RN_4.
 //
-// Se ejecuta el script real de login.html contra un DOM mínimo simulado, porque lo
+// Se ejecuta el script real de login.js contra un DOM mínimo simulado, porque lo
 // que estos criterios describen es comportamiento del navegador y no de la API. No
 // sustituye a verlo en un navegador —no comprueba que el spinner se vea— pero sí que
 // la lógica haga lo que debe: no enviar con campos vacíos, no enviar dos veces,
@@ -51,7 +51,7 @@ class ElementoFalso {
 interface Resultado { ok: boolean; user?: { redirect: string }; mensaje?: string; error?: string }
 
 /**
- * Carga el script de login.html con un DOM y un Session simulados.
+ * Carga login.js (el script de login.html) con un DOM y un Session simulados.
  * `respuesta` decide qué devuelve Session.login, y se puede dejar pendiente para
  * observar el estado mientras la petición está en vuelo.
  */
@@ -59,9 +59,7 @@ function cargarFormulario(opciones: {
   sesionExistente?: { redirect: string } | null
   respuesta?: () => Promise<Resultado>
 } = {}) {
-  const codigo = readFileSync(path.join(RAIZ, 'login.html'), 'utf8')
-  const bloques = [...codigo.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]!)
-  const script = bloques.reduce((a, b) => (b.length > a.length ? b : a), '')
+  const script = readFileSync(path.join(RAIZ, 'login.js'), 'utf8')
 
   const el: Record<string, ElementoFalso> = {}
   for (const id of ['btnLogin', 'btnText', 'captionName', 'email', 'emailErr', 'errorBox',
@@ -250,5 +248,17 @@ describe('RN_3: sin recuperación por correo', () => {
     assert.match(String(f.el.errorMsg!.textContent), /Administrador/,
       'debe remitir al Administrador, que es quien restablece (RN_3)')
     assert.deepEqual(f.navegaciones, [])
+  })
+})
+
+describe('login.js y login.html van juntos', () => {
+  test('cada elemento que busca login.js existe en login.html, y la página carga login.js y login.css', () => {
+    const html = readFileSync(path.join(RAIZ, 'login.html'), 'utf8')
+    const script = readFileSync(path.join(RAIZ, 'login.js'), 'utf8')
+    const ids = [...script.matchAll(/getElementById\('([^']+)'\)/g)].map((m) => m[1]!)
+    assert.ok(ids.length > 5)
+    assert.deepEqual(ids.filter((id) => !html.includes(`id="${id}"`)), [])
+    assert.match(html, /<script src="login\.js"><\/script>\s*<\/body>/)
+    assert.match(html, /<link rel="stylesheet" href="login\.css">/)
   })
 })

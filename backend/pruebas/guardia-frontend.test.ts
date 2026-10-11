@@ -3,11 +3,11 @@
 // navega y qué muestra. La seguridad de los datos se prueba en autorizacion.test.ts.
 
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, test } from 'node:test'
+import { codigoSesion, RAIZ } from './apoyo-frontend.js'
 
-const RAIZ = path.resolve(import.meta.dirname, '../..')
 const esperar = () => new Promise((ok) => setImmediate(ok))
 
 interface Nodo { tag: string; hijos: Nodo[]; textContent: string; parentNode: Nodo | null; [k: string]: unknown }
@@ -31,7 +31,7 @@ const PERFIL = `comapa_perfil=${encodeURIComponent(JSON.stringify({
 
 /** Abre `pagina` con session.js. `acceso` es la respuesta de GET /api/auth/acceso. */
 function abrir(pagina: string, opciones: { cookie?: string; acceso?: { status: number; cuerpo?: unknown } } = {}) {
-  const codigo = readFileSync(path.join(RAIZ, 'session.js'), 'utf8')
+  const codigo = codigoSesion()
   const cookies: string[] = [opciones.cookie ?? PERFIL]
   const navegaciones: string[] = []
   const peticiones: string[] = []
@@ -142,5 +142,20 @@ describe('HU-R7-05: sesión expirada', () => {
     const p = abrir('login.html', { cookie: '' })
     await p.Session.login('a@b.mx', 'mala')
     assert.deepEqual(p.navegaciones, [])
+  })
+})
+
+describe('las páginas cargan la guardia', () => {
+  test('toda página con session.js carga guardia.js y vistas-mir.js justo después, en el <head>', () => {
+    const faltan: string[] = []
+    for (const archivo of readdirSync(RAIZ).filter((f) => f.endsWith('.html'))) {
+      const html = readFileSync(path.join(RAIZ, archivo), 'utf8')
+      if (!html.includes('src="session.js"')) continue
+      const cabeza = html.slice(0, html.indexOf('</head>'))
+      if (!/src="session\.js"><\/script>\s*<script src="guardia\.js"><\/script>\s*<script src="vistas-mir\.js"><\/script>/.test(cabeza)) {
+        faltan.push(archivo)
+      }
+    }
+    assert.deepEqual(faltan, [], 'páginas sin la guardia: quedarían visibles para cualquier rol')
   })
 })

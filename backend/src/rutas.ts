@@ -1,7 +1,7 @@
 // Qué páginas puede abrir cada rol (HU-R7-02 RN_1).
 //
 // Dos usos: decidir si un destino guardado antes del login se honra (HU-R7-02 RN_1) y
-// responder GET /api/auth/acceso, que la guardia de páginas de session.js consulta antes de
+// responder GET /api/auth/acceso, que la guardia de páginas de guardia.js consulta antes de
 // mostrar cualquier página (HU-R7-03). Los DATOS los protege el middleware de autorizacion.ts.
 //
 // Fuente: la tabla «Mapeo de vistas por rol» de roles-usuarios.md, más las

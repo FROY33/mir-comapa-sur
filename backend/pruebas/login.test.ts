@@ -4,65 +4,12 @@
 
 import assert from 'node:assert/strict'
 import { randomUUID } from 'node:crypto'
-import { after, before, describe, test } from 'node:test'
+import { describe, test } from 'node:test'
 import bcrypt from 'bcryptjs'
-import { crearBD } from '../src/bd.js'
-import { ENTIDAD } from '../src/datos/acceso.js'
-import { listarEventos } from '../src/datos/bitacora.js'
-import { MAX_INTENTOS } from '../src/datos/loginIntentos.js'
-import { COOKIE_SESION, HORAS_INACTIVIDAD, revocar } from '../src/datos/sesiones.js'
-import { crearLog } from '../src/log.js'
-import { levantar } from './apoyo.js'
-import { configBD } from './apoyo.js'
+import { COOKIE_SESION, revocar } from '../src/datos/sesiones.js'
+import { PASSWORD, prepararLogin, tokenDe } from './apoyo-login.js'
 
-const bd = crearBD(configBD, crearLog(() => {}))
-after(() => bd.cerrar())
-
-const PASSWORD = 'Contrasena-Valida-2026'
-let app: Awaited<ReturnType<typeof levantar>>
-let gerenciaId: string
-let unidadId: string
-
-/** Crea un usuario con contraseña real. bcrypt a 12 rondas, como manda RN_1. */
-async function crearUsuario(rol: 'admin' | 'revisor' | 'enlace', activo = true) {
-  const email = `login-${randomUUID()}@comapasur.gob.mx`
-  const hash = await bcrypt.hash(PASSWORD, 12)
-  const [u] = await bd.consultar<{ id: string }>(
-    `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, activo)
-     VALUES ($1, $2, 'Quien inicia sesión', $3, $4, $5, $6) RETURNING id`,
-    [gerenciaId, unidadId, email, hash, rol, activo])
-  return { id: u!.id, email }
-}
-
-/** POST /api/auth/login contra el backend real. Devuelve status, cuerpo y cookies. */
-async function entrar(cuerpo: unknown, cookie?: string) {
-  const r = await fetch(`${app.url}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
-    body: typeof cuerpo === 'string' ? cuerpo : JSON.stringify(cuerpo),
-  })
-  return { status: r.status, cuerpo: await r.json() as Record<string, any>, setCookie: r.headers.getSetCookie() }
-}
-
-/** Extrae el valor de la cookie de sesión de un Set-Cookie. */
-const tokenDe = (setCookie: string[]) => {
-  const linea = setCookie.find((c) => c.startsWith(`${COOKIE_SESION}=`))
-  return linea?.slice(COOKIE_SESION.length + 1).split(';')[0]
-}
-
-before(async () => {
-  app = await levantar()
-  const sufijo = randomUUID()
-  const [org] = await bd.consultar<{ id: string }>(
-    'INSERT INTO organizaciones (nombre) VALUES ($1) RETURNING id', [`Org login ${sufijo}`])
-  const [g] = await bd.consultar<{ id: string }>(
-    `INSERT INTO gerencias (organizacion_id, clave, nombre) VALUES ($1, 'TEC', 'Gerencia Técnica') RETURNING id`, [org!.id])
-  const [n] = await bd.consultar<{ id: string }>(
-    `INSERT INTO unidades (gerencia_id, nombre, es_coord_general) VALUES ($1, 'Coordinación General Técnica', true) RETURNING id`, [g!.id])
-  gerenciaId = g!.id
-  unidadId = n!.id
-})
-after(() => app.cerrar())
+const { bd, crearUsuario, entrar, url } = prepararLogin()
 
 describe('credenciales', () => {
   test('con credenciales correctas entra y recibe su sesión', async () => {
@@ -188,7 +135,7 @@ describe('CA-4 y CA-5: rol y sesión existente', () => {
     const entrada = await entrar({ email: u.email, password: PASSWORD })
     const token = tokenDe(entrada.setCookie)!
 
-    const r = await fetch(`${app.url}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
+    const r = await fetch(`${url()}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
     assert.equal(r.status, 200)
     const cuerpo = await r.json() as Record<string, any>
     assert.equal(cuerpo.usuario.email, u.email)
@@ -196,13 +143,13 @@ describe('CA-4 y CA-5: rol y sesión existente', () => {
   })
 
   test('sin cookie, /api/auth/sesion responde 401', async () => {
-    const r = await fetch(`${app.url}/api/auth/sesion`)
+    const r = await fetch(`${url()}/api/auth/sesion`)
     assert.equal(r.status, 401)
     assert.equal((await r.json() as Record<string, any>).error, 'sin_sesion')
   })
 
   test('una cookie inventada no abre sesión', async () => {
-    const r = await fetch(`${app.url}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=inventado` } })
+    const r = await fetch(`${url()}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=inventado` } })
     assert.equal(r.status, 401)
   })
 
@@ -210,7 +157,7 @@ describe('CA-4 y CA-5: rol y sesión existente', () => {
     const u = await crearUsuario('enlace')
     const token = tokenDe((await entrar({ email: u.email, password: PASSWORD })).setCookie)!
     assert.ok(await revocar(bd, token))
-    const r = await fetch(`${app.url}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
+    const r = await fetch(`${url()}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
     assert.equal(r.status, 401)
   })
 
@@ -218,101 +165,7 @@ describe('CA-4 y CA-5: rol y sesión existente', () => {
     const u = await crearUsuario('enlace')
     const token = tokenDe((await entrar({ email: u.email, password: PASSWORD })).setCookie)!
     await bd.consultar('UPDATE usuarios SET activo = false WHERE id = $1', [u.id])
-    const r = await fetch(`${app.url}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
+    const r = await fetch(`${url()}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
     assert.equal(r.status, 401)
-  })
-})
-
-describe('RN_2: inactividad de 8 horas renovable', () => {
-  test('la sesión nace con 8 horas por delante', async () => {
-    const u = await crearUsuario('enlace')
-    const token = tokenDe((await entrar({ email: u.email, password: PASSWORD })).setCookie)!
-    const [fila] = await bd.consultar<{ horas: string }>(
-      `SELECT round(extract(epoch FROM expira_at - now()) / 3600)::text AS horas
-         FROM sesiones WHERE token_hash = encode(sha256($1::bytea), 'hex')`, [token])
-    assert.equal(fila!.horas, String(HORAS_INACTIVIDAD))
-  })
-
-  test('cada petición autenticada corre la expiración hacia adelante', async () => {
-    const u = await crearUsuario('enlace')
-    const token = tokenDe((await entrar({ email: u.email, password: PASSWORD })).setCookie)!
-    const llave = `encode(sha256($1::bytea), 'hex')`
-    // Se envejece la sesión a mano: faltándole 1 hora, una petición debe devolverla a 8
-    await bd.consultar(`UPDATE sesiones SET expira_at = now() + interval '1 hour' WHERE token_hash = ${llave}`, [token])
-    const r = await fetch(`${app.url}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
-    assert.equal(r.status, 200)
-    const [fila] = await bd.consultar<{ horas: string }>(
-      `SELECT round(extract(epoch FROM expira_at - now()) / 3600)::text AS horas
-         FROM sesiones WHERE token_hash = ${llave}`, [token])
-    assert.equal(fila!.horas, String(HORAS_INACTIVIDAD), 'la expiración no se renovó')
-  })
-
-  test('una sesión expirada no revive', async () => {
-    const u = await crearUsuario('enlace')
-    const token = tokenDe((await entrar({ email: u.email, password: PASSWORD })).setCookie)!
-    await bd.consultar(
-      `UPDATE sesiones SET expira_at = now() - interval '1 second' WHERE token_hash = encode(sha256($1::bytea), 'hex')`, [token])
-    const r = await fetch(`${app.url}/api/auth/sesion`, { headers: { cookie: `${COOKIE_SESION}=${token}` } })
-    assert.equal(r.status, 401)
-  })
-})
-
-describe('bloqueo por intentos y auditoría', () => {
-  test('tras MAX_INTENTOS fallos el login responde 423 sin revisar la contraseña', async () => {
-    const u = await crearUsuario('enlace')
-    for (let i = 0; i < MAX_INTENTOS; i++) {
-      const r = await entrar({ email: u.email, password: 'mala' })
-      assert.ok([401, 423].includes(r.status))
-    }
-    // Ya bloqueado: incluso con la contraseña correcta
-    const r = await entrar({ email: u.email, password: PASSWORD })
-    assert.equal(r.status, 423)
-    assert.equal(r.cuerpo.error, 'cuenta_bloqueada')
-    assert.equal(r.setCookie.length, 0, 'no debe abrir sesión estando bloqueada')
-  })
-
-  test('TEC-05 CA-1: el login exitoso y el fallido quedan en la auditoría con su IP', async () => {
-    const u = await crearUsuario('enlace')
-    await entrar({ email: u.email, password: 'mala' })
-    await entrar({ email: u.email, password: PASSWORD })
-
-    const eventos = await listarEventos(bd, ENTIDAD, u.email.toLowerCase())
-    const acciones = eventos.map((e) => e.accion)
-    assert.ok(acciones.includes('login_fallido'), 'falta el evento de login fallido')
-    assert.ok(acciones.includes('login_exitoso'), 'falta el evento de login exitoso')
-
-    const [conIp] = await bd.consultar<{ n: string }>(
-      `SELECT count(*)::text AS n FROM bitacora
-        WHERE entidad = $1 AND entidad_id = $2 AND ip IS NOT NULL`, [ENTIDAD, u.email.toLowerCase()])
-    assert.equal(conIp!.n, String(eventos.length), 'hay eventos de acceso sin IP')
-  })
-
-  test('el login exitoso deja el evento con el usuario y su rol', async () => {
-    const u = await crearUsuario('admin')
-    await entrar({ email: u.email, password: PASSWORD })
-    const [evento] = (await listarEventos(bd, ENTIDAD, u.email.toLowerCase()))
-      .filter((e) => e.accion === 'login_exitoso')
-    assert.equal(evento?.usuario_id, u.id)
-    assert.equal(evento?.rol, 'admin')
-  })
-
-  test('CA-2: ni la contraseña ni el token llegan a la auditoría', async () => {
-    const u = await crearUsuario('enlace')
-    const r = await entrar({ email: u.email, password: PASSWORD })
-    const token = tokenDe(r.setCookie)!
-    const [fila] = await bd.consultar<{ n: string }>(
-      `SELECT count(*)::text AS n FROM bitacora
-        WHERE entidad = $1 AND (detalle::text LIKE '%' || $2 || '%' OR detalle::text LIKE '%' || $3 || '%')`,
-      [ENTIDAD, PASSWORD, token])
-    assert.equal(fila!.n, '0')
-  })
-
-  test('el login correcto limpia el contador de intentos', async () => {
-    const u = await crearUsuario('enlace')
-    for (let i = 0; i < MAX_INTENTOS - 1; i++) await entrar({ email: u.email, password: 'mala' })
-    assert.equal((await entrar({ email: u.email, password: PASSWORD })).status, 200)
-    const [fila] = await bd.consultar<{ n: string }>(
-      'SELECT count(*)::text AS n FROM login_intentos WHERE email = $1', [u.email.toLowerCase()])
-    assert.equal(fila!.n, '0')
   })
 })
