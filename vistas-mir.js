@@ -32,6 +32,7 @@ var ESTADO_CFG_MIR = {
   listo_validar:    { label:'Listo para validar', cls:'listo_validar',    accion:'Ver detalle',         btnCls:'neutral' },
   vencido:          { label:'Vencido',            cls:'vencido',          accion:'Ver detalle',         btnCls:'danger'  },
   proximo_periodo:  { label:'Próximo período',    cls:'proximo_periodo',  accion:'Ver calendario',      btnCls:'neutral' },
+  regresado_correccion: { label:'Regresado a corrección', cls:'observado', accion:'Atender corrección', btnCls:'warning' },
 };
 
 // Normaliza el estado raw de un indicador al estado de visualización.
@@ -93,25 +94,56 @@ function getActividadesRevisor() {
 // Coordinación General → todos los de la gerencia.
 // Coordinación específica → solo los de esa unidad.
 // Sin unidad asignada → todos los de la gerencia.
+// Reportes reales del periodo abierto (HU-R1-01), una vez cargados con cargarPendientesEnlace().
+// Mientras no se cargan, las vistas usan los datos demo del prototipo.
+var PENDIENTES_ENLACE = null;
+var RESUMEN_PENDIENTES = null;
+
+var NIVEL_VISTA = { fin: 'Fin', proposito: 'Propósito', componente: 'Componente', actividad: 'Actividad' };
+var capitalizar = function (t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; };
+
+/** Un reporte de GET /api/pendientes con la forma que esperan las vistas del prototipo. */
+function aActividad(r) {
+  return {
+    id: r.codigo, reporteId: r.reporte_id, tipo: r.tipo,
+    nombreIndicador: r.nombre, unidadResponsable: r.unidad || '', area: r.unidad || '',
+    nivel: NIVEL_VISTA[r.nivel] || '', medioVerificacion: r.medio_verificacion || '—',
+    frecuenciaMedicion: capitalizar(r.frecuencia), periodo: r.periodo, fechaLimite: r.fecha_limite,
+    estado: r.estado, ultimaActualizacion: String(r.actualizado_at || '').slice(0, 10),
+    iso: r.es_iso ? 'x' : '', pendiente: r.pendiente, vencido: r.vencido, urgente: r.urgente
+  };
+}
+
+/** Trae los reportes de la gerencia de la sesión. Resuelve con la respuesta, o null si falla. */
+function cargarPendientesEnlace() {
+  return pedir('/api/pendientes')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return null;
+      PENDIENTES_ENLACE = d.reportes.map(aActividad);
+      RESUMEN_PENDIENTES = d.resumen;
+      return d;
+    }, function () { return null; });
+}
+
+/**
+ * ¿Pide acción del Enlace? Con datos reales lo dice el servidor (pendiente_carga, borrador,
+ * observado y regresado a corrección; HU-R1-01 RN_2), y así la lista y el KPI del dashboard
+ * cuentan exactamente lo mismo (CA_5).
+ */
+function esPendiente(a) {
+  if (a.pendiente !== undefined) return a.pendiente;
+  return ['pendiente_carga', 'borrador', 'incompleto'].indexOf(a.estado) !== -1;
+}
+
+// Indicadores MIR de la gerencia del Enlace. Cualquier Enlace de la gerencia los ve todos:
+// la unidad responsable es informativa y no limita (HU-R1-01 RN_1, HU-R7-03).
 function getActividadesEnlace() {
+  if (PENDIENTES_ENLACE) return PENDIENTES_ENLACE.filter(function (a) { return a.tipo === 'mir'; });
   if (typeof ACTIVIDADES_ENLACE === 'undefined') return [];
   var user = Session.getUser();
   if (!user) return ACTIVIDADES_ENLACE;
-
-  var ger    = user.gerencia;
-  var unidad = user.unidadResponsable || null;
-
-  var byGerencia = ACTIVIDADES_ENLACE.filter(function(a) {
-    return a.gerencia === ger;
-  });
-
-  if (!unidad || unidad.toLowerCase().indexOf('general') !== -1) {
-    return byGerencia;
-  }
-
-  return byGerencia.filter(function(a) {
-    return a.unidadResponsable === unidad;
-  });
+  return ACTIVIDADES_ENLACE.filter(function (a) { return a.gerencia === user.gerencia; });
 }
 
 // Devuelve el nombre de la unidad/gerencia del usuario activo para mostrar en la UI.
@@ -131,5 +163,6 @@ function getNombreGerenciaEnlace() {
 
 // Devuelve los indicadores gerenciales de las 4 gerencias generales.
 function getActividadesGerencia() {
+  if (PENDIENTES_ENLACE) return PENDIENTES_ENLACE.filter(function (a) { return a.tipo === 'gerencial'; });
   return (typeof ACTIVIDADES_GERENCIA !== 'undefined') ? ACTIVIDADES_GERENCIA : [];
 }

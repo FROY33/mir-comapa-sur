@@ -365,7 +365,9 @@
 </div>
 
 <script>
-(function() {
+// Se pinta con lo que haya (datos demo) y se vuelve a pintar con los reportes reales del
+// periodo en cuanto llegan (HU-R1-01). El KPI «Pendientes» usa esPendiente(), igual que la lista (CA_5).
+function pintarDashboardEnlace() {
   if (typeof getActividadesEnlace !== 'function') return;
 
   var ger  = getNombreGerenciaEnlace();
@@ -377,15 +379,15 @@
   if (roleEl) roleEl.textContent = ger;
 
   // ── KPIs ────────────────────────────────────────────────────────────
-  var pend = inds.filter(function(a){ return ['pendiente_carga','incompleto','borrador'].includes(a.estado); }).length;
+  var pend = inds.filter(esPendiente).length;
   var env  = inds.filter(function(a){ return ['enviado_revision','corregido'].includes(a.estado); }).length;
   var obs  = inds.filter(function(a){ return a.estado === 'observado'; }).length;
   var apr  = inds.filter(function(a){ return ['listo_validar','cerrado'].includes(a.estado); }).length;
   var bor  = inds.filter(function(a){ return a.estado === 'borrador'; }).length;
   var hoy  = new Date(); hoy.setHours(0,0,0,0);
   var venc = inds.filter(function(a){
-    return ['pendiente_carga','incompleto','borrador'].includes(a.estado) &&
-           a.fechaLimite && new Date(a.fechaLimite) < hoy;
+    if (a.vencido !== undefined) return a.vencido;
+    return esPendiente(a) && a.fechaLimite && new Date(a.fechaLimite) < hoy;
   }).length;
 
   var s = function(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
@@ -402,12 +404,13 @@
   if (obsCountEl) obsCountEl.textContent = obs || 2;
 
   // ── Indicadores próximos a reportar ─────────────────────────────────
-  var sorted = inds.slice().sort(function(a, b){ return a.fechaLimite.localeCompare(b.fechaLimite); });
+  // Solo lo que pide acción, vencidos primero y luego por fecha límite (HU-R1-01 CA_4, RN_2)
+  var sorted = inds.filter(esPendiente).sort(function(a, b){ return a.fechaLimite.localeCompare(b.fechaLimite); });
   var top4   = sorted.slice(0, 4);
   var dl = document.getElementById('deadlineList');
   if (dl) dl.innerHTML = top4.length ? top4.map(function(a) {
     var d   = diasRestantes(a.fechaLimite);
-    var cls = d < 0 ? 'urgente' : d <= 7 ? 'urgente' : d <= 14 ? 'proximo' : 'normal';
+    var cls = d <= 3 ? 'urgente' : d <= 14 ? 'proximo' : 'normal';   // CA_2: rojo a 3 días o vencido
     var lbl = d < 0 ? 'Vencida' : d === 0 ? 'Hoy' : 'Vence en ' + d + ' día' + (d === 1 ? '' : 's');
     return '<div class="ind-item" onclick="window.location.href=\'detalle-actividad.html?id=' + a.id + '\'">' +
       '<div class="ind-dot ' + cls + '"></div>' +
@@ -422,7 +425,9 @@
     '</div>';
   }).join('') : '<p style="font-size:12px;color:var(--color-text-muted);padding:12px 0;">Sin indicadores próximos a vencer.</p>';
 
-})();
+}
+pintarDashboardEnlace();
+cargarPendientesEnlace().then(function (d) { if (d) pintarDashboardEnlace(); });
 
 // ── Banner ciclo de planeación ────────────────────────────────────────
 (function() {

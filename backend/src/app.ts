@@ -7,6 +7,7 @@ import { listarFrecuencias } from './datos/frecuencias.js'
 import { crearManejador } from './http.js'
 import { cambiarPassword } from './cuenta.js'
 import * as indicadores from './indicadores.js'
+import * as pendientes from './pendientes.js'
 import type { Log } from './log.js'
 import type { Rol } from './rutas.js'
 import * as usuarios from './usuarios.js'
@@ -36,6 +37,9 @@ export function crearApp(
     'GET /api/indicadores': protegida(TODOS, indicadores.listar(bd)),
     'POST /api/indicadores/buscar': protegida(TODOS, indicadores.buscar(bd)),
     'GET /api/indicadores/:id': protegida(TODOS, indicadores.detalle(bd)),
+
+    // Reportes del periodo abierto de la gerencia, con los pendientes del Enlace (HU-R1-01)
+    'GET /api/pendientes': protegida(TODOS, pendientes.listar(bd)),
 
     // Solo Administrador: todo lo que cuelga de /api/admin/ (HU-R7-03 CA_3, CA_6)
     'GET /api/admin/configuracion': protegida(['admin'], async () => ({

@@ -56,7 +56,9 @@ let indicadoresSinFixtures = -1
 describe('carga inicial', () => {
   before(async () => {
     sembrar()
-    reportesSinFixtures = Number(await uno<string>('SELECT count(*) FROM reportes'))
+    // Solo los de la semilla: otras pruebas crean reportes propios en la misma base, en paralelo
+    reportesSinFixtures = Number(await uno<string>(
+      `SELECT count(*) FROM reportes WHERE gerencia_id IN (SELECT id FROM gerencias WHERE organizacion_id = ${ORG})`))
     indicadoresSinFixtures = Number(await uno<string>('SELECT count(*) FROM indicadores'))
     sembrar('--con-fixtures')
   })
