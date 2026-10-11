@@ -4,6 +4,7 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import { after, before, describe, test } from 'node:test'
+import bcrypt from 'bcryptjs'
 import { crearBD } from '../src/bd.js'
 import { crearLog } from '../src/log.js'
 import { configBD } from './apoyo.js'
@@ -11,11 +12,14 @@ import { configBD } from './apoyo.js'
 const bd = crearBD(configBD, crearLog(() => {}))
 after(() => bd.cerrar())
 
+/** Contraseña inicial solo para las pruebas; no es de ninguna cuenta real. */
+const PASSWORD_PRUEBAS = 'semilla-de-pruebas-2026'
+
 /** Corre la carga contra la base de pruebas. */
 function sembrar(...args: string[]) {
   execFileSync('db/sembrar.sh', args, {
     stdio: 'pipe',
-    env: { ...process.env, DATABASE_URL: configBD.url },
+    env: { ...process.env, DATABASE_URL: configBD.url, SEMILLA_PASSWORD: PASSWORD_PRUEBAS },
   })
 }
 
@@ -97,14 +101,44 @@ describe('carga inicial', () => {
     assert.deepEqual(huecos, [], 'hay gerencias sin Revisor o sin Enlace')
   })
 
-  test('CA-5: ninguna unidad ni usuario cruza de gerencia', async () => {
-    // La FK compuesta lo impide, pero se verifica que la carga no haya dejado nulos
+  test('CA-5: cada reporte pertenece a la gerencia de su indicador', async () => {
+    // Para probar aislamiento, un reporte no puede quedar en otra gerencia que su indicador
     assert.equal(await uno<string>(
-      `SELECT count(*) FROM (${USUARIOS_SEMILLA}) s WHERE unidad_id IS NULL`), '0')
-    assert.equal(await uno<string>(
-      `SELECT count(*) FROM unidades u JOIN gerencias g ON g.id = u.gerencia_id
-       WHERE NOT g.activo AND u.activo AND EXISTS (
-         SELECT 1 FROM indicadores i WHERE i.unidad_id = u.id)`), '0')
+      `SELECT count(*) FROM reportes r JOIN indicadores i ON i.id = r.indicador_id
+       WHERE r.gerencia_id <> i.gerencia_id`), '0')
+    assert.ok(Number(await uno<string>(
+      `SELECT count(DISTINCT gerencia_id) FROM reportes`)) >= 2, 'los reportes no cubren dos gerencias')
+  })
+
+  test('hay al menos un Administrador activo', async () => {
+    assert.ok(Number(await uno<string>(
+      `SELECT count(*) FROM (${USUARIOS_SEMILLA}) s WHERE rol = 'admin' AND activo`)) >= 1)
+  })
+
+  test('la contraseña inicial es la de SEMILLA_PASSWORD, no un valor del repositorio', async () => {
+    const [u] = await bd.consultar<{ password_hash: string }>(
+      `SELECT password_hash FROM (${USUARIOS_SEMILLA}) s WHERE rol = 'admin' LIMIT 1`)
+    assert.equal(await bcrypt.compare(PASSWORD_PRUEBAS, u!.password_hash), true)
+  })
+
+  test('recargar corrige lo que se desvió del CSV: padre, acumulable y unidades que ya no están', async () => {
+    const [raiz] = await bd.consultar<{ id: string; acumulable: boolean }>(
+      `SELECT id, acumulable FROM indicadores WHERE parent_id IS NULL AND tipo = 'mir' LIMIT 1`)
+    const [otro] = await bd.consultar<{ id: string }>(
+      `SELECT id FROM indicadores WHERE id <> $1 AND parent_id IS NULL LIMIT 1`, [raiz!.id])
+    await bd.consultar('UPDATE indicadores SET parent_id = $2, acumulable = NOT acumulable WHERE id = $1',
+      [raiz!.id, otro!.id])
+    const [vieja] = await bd.consultar<{ id: string }>(
+      `INSERT INTO unidades (gerencia_id, nombre) SELECT id, 'Unidad renombrada' FROM gerencias
+        WHERE organizacion_id = ${ORG} AND clave = 'TEC' RETURNING id`)
+
+    sembrar()
+
+    const [despues] = await bd.consultar<{ parent_id: string | null; acumulable: boolean }>(
+      'SELECT parent_id, acumulable FROM indicadores WHERE id = $1', [raiz!.id])
+    assert.equal(despues!.parent_id, null)
+    assert.equal(despues!.acumulable, raiz!.acumulable)
+    assert.equal(await uno<boolean>(`SELECT activo FROM unidades WHERE id = '${vieja!.id}'`), false)
   })
 
   test('CA-5: hay reportes en los estados del flujo que se van a probar', async () => {
@@ -144,6 +178,14 @@ describe('carga inicial', () => {
     assert.equal(await uno<string>(
       `SELECT count(*) FROM indicadores h JOIN indicadores p ON p.id = h.parent_id
        WHERE p.gerencia_id <> h.gerencia_id`), '0')
+    // Se sube por los padres; si un indicador vuelve a aparecer en su propio camino, hay ciclo
+    assert.equal(await uno<string>(
+      `WITH RECURSIVE camino(origen, actual, visitados, ciclo) AS (
+         SELECT id, parent_id, ARRAY[id], false FROM indicadores WHERE parent_id IS NOT NULL
+         UNION ALL
+         SELECT c.origen, i.parent_id, c.visitados || i.id, i.id = ANY(c.visitados)
+           FROM camino c JOIN indicadores i ON i.id = c.actual WHERE NOT c.ciclo)
+       SELECT count(*) FROM camino WHERE ciclo`), '0')
     assert.ok(Number(await uno<string>(
       `SELECT count(*) FROM indicadores WHERE parent_id IS NOT NULL`)) > 0,
       'no se cargó ninguna relación padre-hijo')

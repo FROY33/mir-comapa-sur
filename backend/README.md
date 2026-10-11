@@ -30,7 +30,8 @@ curl localhost:3000/api/salud
 | `PORT` | no | `3000` | Puerto HTTP |
 | `NODE_ENV` | no | `development` | `development`, `test` o `production` |
 | `BD_MAX_CONEXIONES` | no | `10` | Tamaño del pool |
-| `SEMILLA_PASSWORD` | no | — | Contraseña inicial de las cuentas que crea la carga (ver `db/semilla/`) |
+| `SEMILLA_PASSWORD` | para sembrar | — | Contraseña inicial de las cuentas que crea la carga, 12 caracteres o más. Sin valor por defecto (ver `db/semilla/`) |
+| `SEMILLA_ADMIN_EMAIL`, `SEMILLA_ADMIN_NOMBRE` | para sembrar producción | — | La cuenta de Administrador de la carga inicial. `SEMILLA_ADMIN_GERENCIA` (opcional, `PLA`) |
 | `CONFIAR_PROXY` | no | `false` | `true` solo si el backend está detrás de un proxy propio: entonces la IP de la bitácora se toma de `X-Forwarded-For`. Expuesto directo debe quedar en `false`, o cualquiera podría falsear su IP |
 | `BD_TIMEOUT_CONEXION_MS` | no | `5000` | Cuánto esperar una conexión antes de responder 503 |
 | `BD_TIMEOUT_CONSULTA_MS` | no | `15000` | Límite por consulta (`statement_timeout`) |

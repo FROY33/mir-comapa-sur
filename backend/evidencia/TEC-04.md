@@ -82,3 +82,24 @@ Reportes por estado: `cerrado` 93, `pendiente_carga` 11, `enviado_revision` 11, 
    no estructura: el dataset se regenera con `node db/semilla/extraer.ts`.
 3. **El universo oficial de indicadores sigue sin definirse:** 123 operativos, 193 en el catálogo
    de abril, 132 en la documentación (hallazgo 2).
+
+## Correcciones tras la auditoría del 10/10/2026
+
+La auditoría encontró que la carga dejaba a las 39 cuentas, Administrador incluido, con una
+contraseña escrita en el repositorio, y que cargaba usuarios de prueba y del prototipo en
+producción. Correcciones y su prueba:
+
+| Hallazgo | Corrección | Prueba |
+|---|---|---|
+| Contraseña por defecto `CambiarAlIngresar2026`; `SEMILLA_PASSWORD` en `.env` se ignoraba | Sin valor por defecto: la carga exige `SEMILLA_PASSWORD` (12+ caracteres) y la lee después de cargar `.env` | `semilla-inicial.test.ts`, `semilla.test.ts` («la contraseña inicial es la de SEMILLA_PASSWORD») |
+| Usuarios de prueba y del prototipo en producción | Modo inicial (producción o base remota): catálogo y una sola cuenta de Administrador de `SEMILLA_ADMIN_*` | «crea el catálogo y una sola cuenta…» sobre una base vacía en `NODE_ENV=production` |
+| Fixtures desde una laptop contra producción, sin `NODE_ENV` | Fixtures solo en base local o `_test`; se imprime el destino; opciones desconocidas son error | `plan de carga` (8 pruebas) |
+| Recargar producción revertía cambios hechos desde la app | En modo inicial, si ya hay usuarios no se hace nada | «una segunda corrida no cambia nada…» |
+| `acumulable`, `sentido_meta` y `parent_id` no se actualizaban; unidades renombradas quedaban activas; fixtures o padres inexistentes se omitían en silencio | `DO UPDATE` completo; el padre se quita si el CSV no lo trae; unidades fuera del CSV se desactivan; lo inexistente es error | «recargar corrige lo que se desvió del CSV» |
+| Pruebas que no podían fallar (unidad nula en columna NOT NULL; «sin ciclos» sin buscar ciclos) | Reemplazadas: reporte en la gerencia de su indicador y búsqueda recursiva de ciclos | Verificado con mutaciones |
+| El extractor fallaba: `MOCK_USERS` ya no está en `session.js` | Los usuarios del prototipo se congelaron sin contraseñas en `origen/usuarios-prototipo.js`; los CSV regenerados salen idénticos byte por byte | `npx tsx db/semilla/extraer.ts` |
+| `semilla.json` (12 162 líneas) generado y sin uso | Eliminado | — |
+| Fixtures enviadas sin autor | `enviado_por` se resuelve por `enviado_por_email`: 97 reportes quedan con autor. Los 21 enviados restantes no traen correo en el CSV | Consulta sobre la base de pruebas |
+
+Sigue pendiente: la confirmación institucional de gerencias y unidades (CA-1), y obligar al cambio
+de contraseña en el primer acceso (`debe_cambiar_password` se informa, pero el backend no lo exige).

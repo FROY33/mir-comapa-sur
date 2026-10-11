@@ -13,10 +13,24 @@ Estratégica y los que deben poder recargarse sin duplicar.
 cd backend
 ./db/migrar.sh up                  # el esquema primero: sin tablas no hay dónde cargar
 ./db/sembrar.sh                    # definición: gerencias, unidades, usuarios, indicadores, periodos
-./db/sembrar.sh --con-fixtures     # agrega los 123 reportes de prueba (CA-4)
+./db/sembrar.sh --con-fixtures     # agrega los 123 reportes de prueba (CA-4; solo base local o _test)
 ./db/sembrar.sh --verificar        # no escribe; reporta qué hay en la base
 npm run bd:sembrar                 # equivalente a ./db/sembrar.sh
 ```
+
+Antes de la primera carga define `SEMILLA_PASSWORD` (12 caracteres o más) en `.env` o en el
+entorno. No hay valor por defecto. Una opción mal escrita es un error, no se ignora.
+
+### Qué se carga, según el destino (`plan.ts`)
+
+| Destino | Modo | Qué carga |
+|---|---|---|
+| Base local o `_test`, fuera de producción | demostración | Catálogo, los 35 usuarios del prototipo, los 5 de prueba y, con `--con-fixtures`, los 123 reportes |
+| Producción, o cualquier base remota | inicial | Catálogo y **una** cuenta de Administrador: `SEMILLA_ADMIN_EMAIL`, `SEMILLA_ADMIN_NOMBRE` y opcional `SEMILLA_ADMIN_GERENCIA` (`PLA` por defecto). Ninguna persona del prototipo |
+
+En modo inicial, si la base ya tiene usuarios la carga no hace nada: no se repite, así una
+segunda corrida no revierte lo que se haya cambiado desde la aplicación. Las fixtures se rechazan
+fuera de una base local o `_test`, aunque falte `NODE_ENV`: el destino se imprime antes de cargar.
 
 ## Regenerar el dataset desde el prototipo
 
@@ -29,9 +43,9 @@ Determinista: misma entrada, mismos bytes. Las filas se ordenan por clave natura
 (soporte de CA-3).
 
 ```sh
-cd backend/db/semilla
-shasum -a 256 datos/*.csv > /tmp/h1 && node extraer.ts >/dev/null \
-  && shasum -a 256 datos/*.csv | diff /tmp/h1 - && echo determinista
+cd backend
+shasum -a 256 db/semilla/datos/*.csv > /tmp/h1 && npx tsx db/semilla/extraer.ts >/dev/null \
+  && shasum -a 256 db/semilla/datos/*.csv | diff /tmp/h1 - && echo determinista
 ```
 
 ## Archivos
@@ -39,10 +53,12 @@ shasum -a 256 datos/*.csv > /tmp/h1 && node extraer.ts >/dev/null \
 | Archivo | Qué es |
 |---|---|
 | `extraer.ts` | Extractor. Lee los `.js` del prototipo en la raíz del repo y escribe `datos/` |
+| `origen/usuarios-prototipo.js` | Los usuarios del prototipo, congelados sin contraseñas: HU-R7-01 los quitó de `session.js` |
 | `mapeos.ts` | Único lugar con la traducción prototipo → catálogos del esquema |
 | `cargar.ts` | Cargador idempotente. Lee los CSV e inserta en orden de dependencias |
+| `plan.ts` | Qué se carga según el destino, y las variables obligatorias. Funciones puras, con pruebas |
+| `csv.ts` | Lector de CSV, sin dependencias |
 | `datos/*.csv` | El dataset. Formato de revisión: `gerencias.csv` y `unidades.csv` están hechos para imprimirse y que Planeación confirme renglón por renglón (CA-1) |
-| `semilla.json` | El dataset generado como un solo JSON. Artefacto de conveniencia: `cargar.ts` lee los CSV, no este archivo, porque los CSV son lo que Planeación revisa |
 | `manifest.json` | Conteos, `sha256`, verificaciones de integridad y lista de pendientes |
 | `INCONSISTENCIAS.md` | Hallazgos, con el criterio de aceptación que bloquea cada uno y quién decide |
 
@@ -82,11 +98,11 @@ fixtures salvo petición explícita.
 bcrypt de 12 rondas lo genera `cargar.ts` con `bcryptjs`, uno por usuario con su propia sal.
 Todos salen con `debe_cambiar_password = true`.
 
-La contraseña inicial es común y no es un secreto: se cambia al primer acceso. Para no usar el
-valor por omisión, define `SEMILLA_PASSWORD` en el entorno antes de sembrar.
+La contraseña inicial sale de `SEMILLA_PASSWORD` y no hay valor por defecto: una contraseña escrita
+en el repositorio la conocería cualquiera que lo lea, incluida la del Administrador.
 
-En una segunda carga el hash **no se regenera**: bcrypt daría uno distinto cada vez y la carga no
-sería comparable (CA-3).
+En una segunda carga el hash de una cuenta existente **no se regenera**: conserva su contraseña,
+y la carga sigue siendo comparable (CA-3).
 
 ## Antes de cargar
 
@@ -108,5 +124,5 @@ abiertas (5, 24a, 24g y la regla general 2).
 | Unos reportes en estado `borrador` para CA-5 | Propio; ver hallazgo 19 |
 | Confirmar la gerencia del Revisor Carlos Mendoza | Dueño funcional; ver hallazgo 18 |
 
-Ya hecho: `cargar.ts`, `db/sembrar.sh`, `npm run bd:sembrar`, las 10 pruebas de
-`backend/pruebas/semilla.test.ts` y `backend/evidencia/TEC-04.md`.
+Ya hecho: `cargar.ts`, `db/sembrar.sh`, `npm run bd:sembrar`, las pruebas de
+`backend/pruebas/semilla.test.ts` y `semilla-inicial.test.ts`, y `backend/evidencia/TEC-04.md`.

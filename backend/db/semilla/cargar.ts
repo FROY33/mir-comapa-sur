@@ -1,25 +1,21 @@
 #!/usr/bin/env node
 // Carga inicial de datos y cuentas (TEC-04). Lee los CSV de datos/ y los inserta
-// en la base, en orden de dependencias.
+// en la base, en orden de dependencias. Qué se carga depende del destino: ver plan.ts.
 //
 // Idempotente (CA-3): cada tabla hace ON CONFLICT sobre su clave natural, así que
-// correrlo dos veces no duplica ni cambia conteos. El hash de contraseña NO se
-// regenera en la segunda corrida: bcrypt da un hash distinto cada vez y eso haría
-// que la carga no fuera comparable.
+// correrlo dos veces no duplica ni cambia conteos. El hash de contraseña solo se
+// calcula para cuentas nuevas: una cuenta existente conserva el suyo.
 //
-//   tsx cargar.ts                  solo definición (gerencias, unidades, usuarios, indicadores, periodos)
-//   tsx cargar.ts --con-fixtures   agrega los reportes de prueba (nunca en producción, CA-4)
+//   tsx cargar.ts                  definición (+ usuarios de demostración si la base es local)
+//   tsx cargar.ts --con-fixtures   agrega los reportes de prueba (solo base local o de pruebas, CA-4)
 //   tsx cargar.ts --verificar      no escribe; solo reporta qué hay en la base
 
-import { readFileSync } from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import bcrypt from 'bcryptjs'
 import { crearBD, type BD, type Ejecutor } from '../../src/bd.js'
 import { cargarConfig } from '../../src/config.js'
 import { crearLog } from '../../src/log.js'
-
-const DATOS = path.join(path.dirname(fileURLToPath(import.meta.url)), 'datos')
+import { booleano, leerCsv, numeroONulo, vacioANulo } from './csv.js'
+import { adminInicial, destino, ErrorPlan, passwordInicial, planDeCarga, type AdminInicial, type Plan } from './plan.js'
 
 /** La organización es una sola en S1; existe para no migrar de forma destructiva después. */
 const ORGANIZACION = 'COMAPA Sur'
@@ -27,52 +23,12 @@ const ORGANIZACION = 'COMAPA Sur'
 /** bcrypt con 12 rondas o más (DICCIONARIO.md, usuarios.password_hash). */
 const RONDAS_BCRYPT = 12
 
-/**
- * Contraseña inicial de todas las cuentas. No es un secreto: todos los usuarios
- * salen con debe_cambiar_password = true y la cambian al primer acceso. Se puede
- * sobrescribir con SEMILLA_PASSWORD para no usar un valor conocido.
- */
-const PASSWORD_INICIAL = process.env.SEMILLA_PASSWORD ?? 'CambiarAlIngresar2026'
-
-// ── Lectura de CSV ───────────────────────────────────────────────────────────
-// Los CSV son el artefacto de revisión (Planeación confirma gerencias y unidades
-// sobre ellos), así que son también la fuente de la carga: lo que se revisa es lo
-// que se carga. Parser mínimo con comillas dobles, sin dependencias.
-function leerCsv(nombre: string): Record<string, string>[] {
-  const texto = readFileSync(path.join(DATOS, nombre), 'utf8')
-  const filas: string[][] = []
-  let campo = ''
-  let fila: string[] = []
-  let enComillas = false
-
-  for (let i = 0; i < texto.length; i++) {
-    const c = texto[i]
-    if (enComillas) {
-      if (c === '"' && texto[i + 1] === '"') { campo += '"'; i++ }
-      else if (c === '"') enComillas = false
-      else campo += c
-    } else if (c === '"') enComillas = true
-    else if (c === ',') { fila.push(campo); campo = '' }
-    else if (c === '\n') { fila.push(campo); filas.push(fila); fila = []; campo = '' }
-    else if (c !== '\r') campo += c
-  }
-  if (campo !== '' || fila.length > 0) { fila.push(campo); filas.push(fila) }
-
-  const [encabezado, ...resto] = filas
-  if (encabezado === undefined) throw new Error(`${nombre} está vacío`)
-  return resto
-    .filter((f) => f.some((v) => v !== ''))
-    .map((f) => Object.fromEntries(encabezado.map((col, n) => [col, f[n] ?? ''])))
-}
-
-const vacioANulo = (v: string | undefined) => (v === undefined || v === '' ? null : v)
-const numeroONulo = (v: string | undefined) => (v === undefined || v === '' ? null : Number(v))
-const booleano = (v: string | undefined) => v === 'true'
-
 // ── Carga ────────────────────────────────────────────────────────────────────
 interface Resumen { tabla: string; filas: number; procesados: number }
 
-async function cargar(bd: BD, opciones: { fixtures: boolean }): Promise<Resumen[]> {
+interface Cuentas { password: string; admin?: AdminInicial }
+
+async function cargar(bd: BD, plan: Plan, cuentas: Cuentas): Promise<Resumen[]> {
   const resumen: Resumen[] = []
 
   return bd.transaccion(async (tx) => {
@@ -117,22 +73,47 @@ async function cargar(bd: BD, opciones: { fixtures: boolean }): Promise<Resumen[
       if (fila === undefined) throw new Error(`Unidad ${u.nombre}: sin id`)
       idUnidad.set(`${u.gerencia_clave}||${u.nombre}`, fila.id)
     }
+    // Una unidad renombrada en el CSV deja la vieja sin uso: se desactiva, no se borra
+    // (puede tener usuarios o indicadores). Solo en demostración, donde el CSV manda.
+    if (plan.modo === 'demostracion') {
+      await tx.consultar(
+        `UPDATE unidades u SET activo = false
+          WHERE u.activo AND u.gerencia_id = ANY($1::uuid[]) AND NOT (u.id = ANY($2::uuid[]))`,
+        [[...idGerencia.values()], [...idUnidad.values()]])
+    }
     resumen.push({ tabla: 'unidades', filas: unidades.length, procesados: unidades.length })
 
-    // 4. Usuarios — del prototipo y los de prueba que las fixtures necesitan
-    const usuarios = [...leerCsv('usuarios.csv'), ...leerCsv('usuarios_prueba.csv')]
-    const idUsuario = new Map<string, string>()
+    // 4. Usuarios. En demostración: los del prototipo más los de prueba, y una fila de
+    //    usuarios_prueba.csv corrige a la del mismo correo en usuarios.csv. En la carga
+    //    inicial: solo la cuenta de Administrador de las variables de entorno.
+    const porEmail = new Map<string, Record<string, string>>()
+    if (plan.modo === 'demostracion') {
+      for (const u of [...leerCsv('usuarios.csv'), ...leerCsv('usuarios_prueba.csv')]) porEmail.set(u.email!.toLowerCase(), u)
+    } else {
+      const admin = cuentas.admin!
+      const [coord] = leerCsv('unidades.csv')
+        .filter((u) => u.gerencia_clave === admin.gerenciaClave && booleano(u.es_coord_general))
+      if (coord === undefined) throw new Error(`SEMILLA_ADMIN_GERENCIA=${admin.gerenciaClave} no tiene Coordinación General`)
+      porEmail.set(admin.email.toLowerCase(), {
+        email: admin.email, nombre: admin.nombre, rol: 'admin',
+        gerencia_clave: admin.gerenciaClave, unidad_nombre: coord.nombre!,
+      })
+    }
+    const usuarios = [...porEmail.values()]
+    const existentes = new Set((await tx.consultar<{ email: string }>(
+      'SELECT lower(email::text) AS email FROM usuarios WHERE email = ANY($1::citext[])',
+      [usuarios.map((u) => u.email)])).map((u) => u.email))
+
+    const idUsuarioPorEmail = new Map<string, string>()
     for (const u of usuarios) {
       const gerenciaId = idGerencia.get(u.gerencia_clave!)
       const unidadId = idUnidad.get(`${u.gerencia_clave}||${u.unidad_nombre}`)
       if (gerenciaId === undefined) throw new Error(`${u.email}: gerencia ${u.gerencia_clave} desconocida`)
       if (unidadId === undefined) throw new Error(`${u.email}: unidad "${u.unidad_nombre}" no existe en ${u.gerencia_clave}`)
-      // Un hash por usuario: bcrypt genera su propia sal en cada llamada. Hashear
-      // una vez y reutilizar dejaría a las 39 cuentas con el mismo hash.
-      const hash = await bcrypt.hash(PASSWORD_INICIAL, RONDAS_BCRYPT)
+      // Un hash por usuario nuevo: bcrypt genera su propia sal en cada llamada. Una cuenta
+      // existente conserva su hash, y con él la contraseña que ya haya cambiado.
+      const hash = existentes.has(u.email!.toLowerCase()) ? '' : await bcrypt.hash(cuentas.password, RONDAS_BCRYPT)
       const [fila] = await tx.consultar<{ id: string }>(
-        // password_hash solo se escribe al insertar: en una segunda corrida se
-        // conserva el existente, para que la carga sea comparable (CA-3).
         `INSERT INTO usuarios (gerencia_id, unidad_id, nombre, email, password_hash, rol, debe_cambiar_password, activo)
          VALUES ($1, $2, $3, $4, $5, $6, true, true)
          ON CONFLICT (email) DO UPDATE
@@ -141,8 +122,7 @@ async function cargar(bd: BD, opciones: { fixtures: boolean }): Promise<Resumen[
          RETURNING id`,
         [gerenciaId, unidadId, u.nombre, u.email, hash, u.rol])
       if (fila === undefined) throw new Error(`Usuario ${u.email}: sin id`)
-      // Por gerencia y nombre: hay un nombre repetido en dos gerencias (INCONSISTENCIAS.md §9)
-      idUsuario.set(`${u.gerencia_clave}||${u.nombre}`, fila.id)
+      idUsuarioPorEmail.set(u.email!.toLowerCase(), fila.id)
     }
     resumen.push({ tabla: 'usuarios', filas: usuarios.length, procesados: usuarios.length })
 
@@ -169,6 +149,7 @@ async function cargar(bd: BD, opciones: { fixtures: boolean }): Promise<Resumen[
            formula = EXCLUDED.formula, numerador_desc = EXCLUDED.numerador_desc,
            denominador_desc = EXCLUDED.denominador_desc, denominador_fijo = EXCLUDED.denominador_fijo,
            medio_verificacion = EXCLUDED.medio_verificacion, origen_mv = EXCLUDED.origen_mv,
+           acumulable = EXCLUDED.acumulable, sentido_meta = EXCLUDED.sentido_meta,
            supuestos = EXCLUDED.supuestos, es_iso = EXCLUDED.es_iso,
            observaciones_mir = EXCLUDED.observaciones_mir, activo = EXCLUDED.activo`,
         [gerenciaId, unidadId, i.codigo, i.tipo, vacioANulo(i.nivel), vacioANulo(i.numero),
@@ -178,15 +159,15 @@ async function cargar(bd: BD, opciones: { fixtures: boolean }): Promise<Resumen[
          i.sentido_meta, vacioANulo(i.medio_verificacion), vacioANulo(i.origen_mv),
          vacioANulo(i.supuestos), booleano(i.es_iso), vacioANulo(i.observaciones_mir), booleano(i.activo)])
     }
-    for (const i of indicadores.filter((x) => x.parent_codigo)) {
-      await tx.consultar(
-        `UPDATE indicadores SET parent_id = padre.id
-         FROM indicadores padre
-         WHERE indicadores.codigo = $1 AND padre.codigo = $2`, [i.codigo, i.parent_codigo])
+    // Sin parent_codigo en el CSV, el padre se quita; un padre que no existe es un error del CSV
+    for (const i of indicadores) {
+      const filas = await tx.consultar(
+        `UPDATE indicadores SET parent_id = (SELECT id FROM indicadores WHERE codigo = $2)
+          WHERE codigo = $1 AND ($2::text IS NULL OR EXISTS (SELECT 1 FROM indicadores WHERE codigo = $2))
+         RETURNING id`, [i.codigo, vacioANulo(i.parent_codigo)])
+      if (filas.length === 0) throw new Error(`${i.codigo}: el padre ${i.parent_codigo} no existe`)
     }
     resumen.push({ tabla: 'indicadores', filas: indicadores.length, procesados: indicadores.length })
-
-    const gerenciaDeIndicador = new Map(indicadores.map((i) => [i.codigo!, i.gerencia_clave!]))
 
     // 6. Periodos de reporte
     const periodos = leerCsv('periodos.csv')
@@ -209,29 +190,34 @@ async function cargar(bd: BD, opciones: { fixtures: boolean }): Promise<Resumen[
     resumen.push({ tabla: 'periodos_reporte', filas: periodos.length, procesados: periodos.length })
 
     // 7. Fixtures de reporte — solo con --con-fixtures (CA-4)
-    if (!opciones.fixtures) {
+    if (!plan.fixtures) {
       resumen.push({ tabla: 'reportes (omitido)', filas: 0, procesados: 0 })
       return resumen
     }
 
+    const idIndicador = new Map((await tx.consultar<{ codigo: string; id: string }>(
+      'SELECT codigo, id FROM indicadores')).map((i) => [i.codigo, i.id]))
     const fixtures = leerCsv('fixtures_reportes.csv')
     let procesados = 0
     for (const f of fixtures) {
+      const indicadorId = idIndicador.get(f.indicador_codigo!)
+      if (indicadorId === undefined) throw new Error(`Fixture: el indicador ${f.indicador_codigo} no existe`)
       const periodoId = idPeriodo.get(`${f.periodo_frecuencia}||${f.periodo_numero}`)
       if (periodoId === undefined) throw new Error(`${f.indicador_codigo}: periodo ${f.periodo_frecuencia} ${f.periodo_numero} desconocido`)
+      const enviadoPor = f.enviado_por_email ? idUsuarioPorEmail.get(f.enviado_por_email.toLowerCase()) : undefined
+      if (f.enviado_por_email && enviadoPor === undefined) {
+        throw new Error(`${f.indicador_codigo}: quien envió (${f.enviado_por_email}) no tiene cuenta`)
+      }
       // Un reporte cerrado no se puede editar sin autorización de reapertura, así
       // que si la fixture ya existe se deja intacta en vez de actualizarla.
       const filas = await tx.consultar<{ id: string }>(
         `INSERT INTO reportes (indicador_id, periodo_id, estado, numerador, denominador, avance,
                                enviado_por, enviado_at, cerrado_at)
-         SELECT i.id, $2, $3, $4, $5, $6, $7, $8::timestamptz, $9::timestamptz
-         FROM indicadores i WHERE i.codigo = $1
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::timestamptz, $9::timestamptz)
          ON CONFLICT (indicador_id, periodo_id) DO NOTHING
          RETURNING id`,
-        [f.indicador_codigo, periodoId, f.estado, numeroONulo(f.numerador), numeroONulo(f.denominador),
-         numeroONulo(f.avance),
-         idUsuario.get(`${gerenciaDeIndicador.get(f.indicador_codigo!)}||${f.responsable_enlace_prototipo}`) ?? null,
-         vacioANulo(f.enviado_at), vacioANulo(f.cerrado_at)])
+        [indicadorId, periodoId, f.estado, numeroONulo(f.numerador), numeroONulo(f.denominador),
+         numeroONulo(f.avance), enviadoPor ?? null, vacioANulo(f.enviado_at), vacioANulo(f.cerrado_at)])
       procesados += filas.length
     }
     resumen.push({ tabla: 'reportes', filas: fixtures.length, procesados })
@@ -254,20 +240,34 @@ export async function contar(tx: Ejecutor) {
 }
 
 // ── Punto de entrada ─────────────────────────────────────────────────────────
+// cargarConfig() lee .env (o .env.test): las variables SEMILLA_* se leen DESPUÉS, para
+// que también valgan desde ese archivo.
 const config = cargarConfig()
-const bd = crearBD(config.bd, crearLog(() => {}))
-const fixtures = process.argv.includes('--con-fixtures')
-const soloVerificar = process.argv.includes('--verificar')
-
-// CA-4: las fixtures no se cargan en producción, ni pidiéndolo
-if (fixtures && config.entorno === 'production') {
-  console.error('Las fixtures de prueba no se cargan en producción (CA-4).')
+let plan: Plan
+let cuentas: Cuentas
+try {
+  plan = planDeCarga(process.argv.slice(2), config.entorno, config.bd.url)
+  cuentas = plan.soloVerificar ? { password: '' } : {
+    password: passwordInicial(process.env),
+    admin: plan.modo === 'inicial' ? adminInicial(process.env) : undefined,
+  }
+} catch (err) {
+  if (!(err instanceof ErrorPlan)) throw err
+  console.error(`✗ ${err.message}`)
   process.exit(1)
 }
 
+const bd = crearBD(config.bd, crearLog(() => {}))
+console.log(`Destino: ${destino(config.bd.url)} · modo ${plan.modo}${plan.fixtures ? ' con fixtures' : ''}`)
+
 try {
-  if (!soloVerificar) {
-    const resumen = await cargar(bd, { fixtures })
+  const yaCargada = Number((await contar(bd)).usuarios) > 0
+  if (plan.soloVerificar) {
+    // solo reporta
+  } else if (plan.modo === 'inicial' && yaCargada) {
+    console.log('La base ya tiene usuarios: la carga inicial no se repite (no se cambió nada).')
+  } else {
+    const resumen = await cargar(bd, plan, cuentas)
     for (const r of resumen) console.log(`  ${r.tabla.padEnd(20)} ${String(r.procesados).padStart(4)} de ${r.filas}`)
     console.log()
   }

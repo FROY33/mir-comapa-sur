@@ -3,11 +3,11 @@
  * TEC-04 — Extrae el dataset de origen de los archivos del prototipo y lo deja
  * listo para el esquema de TEC-02.
  *
- * Emite CSV (revisión humana), un bundle JSON (consumo del cargador) y un
- * manifest con conteos, sha256 y verificaciones. Determinista: misma entrada,
+ * Emite CSV (revisión humana y fuente del cargador) y un manifest con conteos,
+ * sha256 y verificaciones. Determinista: misma entrada,
  * mismos bytes. Las filas se ordenan por clave natural (soporte de CA-3).
  *
- * Uso:  node backend/db/semilla/extraer.ts
+ * Uso:  npx tsx db/semilla/extraer.ts   (desde backend/)
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -28,8 +28,9 @@ const EJERCICIO = 2026
 const CORTE = '2026-09-30'
 
 // ── Carga de los archivos del prototipo ──────────────────────────────────────
-// Son scripts de navegador, no módulos: se evalúan en un scope aislado con stubs
-// de window/document/localStorage para extraer la variable global que declaran.
+// Son scripts de navegador, no módulos: se evalúan con new Function y stubs de
+// window/document/localStorage para extraer la variable global que declaran. No es un
+// entorno aislado (corre con los permisos de Node): solo se usa con archivos del repo.
 function cargar<T>(archivoRelativo: string, nombreVariable: string): T[] {
   const code = fs.readFileSync(path.join(RAIZ, archivoRelativo), 'utf8')
   const noop = () => {}
@@ -48,7 +49,8 @@ const src = {
   gerenciales: cargar<any>('mir-gerencial-data.js', 'ACTIVIDADES_GERENCIA'),
   catGerencias: cargar<any>('mir-gerencias-data.js', 'GERENCIAS_MIR'),
   catalogoMir: cargar<any>('data/mir-comapa-sur.js', 'MIR_DATA'),
-  usuarios:    cargar<any>('session.js', 'MOCK_USERS'),
+  // session.js ya no tiene usuarios (HU-R7-01 conectó el login real): se leen de la copia congelada
+  usuarios:    cargar<any>('backend/db/semilla/origen/usuarios-prototipo.js', 'MOCK_USERS'),
 }
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
@@ -343,7 +345,7 @@ const filasPeriodos = Object.keys(MESES_POR_FRECUENCIA)
         // fecha_limite: días hábiles de la frecuencia contados de lunes a viernes,
         // sin calendario de festivos (limitación conocida de S1).
         fecha_limite: iso(diaHabil(abre, dias)),
-        estado: iso(fin) <= CORTE ? 'abierto' : 'abierto', // S1 los crea abiertos; el cierre es acción del Admin
+        estado: 'abierto',                                // S1 los crea abiertos; el cierre es acción del Admin
       }
     })
   })
@@ -440,33 +442,6 @@ for (const obsoleto of ['indicadores_operativos.csv', 'indicadores_gerenciales.c
   const p = path.join(DATOS, obsoleto)
   if (fs.existsSync(p)) fs.unlinkSync(p);                 // ahora van juntos en indicadores.csv
 }
-
-const CLAVES_NATURALES = {
-  gerencias: ['clave'],
-  unidades: ['gerencia_clave', 'nombre'],
-  usuarios: ['email'],
-  indicadores: ['codigo'],
-  periodos: ['frecuencia', 'ejercicio', 'numero'],
-  catalogo_mir_193: ['codigo'],
-  fixtures_reportes: ['indicador_codigo', 'periodo_frecuencia', 'periodo_numero'],
-}
-
-const bundle = {
-  _meta: {
-    descripcion: 'Dataset de origen TEC-04, extraído del prototipo y mapeado al esquema de TEC-02.',
-    generadoPor: 'backend/db/semilla/extraer.ts',
-    ejercicio: EJERCICIO,
-    corte: CORTE,
-    clavesNaturales: CLAVES_NATURALES,
-    advertencia: 'gerencias y unidades están en confirmacion_institucional=PENDIENTE: CA-1 no se cumple hasta que Planeación Estratégica las confirme. fixtures_reportes es solo para pruebas (CA-4).',
-  },
-  gerencias: filasGerencias, unidades: filasUnidades, usuarios: filasUsuarios,
-  indicadores: filasIndicadores, periodos: filasPeriodos,
-  catalogo_mir_193: filasCatalogo193, fixtures_reportes: filasFixtures,
-}
-const textoJson = JSON.stringify(bundle, null, 2) + '\n'
-fs.writeFileSync(path.join(AQUI, 'semilla.json'), textoJson, 'utf8')
-salidas.push({ archivo: 'semilla.json', sha256: sha(textoJson) })
 
 // ── Verificación ─────────────────────────────────────────────────────────────
 const clavesGerencia = new Set(filasGerencias.map(g => g.clave))
