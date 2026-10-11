@@ -8,6 +8,7 @@ import { crearBD } from '../src/bd.js'
 import { listarEventos } from '../src/datos/bitacora.js'
 import {
   consultarBloqueo, desbloquear, MAX_INTENTOS, MENSAJE_BLOQUEO, MINUTOS_BLOQUEO, registrarFallo, reiniciar,
+  reservarIntento,
 } from '../src/datos/loginIntentos.js'
 import { crearLog } from '../src/log.js'
 import { configBD } from './apoyo.js'
@@ -63,10 +64,11 @@ describe('CA_1: bloqueo tras 5 intentos consecutivos', () => {
     assert.equal(estado.intentos, 5)
     assert.equal(estado.bloqueado, true)
 
-    const [{ minutos }] = await bd.consultar<{ minutos: number }>(
-      `SELECT extract(epoch FROM bloqueado_hasta - ultimo_intento_at) / 60 AS minutos
-         FROM login_intentos WHERE email = $1`, [email]) as [{ minutos: number }]
-    assert.equal(Number(minutos), MINUTOS_BLOQUEO)
+    // El bloqueo se fija al confirmar el quinto fallo: dura 15 minutos desde ese momento (±1 s)
+    const [{ segundos }] = await bd.consultar<{ segundos: number }>(
+      `SELECT extract(epoch FROM bloqueado_hasta - now()) AS segundos
+         FROM login_intentos WHERE email = $1`, [email]) as [{ segundos: number }]
+    assert.ok(Math.abs(Number(segundos) - MINUTOS_BLOQUEO * 60) < 1, `duración: ${segundos} s`)
     assert.equal((await consultarBloqueo(bd, email)).bloqueado, true)
   })
 
@@ -100,6 +102,38 @@ describe('CA_1: bloqueo tras 5 intentos consecutivos', () => {
     assert.equal(estado.intentos, 5)
     assert.equal(estado.bloqueado, true)
     assert.equal((await eventosBloqueo(email)).length, 1)
+  })
+})
+
+describe('reserva antes de comparar (auditoría 10/10/2026)', () => {
+  test('con 5 intentos en curso, el sexto se niega sin llegar a comparar', async () => {
+    const email = correoNuevo()
+    for (let i = 0; i < MAX_INTENTOS; i++) assert.equal((await reservarIntento(bd, email)).permitido, true)
+    const sexto = await reservarIntento(bd, email)
+    assert.equal(sexto.permitido, false)
+  })
+
+  test('si el intento en curso era la contraseña correcta, reiniciar() libera el cupo', async () => {
+    const email = correoNuevo()
+    for (let i = 0; i < MAX_INTENTOS; i++) await reservarIntento(bd, email)
+    await reiniciar(bd, email)
+    assert.equal((await reservarIntento(bd, email)).permitido, true)
+  })
+
+  test('reservas huérfanas de hace más de un minuto no dejan la cuenta trabada', async () => {
+    const email = correoNuevo()
+    for (let i = 0; i < MAX_INTENTOS; i++) await reservarIntento(bd, email)
+    await bd.consultar(
+      `UPDATE login_intentos SET ultimo_intento_at = now() - interval '2 minutes' WHERE email = $1`, [email])
+    assert.equal((await reservarIntento(bd, email)).permitido, true)
+    assert.equal((await consultarBloqueo(bd, email)).intentos, 1)
+  })
+
+  test('durante un bloqueo la reserva se niega y no mueve el contador', async () => {
+    const email = correoNuevo()
+    await fallar(email, MAX_INTENTOS)
+    assert.equal((await reservarIntento(bd, email)).permitido, false)
+    assert.equal((await consultarBloqueo(bd, email)).intentos, MAX_INTENTOS)
   })
 })
 

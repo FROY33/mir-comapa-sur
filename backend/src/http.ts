@@ -3,6 +3,7 @@
 
 import { randomUUID } from 'node:crypto'
 import type { IncomingMessage, RequestListener, ServerResponse } from 'node:http'
+import { isIP } from 'node:net'
 import { ErrorBD, ErrorSolicitud, detalleError } from './errores.js'
 import type { Log } from './log.js'
 
@@ -82,23 +83,24 @@ export function crearManejador(
  * IP del cliente para la bitácora (columna `inet`).
  *
  * Sin confiarProxy se usa la dirección del socket, que no se puede falsear. Con
- * confiarProxy se toma la primera entrada de X-Forwarded-For, que es el cliente
- * original cuando hay un proxy propio delante. Las direcciones IPv4 mapeadas en
- * IPv6 (`::ffff:10.0.0.1`) se normalizan a su forma IPv4.
+ * confiarProxy se toma la ÚLTIMA entrada de X-Forwarded-For: la agrega nuestro proxy y
+ * es la única confiable; las anteriores las puede inventar el cliente. Lo que no sea una
+ * IP válida se ignora y se usa el socket: un valor basura llegaría a la columna `inet`,
+ * fallaría el INSERT y con él se desharía el bloqueo por intentos (auditoría 10/10/2026).
+ * Las direcciones IPv4 mapeadas en IPv6 (`::ffff:10.0.0.1`) se normalizan a IPv4.
  */
 export function ipDelCliente(req: IncomingMessage, confiarProxy: boolean): string | undefined {
-  let ip = req.socket.remoteAddress
-
-  if (confiarProxy) {
-    const cabecera = req.headers['x-forwarded-for']
-    const lista = Array.isArray(cabecera) ? cabecera[0] : cabecera
-    const primera = lista?.split(',')[0]?.trim()
-    if (primera) ip = primera
+  const normalizar = (ip: string | undefined) => {
+    const limpia = ip?.trim()
+    if (!limpia || isIP(limpia) === 0) return undefined
+    return /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(limpia)?.[1] ?? limpia
   }
+  const socket = normalizar(req.socket.remoteAddress)
+  if (!confiarProxy) return socket
 
-  if (ip === undefined || ip === '') return undefined
-  const mapeada = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(ip)
-  return mapeada?.[1] ?? ip
+  const cabecera = req.headers['x-forwarded-for']
+  const lista = Array.isArray(cabecera) ? cabecera.join(',') : cabecera
+  return normalizar(lista?.split(',').at(-1)) ?? socket
 }
 
 /**

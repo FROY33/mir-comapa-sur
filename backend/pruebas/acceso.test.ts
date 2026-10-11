@@ -232,9 +232,21 @@ describe('IP del cliente', () => {
     assert.equal(pedir({ 'x-forwarded-for': '1.2.3.4' }, '10.0.0.1'), '10.0.0.1')
   })
 
-  test('confiando en el proxy se toma el primer salto de X-Forwarded-For', () => {
-    const req = { headers: { 'x-forwarded-for': '1.2.3.4, 10.0.0.1' }, socket: { remoteAddress: '10.0.0.1' } }
-    assert.equal(ipDelCliente(req as unknown as IncomingMessage, true), '1.2.3.4')
+  const detrasDelProxy = (xff: string) => ipDelCliente(
+    { headers: { 'x-forwarded-for': xff }, socket: { remoteAddress: '10.0.0.1' } } as unknown as IncomingMessage, true)
+
+  test('confiando en el proxy se toma la última entrada de X-Forwarded-For, la que agrega el proxy', () => {
+    assert.equal(detrasDelProxy('1.2.3.4'), '1.2.3.4')
+  })
+
+  test('una entrada inventada por el cliente al inicio de la cabecera no suplanta su IP', () => {
+    // nginx con $proxy_add_x_forwarded_for agrega la IP real al final de lo que mandó el cliente
+    assert.equal(detrasDelProxy('6.6.6.6, 1.2.3.4'), '1.2.3.4')
+  })
+
+  test('un valor que no es IP se ignora y se usa el socket', () => {
+    assert.equal(detrasDelProxy('no-es-ip'), '10.0.0.1')
+    assert.equal(detrasDelProxy('1.2.3.4, basura'), '10.0.0.1')
   })
 
   test('una IPv4 mapeada en IPv6 se normaliza', () => {

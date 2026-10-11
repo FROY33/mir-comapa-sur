@@ -9,7 +9,7 @@
 import bcrypt from 'bcryptjs'
 import type { BD } from './bd.js'
 import { auditarAcceso, type MotivoFallo } from './datos/acceso.js'
-import { consultarBloqueo, MENSAJE_BLOQUEO, registrarFallo, reiniciar } from './datos/loginIntentos.js'
+import { confirmarFallo, MENSAJE_BLOQUEO, reiniciar, reservarIntento } from './datos/loginIntentos.js'
 import {
   COOKIE_MAX_EDAD_SEGUNDOS, COOKIE_PERFIL, COOKIE_SESION,
   consultarYRenovar, crear, revocar, type SesionActiva,
@@ -118,7 +118,7 @@ export function login(bd: BD, produccion: boolean) {
     }
 
     const rechazar = async (motivo: MotivoFallo) => {
-      const estado = await registrarFallo(bd, email, s.ip)
+      const estado = await confirmarFallo(bd, email, s.ip)
       await auditarAcceso.loginFallido(bd, email, motivo, s.ip, estado.intentos)
       // Si este fallo fue el que bloqueó, se dice; el bloqueo no es información que haya que esconder
       return estado.bloqueado
@@ -126,10 +126,12 @@ export function login(bd: BD, produccion: boolean) {
         : { status: 401, cuerpo: { error: 'credenciales', mensaje: MENSAJE_CREDENCIALES } }
     }
 
-    // Cuenta bloqueada: no se revisa la contraseña (R7-06)
-    const bloqueo = await consultarBloqueo(bd, email)
-    if (bloqueo.bloqueado) {
-      await auditarAcceso.loginFallido(bd, email, 'cuenta_bloqueada', s.ip, bloqueo.intentos)
+    // El intento se aparta ANTES de comparar la contraseña (R7-06): si la cuenta está bloqueada,
+    // o ya hay MAX_INTENTOS en curso, no se compara. Revisar el bloqueo y registrar el fallo
+    // después dejaba que muchos intentos simultáneos compararan su contraseña.
+    const reserva = await reservarIntento(bd, email)
+    if (!reserva.permitido) {
+      await auditarAcceso.loginFallido(bd, email, 'cuenta_bloqueada', s.ip, reserva.estado.intentos)
       return { status: 423, cuerpo: { error: 'cuenta_bloqueada', mensaje: MENSAJE_BLOQUEO } }
     }
 
