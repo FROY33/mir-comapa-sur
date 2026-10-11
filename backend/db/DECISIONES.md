@@ -25,6 +25,7 @@ arquitectura de base de datos» (08/10/2026) y respuestas del equipo.
 | Capa HTTP | `node:http` sin framework; el framework se decide en el ticket de autenticación si hace falta | Equipo, 08/10/2026 (TEC-03) | Ninguno; la capa de datos (`src/bd.ts`) no depende de la capa HTTP |
 | Frecuencias | Seis: mensual, bimestral, trimestral, cuatrimestral, semestral, anual | RQM glosario; datos reales | Catálogo `frecuencias` |
 | Bloqueo por intentos (R7-06) | Se cuenta por correo, exista o no; durante el bloqueo los fallos no suman ni lo alargan; al vencer, la cuenta empieza de 1; el Admin desbloquea y queda en la bitácora | RQM HU-R7-06; implementación 09/10/2026 | `login_intentos` sin FK; eventos `cuenta_bloqueada` y `cuenta_desbloqueada` con `entidad = 'acceso'` |
+| Apertura de ciclos (R3-01) — supuesto | Abrir el periodo siguiente no cierra el anterior; sigue abierto hasta que el Admin lo cierre (R3-05). Solo se abre el periodo más reciente por frecuencia y solo si su ventana sigue corriendo. Días hábiles de lunes a viernes, sin festivos | RQM HU-R3-01 RN_2 se contradice («un ciclo abierto por frecuencia» y «el siguiente se abre aunque el anterior siga abierto»): **confirmar con el Product Owner**; pregunta 8 | Job en `src/datos/ciclos.ts`; `periodos_reporte.fecha_limite` se fija al abrir |
 
 ## Supuestos de S1 (confirmar)
 

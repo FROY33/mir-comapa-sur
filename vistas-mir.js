@@ -166,3 +166,37 @@ function getActividadesGerencia() {
   if (PENDIENTES_ENLACE) return PENDIENTES_ENLACE.filter(function (a) { return a.tipo === 'gerencial'; });
   return (typeof ACTIVIDADES_GERENCIA !== 'undefined') ? ACTIVIDADES_GERENCIA : [];
 }
+
+// ── Periodos abiertos (HU-R3-01 CA_6) ───────────────────────────────────
+// Franja al inicio del contenido con cada periodo abierto y su fecha límite. La usan los
+// dashboards de los tres roles; los datos vienen de GET /api/periodos/abiertos.
+var FRECUENCIA_VISTA = { mensual: 'Mensual', bimestral: 'Bimestral', trimestral: 'Trimestral',
+                         cuatrimestral: 'Cuatrimestral', semestral: 'Semestral', anual: 'Anual' };
+
+function pintarPeriodosAbiertos() {
+  var main = document.querySelector('main');
+  if (!main) return;
+  pedir('/api/periodos/abiertos').then(function (r) { return r.ok ? r.json() : null; }).then(function (lista) {
+    if (!lista) return;
+    var franja = document.getElementById('periodosAbiertos') || document.createElement('section');
+    franja.id = 'periodosAbiertos';
+    franja.setAttribute('aria-label', 'Periodos de captura abiertos');
+    franja.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px;padding:10px 14px;' +
+      'border-radius:10px;background:var(--color-bg,#fff);border:1px solid var(--color-neutral-100,#E5E7EB);font-size:12px';
+    var titulo = document.createElement('strong');
+    titulo.textContent = lista.length ? 'Periodos abiertos:' : 'No hay periodos de captura abiertos.';
+    franja.textContent = '';
+    franja.appendChild(titulo);
+    lista.forEach(function (p) {
+      var dias = diasRestantes(p.fecha_limite);
+      var chip = document.createElement('span');
+      chip.style.cssText = 'padding:3px 10px;border-radius:999px;background:var(--color-neutral-50,#F9FAFB);' +
+        'color:' + (dias <= 3 ? 'var(--color-danger,#DC2626)' : 'var(--color-text-primary,#111827)');
+      chip.textContent = (FRECUENCIA_VISTA[p.frecuencia] || p.frecuencia) + ' ' + p.etiqueta +
+        ' · fecha límite ' + formatFecha(p.fecha_limite) +
+        (p.anteriores_abiertos ? ' (+' + p.anteriores_abiertos + ' anterior' + (p.anteriores_abiertos === 1 ? '' : 'es') + ' sin cerrar)' : '');
+      franja.appendChild(chip);
+    });
+    if (!franja.parentNode) main.insertBefore(franja, main.firstChild);
+  }, function () {});
+}

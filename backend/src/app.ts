@@ -2,6 +2,7 @@
 
 import { login, logout, sesion } from './auth.js'
 import { acceso, crearProtegida } from './autorizacion.js'
+import * as ciclos from './ciclos.js'
 import type { BD } from './bd.js'
 import { listarFrecuencias } from './datos/frecuencias.js'
 import { crearManejador } from './http.js'
@@ -38,6 +39,9 @@ export function crearApp(
     'POST /api/indicadores/buscar': protegida(TODOS, indicadores.buscar(bd)),
     'GET /api/indicadores/:id': protegida(TODOS, indicadores.detalle(bd)),
 
+    // Periodos abiertos y su fecha límite, para los tres dashboards (HU-R3-01 CA_6)
+    'GET /api/periodos/abiertos': protegida(TODOS, ciclos.abiertos(bd)),
+
     // Reportes del periodo abierto de la gerencia, con los pendientes del Enlace (HU-R1-01)
     'GET /api/pendientes': protegida(TODOS, pendientes.listar(bd)),
 
@@ -45,6 +49,10 @@ export function crearApp(
     'GET /api/admin/configuracion': protegida(['admin'], async () => ({
       status: 200, cuerpo: { frecuencias: await listarFrecuencias(bd) },
     })),
+    // Ventanas de captura y apertura de ciclos (HU-R3-01)
+    'GET /api/admin/ventanas': protegida(['admin'], ciclos.ventanas(bd)),
+    'PUT /api/admin/ventanas': protegida(['admin'], ciclos.guardarVentanas(bd)),
+    'POST /api/admin/ciclos/abrir': protegida(['admin'], ciclos.abrirAhora(bd)),
     // Gestión de usuarios (HU-R7-07)
     'GET /api/admin/catalogo': protegida(['admin'], usuarios.catalogo(bd)),
     'GET /api/admin/usuarios': protegida(['admin'], usuarios.listar(bd)),

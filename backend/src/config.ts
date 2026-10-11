@@ -22,6 +22,9 @@ export interface Config {
   // X-Forwarded-For. Apagado por defecto a propósito: expuesto directo, cualquiera
   // podría mandar esa cabecera y falsear su IP en la bitácora (TEC-05 CA-1).
   confiarProxy: boolean
+  // Apertura automática de ciclos (HU-R3-01): al arrancar y cada hora. Apagada en pruebas, que
+  // comparten base y no deben ver reportes generados por un servidor que otra prueba levantó.
+  ciclosAutomaticos: boolean
 }
 
 const ENTORNOS: Entorno[] = ['development', 'test', 'production']
@@ -47,6 +50,7 @@ export function cargarConfig(env: NodeJS.ProcessEnv = process.env): Config {
     entorno,
     puerto: entero(env, 'PORT', 3000),
     confiarProxy: env.CONFIAR_PROXY === 'true',
+    ciclosAutomaticos: entorno !== 'test' && env.CICLOS_AUTOMATICOS !== 'false',
     bd: {
       url,
       maxConexiones: entero(env, 'BD_MAX_CONEXIONES', 10),
