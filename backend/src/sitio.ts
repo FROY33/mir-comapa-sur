@@ -1,16 +1,15 @@
 #!/usr/bin/env node
-// Servidor de desarrollo: sirve el prototipo estático de la raíz del repo y reenvía
-// /api/* al backend, de modo que ambos queden en el mismo origen.
+// Servidor del sitio: sirve las páginas de la raíz del repo y reenvía /api/* al backend, de modo
+// que ambos queden en el mismo origen (la cookie de sesión es SameSite=Strict, HU-R7-01 CA-3).
+// Antes de servir una página protegida le pregunta al backend si la sesión puede abrirla
+// (HU-R7-03) y pone las cabeceras de seguridad a todo lo que sirve.
 //
-// Hace falta porque la cookie de sesión es SameSite=Strict (HU-R7-01 CA-3): si el
-// estático y la API estuvieran en orígenes distintos, el navegador no mandaría la
-// cookie y no se podría iniciar sesión. En producción esto lo resuelve la plataforma
-// (Netlify redirigiendo /api/*, o nginx); esto es su equivalente local.
+// Es el mismo en desarrollo y en producción:
+//   desarrollo   npm run dev (API en :3000) y npm run dev:sitio (sitio en :4321)
+//   producción   node dist/sitio.js detrás de Cloudflare Tunnel (ver despliegue/README.md)
 //
-//   npm run dev          en una terminal: el backend en :3000
-//   npm run dev:sitio    en otra: el prototipo en :4321
-//
-// Variables: PUERTO_SITIO (4321), BACKEND_URL (http://127.0.0.1:3000)
+// Variables: PUERTO_SITIO (4321), BACKEND_URL (http://127.0.0.1:3000), SITIO_RAIZ (la raíz del
+// repo), NODE_ENV. Escucha solo en 127.0.0.1: desde fuera se llega únicamente por el túnel.
 
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
@@ -18,7 +17,8 @@ import { createServer, request as pedirAlBackend, type IncomingMessage, type Ser
 import { extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const RAIZ = resolve(fileURLToPath(import.meta.url), '../../..')   // la raíz del repo
+const RAIZ = resolve(process.env.SITIO_RAIZ ?? resolve(fileURLToPath(import.meta.url), '../../..'))   // la raíz del repo
+const PRODUCCION = process.env.NODE_ENV === 'production'
 const PUERTO = Number(process.env.PUERTO_SITIO ?? 4321)
 const BACKEND = new URL(process.env.BACKEND_URL ?? 'http://127.0.0.1:3000')
 // La raíz sirve index.html, que decide a dónde va cada quien según su sesión
@@ -42,8 +42,6 @@ const TIPOS: Record<string, string> = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
-  '.csv': 'text/csv; charset=utf-8',
-  '.md': 'text/markdown; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
@@ -91,6 +89,8 @@ export const PAGINAS_CSP_ESTRICTA = new Set(['index.html', 'login.html', 'cambia
 const CSP_ESTRICTA = CSP.replace("script-src 'self' 'unsafe-inline'", "script-src 'self'")
 
 const CABECERAS_SEGURIDAD: Record<string, string> = {
+  // Solo en producción, donde Cloudflare sirve HTTPS: el navegador no vuelve a intentar HTTP
+  ...(PRODUCCION ? { 'strict-transport-security': 'max-age=31536000; includeSubDomains' } : {}),
   'content-security-policy': CSP,
   'x-content-type-options': 'nosniff',
   'x-frame-options': 'DENY',
@@ -120,8 +120,9 @@ function reenviar(req: IncomingMessage, res: ServerResponse): void {
     res.writeHead(502, { 'content-type': 'application/json; charset=utf-8' })
     res.end(JSON.stringify({
       error: 'backend_inalcanzable',
-      mensaje: `No se pudo hablar con el backend en ${BACKEND.origin}. ¿Está corriendo \`npm run dev\`?`,
-      causa: err.message,
+      mensaje: PRODUCCION ? 'El servicio no está disponible; intenta de nuevo en unos minutos'
+        : `No se pudo hablar con el backend en ${BACKEND.origin}. ¿Está corriendo \`npm run dev\`?`,
+      ...(PRODUCCION ? {} : { causa: err.message }),
     }))
   })
 
@@ -146,7 +147,8 @@ async function archivoDe(ruta: string): Promise<string | null> {
   try {
     const info = await stat(candidato)
     if (info.isDirectory()) return archivoDe(join(decodificada, 'index.html'))
-    return info.isFile() ? candidato : null
+    // Solo los tipos del sitio: un .md interno, un .sql o un .sh de la raíz no se sirven
+    return info.isFile() && TIPOS[extname(candidato).toLowerCase()] ? candidato : null
   } catch {
     return null
   }
@@ -230,7 +232,7 @@ const servidor = createServer((req, res) => {
       }
     }
     res.writeHead(200, {
-      'content-type': TIPOS[extname(archivo).toLowerCase()] ?? 'application/octet-stream',
+      'content-type': TIPOS[extname(archivo).toLowerCase()]!,
       // El prototipo se edita a mano todo el tiempo: que el navegador no lo cachee
       'cache-control': 'no-store',
     })

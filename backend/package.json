@@ -8,9 +8,10 @@
   },
   "scripts": {
     "dev": "tsx watch src/servidor.ts",
-    "dev:sitio": "tsx dev/servir.ts",
+    "dev:sitio": "tsx src/sitio.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/servidor.js",
+    "start:sitio": "node dist/sitio.js",
     "tipos": "tsc --noEmit",
     "bd:migrar": "db/migrar.sh up",
     "bd:estado": "db/migrar.sh status",

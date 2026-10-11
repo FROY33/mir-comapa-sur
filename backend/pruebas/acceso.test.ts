@@ -244,6 +244,13 @@ describe('IP del cliente', () => {
     assert.equal(detrasDelProxy('6.6.6.6, 1.2.3.4'), '1.2.3.4')
   })
 
+  test('detrás de Cloudflare Tunnel se usa CF-Connecting-IP, aunque el cliente mande otro X-Forwarded-For', () => {
+    const req = { headers: { 'cf-connecting-ip': '200.1.2.3', 'x-forwarded-for': '6.6.6.6, 200.1.2.3' }, socket: { remoteAddress: '127.0.0.1' } }
+    assert.equal(ipDelCliente(req as unknown as IncomingMessage, true), '200.1.2.3')
+    // Sin confiar en el proxy, la cabecera de Cloudflare tampoco se lee
+    assert.equal(ipDelCliente(req as unknown as IncomingMessage, false), '127.0.0.1')
+  })
+
   test('un valor que no es IP se ignora y se usa el socket', () => {
     assert.equal(detrasDelProxy('no-es-ip'), '10.0.0.1')
     assert.equal(detrasDelProxy('1.2.3.4, basura'), '10.0.0.1')

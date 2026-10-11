@@ -1,4 +1,4 @@
-// Cabeceras de seguridad del servidor de desarrollo (dev/servir.ts): cada página, script o
+// Cabeceras de seguridad del servidor de desarrollo (src/sitio.ts): cada página, script o
 // error que entrega lleva nosniff, la CSP, la protección contra iframes y el resto. Se arranca
 // el servidor real como proceso aparte, con un backend inalcanzable: no hace falta para servir.
 
@@ -23,20 +23,20 @@ let detener = () => {}
 
 before(async () => {
   const puerto = await puertoLibre()
-  const proceso = spawn(process.execPath, ['--import', 'tsx', 'dev/servir.ts'], {
+  const proceso = spawn(process.execPath, ['--import', 'tsx', 'src/sitio.ts'], {
     env: { ...process.env, PUERTO_SITIO: String(puerto), BACKEND_URL: 'http://127.0.0.1:9' },
     stdio: ['ignore', 'pipe', 'inherit'],
   })
   detener = () => { proceso.kill('SIGTERM') }
   await new Promise<void>((ok, falla) => {
     proceso.stdout.on('data', (t: Buffer) => { if (String(t).includes('Prototipo en')) ok() })
-    proceso.once('exit', (c) => falla(new Error(`dev/servir.ts terminó antes de tiempo (código ${c})`)))
+    proceso.once('exit', (c) => falla(new Error(`src/sitio.ts terminó antes de tiempo (código ${c})`)))
   })
   base = `http://127.0.0.1:${puerto}`
 })
 after(() => detener())
 
-describe('dev/servir.ts: cabeceras de seguridad', () => {
+describe('src/sitio.ts: cabeceras de seguridad', () => {
   for (const ruta of ['/login.html', '/session.js', '/shared.css', '/dashboard-admin.html', '/no-existe.html']) {
     test(`${ruta} las lleva`, async () => {
       const r = await fetch(base + ruta, { redirect: 'manual' })
@@ -113,5 +113,42 @@ describe('CSP estricta en las páginas que reciben contraseñas', () => {
     const r = await fetch(`${base}/dashboard-admin.html`, { redirect: 'manual' })
     await r.arrayBuffer()
     assert.match(r.headers.get('content-security-policy') ?? '', /script-src 'self' 'unsafe-inline'/)
+  })
+})
+
+describe('src/sitio.ts en producción (NODE_ENV=production)', () => {
+  let url = ''
+  let parar = () => {}
+  before(async () => {
+    const puerto = await puertoLibre()
+    const proceso = spawn(process.execPath, ['--import', 'tsx', 'src/sitio.ts'], {
+      env: { ...process.env, NODE_ENV: 'production', PUERTO_SITIO: String(puerto), BACKEND_URL: 'http://127.0.0.1:9' },
+      stdio: ['ignore', 'pipe', 'inherit'],
+    })
+    parar = () => { proceso.kill('SIGTERM') }
+    await new Promise<void>((ok) => proceso.stdout.on('data', (t: Buffer) => { if (String(t).includes('Prototipo en')) ok() }))
+    url = `http://127.0.0.1:${puerto}`
+  })
+  after(() => parar())
+
+  test('manda HSTS (Cloudflare sirve HTTPS)', async () => {
+    const r = await fetch(`${url}/login.html`)
+    await r.arrayBuffer()
+    assert.match(r.headers.get('strict-transport-security') ?? '', /max-age=31536000/)
+  })
+
+  test('no sirve los documentos internos ni archivos fuera de los tipos del sitio', async () => {
+    for (const ruta of ['/proyecto.md', '/roles-usuarios.md', '/backend/README.md', '/.gitignore']) {
+      const r = await fetch(url + ruta)
+      await r.arrayBuffer()
+      assert.equal(r.status, 404, ruta)
+    }
+  })
+
+  test('si el backend no responde, no revela su dirección ni el error', async () => {
+    const r = await fetch(`${url}/api/salud`)
+    const cuerpo = await r.text()
+    assert.equal(r.status, 502)
+    assert.ok(!cuerpo.includes('127.0.0.1') && !cuerpo.includes('ECONNREFUSED'), cuerpo)
   })
 })

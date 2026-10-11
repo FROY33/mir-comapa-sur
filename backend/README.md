@@ -32,7 +32,8 @@ curl localhost:3000/api/salud
 | `BD_MAX_CONEXIONES` | no | `10` | Tamaño del pool |
 | `SEMILLA_PASSWORD` | para sembrar | — | Contraseña inicial de las cuentas que crea la carga, 12 caracteres o más. Sin valor por defecto (ver `db/semilla/`) |
 | `SEMILLA_ADMIN_EMAIL`, `SEMILLA_ADMIN_NOMBRE` | para sembrar producción | — | La cuenta de Administrador de la carga inicial. `SEMILLA_ADMIN_GERENCIA` (opcional, `PLA`) |
-| `CONFIAR_PROXY` | no | `false` | `true` solo si el backend está detrás de un proxy propio: entonces la IP de la bitácora se toma de `X-Forwarded-For`. Expuesto directo debe quedar en `false`, o cualquiera podría falsear su IP |
+| `CONFIAR_PROXY` | no | `false` | `true` detrás de Cloudflare Tunnel o de un proxy propio: la IP de la bitácora y del límite de intentos se toma de `CF-Connecting-IP` (o de la última entrada de `X-Forwarded-For`). Expuesto directo debe quedar en `false`, o cualquiera podría falsear su IP |
+| `HOST` | no | `127.0.0.1` | Interfaz donde escucha la API. En producción se deja así: solo el sitio llega a ella |
 | `BD_TIMEOUT_CONEXION_MS` | no | `5000` | Cuánto esperar una conexión antes de responder 503 |
 | `BD_TIMEOUT_CONSULTA_MS` | no | `15000` | Límite por consulta (`statement_timeout`) |
 
@@ -47,7 +48,7 @@ Si una variable ya existe en el entorno, gana sobre el archivo. `.env` y `.env.t
 ## Probar el prototipo contra el backend
 
 La cookie de sesión es `SameSite=Strict` (HU-R7-01 CA-3), así que el navegador solo la manda si
-el sitio y la API comparten origen. `dev/servir.ts` sirve el prototipo de la raíz del repo y
+el sitio y la API comparten origen. `src/sitio.ts` sirve el prototipo de la raíz del repo y
 reenvía `/api/*` al backend para conseguirlo en local. En producción lo resuelve la plataforma
 (Netlify redirigiendo `/api/*`, o nginx).
 
@@ -66,9 +67,13 @@ el log lo explica sin mostrar valores.
 
 ## Producción
 
+Guía completa para servidor propio con Cloudflare Tunnel y systemd: [`despliegue/README.md`](despliegue/README.md)
+(servicios, túnel, variables, respaldos, actualización y checklist de seguridad).
+
 ```bash
 npm ci && npm run build
-NODE_ENV=production DATABASE_URL=... PORT=... npm start
+NODE_ENV=production DATABASE_URL=... PORT=... npm start        # API, en 127.0.0.1 (HOST)
+NODE_ENV=production npm run start:sitio                            # sitio: páginas + proxy a la API
 ```
 
 **El usuario de base de la app no debe ser dueño de las tablas:** el dueño puede desactivar triggers, vaciar
@@ -88,11 +93,11 @@ nuevo lo agrega ahí, con su prueba.
 ### Cabeceras de seguridad del sitio
 
 El servidor web que entrega las páginas, scripts y estilos (nginx o la plataforma) debe mandar
-en cada respuesta las mismas cabeceras que `dev/servir.ts` (`CABECERAS_SEGURIDAD`):
+en cada respuesta las mismas cabeceras que `src/sitio.ts` (`CABECERAS_SEGURIDAD`):
 
 | Cabecera | Valor |
 |---|---|
-| `Content-Security-Policy` | la de `CSP` en `dev/servir.ts`: todo de `'self'` (scripts, conexiones, imágenes, marcos), `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`; el único externo es Google Fonts en `style-src` y `font-src` |
+| `Content-Security-Policy` | la de `CSP` en `src/sitio.ts`: todo de `'self'` (scripts, conexiones, imágenes, marcos), `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`; el único externo es Google Fonts en `style-src` y `font-src` |
 | `X-Content-Type-Options` | `nosniff` |
 | `X-Frame-Options` | `DENY` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
@@ -100,7 +105,7 @@ en cada respuesta las mismas cabeceras que `dev/servir.ts` (`CABECERAS_SEGURIDAD
 
 **CSP estricta en las páginas de contraseña.** `index.html`, `login.html` y `cambiar-password.html` no tienen
 scripts ni manejadores en línea y se sirven con `script-src 'self'`, sin `'unsafe-inline'` (`PAGINAS_CSP_ESTRICTA`
-en `dev/servir.ts`). Ahí un XSS no puede ejecutar código aunque lograra inyectar HTML. Una página entra a esa lista
+en `src/sitio.ts`). Ahí un XSS no puede ejecutar código aunque lograra inyectar HTML. Una página entra a esa lista
 cuando ya no tiene `<script>` en línea ni atributos `on*=`; la prueba lo verifica.
 
 Límite conocido: en las demás páginas la CSP lleva `'unsafe-inline'` en `script-src` porque tienen scripts y
@@ -148,7 +153,7 @@ petición. El Administrador conserva el acceso global.
 ```
 
 `GET /api/auth/acceso?pagina=x.html` dice si la sesión puede abrir una página (tabla de
-`src/rutas.ts`, lista blanca). La consultan la guardia de `session.js` y `dev/servir.ts`; en
+`src/rutas.ts`, lista blanca). La consultan la guardia de `session.js` y `src/sitio.ts`; en
 producción, el servidor web debe hacer lo mismo antes de servir una página protegida.
 
 ## Límite por IP y cabeceras de seguridad

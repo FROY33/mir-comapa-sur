@@ -23,10 +23,10 @@ const bd = crearBD(config.bd, log)
 const servidor = createServer(crearApp(bd, log, { confiarProxy: config.confiarProxy, produccion: config.entorno === 'production' }))
 const sistema = { entidad: 'sistema', entidadId: 'backend' }
 
-servidor.listen(config.puerto, () => {
+servidor.listen(config.puerto, config.host, () => {
   const direccion = servidor.address()
   const puerto = typeof direccion === 'object' && direccion ? direccion.port : config.puerto
-  log.info('Backend escuchando', { puerto, entorno: config.entorno })
+  log.info('Backend escuchando', { host: config.host, puerto, entorno: config.entorno })
 })
 
 // Si la base no está, el backend arranca igual: responde 503 hasta que vuelva y se recupera solo

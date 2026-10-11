@@ -1,0 +1,8 @@
+# /etc/cloudflared/config.yml — el túnel solo expone el sitio; la API no tiene ruta propia.
+tunnel: <ID-DEL-TÚNEL>
+credentials-file: /etc/cloudflared/<ID-DEL-TÚNEL>.json
+
+ingress:
+  - hostname: mir.ejemplo.gob.mx
+    service: http://127.0.0.1:4321
+  - service: http_status:404

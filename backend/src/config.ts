@@ -17,6 +17,9 @@ export interface ConfigBD {
 export interface Config {
   entorno: Entorno
   puerto: number
+  // Interfaz donde escucha. 127.0.0.1 por defecto: en producción solo el sitio (y por él, el
+  // túnel de Cloudflare) llega a la API; nadie de la red puede hablarle directo ni falsear su IP.
+  host: string
   bd: ConfigBD
   // Si el backend está detrás de un proxy o balanceador, la IP del cliente viene en
   // X-Forwarded-For. Apagado por defecto a propósito: expuesto directo, cualquiera
@@ -49,6 +52,7 @@ export function cargarConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return {
     entorno,
     puerto: entero(env, 'PORT', 3000),
+    host: env.HOST || '127.0.0.1',
     confiarProxy: env.CONFIAR_PROXY === 'true',
     ciclosAutomaticos: entorno !== 'test' && env.CICLOS_AUTOMATICOS !== 'false',
     bd: {

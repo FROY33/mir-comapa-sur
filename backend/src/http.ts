@@ -127,9 +127,11 @@ function crearBuscador(rutas: Record<string, Manejador>) {
 /**
  * IP del cliente para la bitácora (columna `inet`).
  *
- * Sin confiarProxy se usa la dirección del socket, que no se puede falsear. Con
- * confiarProxy se toma la ÚLTIMA entrada de X-Forwarded-For: la agrega nuestro proxy y
- * es la única confiable; las anteriores las puede inventar el cliente. Lo que no sea una
+ * Sin confiarProxy se usa la dirección del socket, que no se puede falsear. Con confiarProxy
+ * (producción, detrás de Cloudflare Tunnel) se toma CF-Connecting-IP, que Cloudflare pone y
+ * sobrescribe en su borde; si no viene, la ÚLTIMA entrada de X-Forwarded-For, que agrega el
+ * proxy (las anteriores las puede inventar el cliente). Solo es confiable si nadie puede llegar
+ * al backend sin pasar por el proxy: por eso escucha en 127.0.0.1. Lo que no sea una
  * IP válida se ignora y se usa el socket: un valor basura llegaría a la columna `inet`,
  * fallaría el INSERT y con él se desharía el bloqueo por intentos (auditoría 10/10/2026).
  * Las direcciones IPv4 mapeadas en IPv6 (`::ffff:10.0.0.1`) se normalizan a IPv4.
@@ -143,6 +145,9 @@ export function ipDelCliente(req: IncomingMessage, confiarProxy: boolean): strin
   const socket = normalizar(req.socket.remoteAddress)
   if (!confiarProxy) return socket
 
+  const cloudflare = req.headers['cf-connecting-ip']
+  const deCloudflare = normalizar(Array.isArray(cloudflare) ? cloudflare[0] : cloudflare)
+  if (deCloudflare) return deCloudflare
   const cabecera = req.headers['x-forwarded-for']
   const lista = Array.isArray(cabecera) ? cabecera.join(',') : cabecera
   return normalizar(lista?.split(',').at(-1)) ?? socket
