@@ -412,15 +412,15 @@ function pintarDashboardEnlace() {
     var d   = diasRestantes(a.fechaLimite);
     var cls = d <= 3 ? 'urgente' : d <= 14 ? 'proximo' : 'normal';   // CA_2: rojo a 3 días o vencido
     var lbl = d < 0 ? 'Vencida' : d === 0 ? 'Hoy' : 'Vence en ' + d + ' día' + (d === 1 ? '' : 's');
-    return '<div class="ind-item" onclick="window.location.href=\'detalle-actividad.html?id=' + a.id + '\'">' +
+    return '<div class="ind-item" data-url="detalle-actividad.html?id=' + encodeURIComponent(a.id) + '" onclick="window.location.href=this.dataset.url">' +
       '<div class="ind-dot ' + cls + '"></div>' +
       '<div class="ind-info">' +
-        '<p class="ind-id">' + a.id + '</p>' +
-        '<p class="ind-name">' + isoBadge(a) + a.nombreIndicador + '</p>' +
+        '<p class="ind-id">' + escaparHTML(a.id) + '</p>' +
+        '<p class="ind-name">' + isoBadge(a) + escaparHTML(a.nombreIndicador) + '</p>' +
       '</div>' +
       '<div style="text-align:right;flex-shrink:0;">' +
         '<p class="ind-date ' + cls + '">' + lbl + '</p>' +
-        '<p class="ind-fecha-lim">' + formatFecha(a.fechaLimite) + ' fecha límite</p>' +
+        '<p class="ind-fecha-lim">' + escaparHTML(formatFecha(a.fechaLimite)) + ' fecha límite</p>' +
       '</div>' +
     '</div>';
   }).join('') : '<p style="font-size:12px;color:var(--color-text-muted);padding:12px 0;">Sin indicadores próximos a vencer.</p>';
@@ -486,7 +486,7 @@ cargarPendientesEnlace().then(function (d) { if (d) pintarDashboardEnlace(); });
     el.className = 'cp-banner';
     el.style.cssText = 'background:'+banner.bg+';border-color:'+banner.border+';';
     el.innerHTML = '<div class="cp-banner-dot" style="background:'+banner.dot+(est==='captura'?';animation:cp-pulse-g 2s infinite':'')+';"></div>'
-      +'<div class="cp-banner-info"><div class="cp-banner-title">'+banner.title+'</div><div class="cp-banner-detail">'+banner.detail+'</div></div>'
+      +'<div class="cp-banner-info"><div class="cp-banner-title">'+escaparHTML(banner.title)+'</div><div class="cp-banner-detail">'+escaparHTML(banner.detail)+'</div></div>'
       +(banner.btn?'<button class="cp-banner-btn" onclick="location.href=\''+banner.href+'\'">'+banner.btn+'</button>':'');
     var ks = document.createElement('style');
     ks.textContent = '@keyframes cp-pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4);}50%{box-shadow:0 0 0 5px rgba(16,185,129,0);}}';

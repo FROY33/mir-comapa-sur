@@ -1266,7 +1266,7 @@ function renderTabla(){
     var gerPills=u.gerencias.length
       ? u.gerencias.map(function(g){
           var gc=GER_COLORS[g]||{bg:'#F3F4F6',color:'#374151'};
-          return '<span class="ger-pill" style="background:'+gc.bg+';color:'+gc.color+'">'+g.replace('Gerencia ','')+'</span>';
+          return '<span class="ger-pill" style="background:'+gc.bg+';color:'+gc.color+'">'+escaparHTML(g.replace('Gerencia ',''))+'</span>';
         }).join('')
       : '<span style="font-size:11px;color:var(--color-text-secondary)">Todas las gerencias</span>';
     var estadoCls=u.activo?'activo':'inactivo';
@@ -1274,16 +1274,16 @@ function renderTabla(){
     var toggleLabel=u.activo?'Desactivar':'Activar';
     return '<tr>'+
       '<td><div class="user-cell">'+
-        '<div class="user-avatar" style="background:'+u.color+'">'+u.iniciales+'</div>'+
-        '<div><p class="user-name">'+u.nombre+'</p><p class="user-email">'+u.email+'</p></div>'+
+        '<div class="user-avatar" style="background:'+escaparHTML(u.color)+'">'+escaparHTML(u.iniciales)+'</div>'+
+        '<div><p class="user-name">'+escaparHTML(u.nombre)+'</p><p class="user-email">'+escaparHTML(u.email)+'</p></div>'+
       '</div></td>'+
-      '<td><span class="rol-badge '+rol.cls+'">'+rol.label+'</span></td>'+
+      '<td><span class="rol-badge '+escaparHTML(rol.cls)+'">'+escaparHTML(rol.label)+'</span></td>'+
       '<td><div class="ger-pills">'+gerPills+'</div></td>'+
-      '<td style="font-size:12px;color:var(--color-text-secondary);white-space:nowrap">'+u.ultimoAcceso+'</td>'+
+      '<td style="font-size:12px;color:var(--color-text-secondary);white-space:nowrap">'+escaparHTML(u.ultimoAcceso)+'</td>'+
       '<td><span class="estado-dot '+estadoCls+'">'+estadoLbl+'</span></td>'+
       '<td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end">'+
-        '<button class="btn-row" onclick="openEditarUsuario(\''+u.id+'\')">'+editSvg+' Editar</button>'+
-        '<button class="btn-row danger" onclick="confirmarToggle(\''+u.id+'\')">'+toggleLabel+'</button>'+
+        '<button class="btn-row" data-id="'+escaparHTML(u.id)+'" onclick="openEditarUsuario(this.dataset.id)">'+editSvg+' Editar</button>'+
+        '<button class="btn-row danger" data-id="'+escaparHTML(u.id)+'" onclick="confirmarToggle(this.dataset.id)">'+toggleLabel+'</button>'+
       '</div></td>'+
     '</tr>';
   }).join('');
@@ -1354,7 +1354,7 @@ function onGerenciaChange() {
   }
   var units = GER_UNITS[ger] || [];
   sel.innerHTML = '<option value="">Selecciona la unidad…</option>' +
-    units.map(function(u) { return '<option value="'+u+'">'+u+'</option>'; }).join('');
+    units.map(function(u) { return '<option value="'+escaparHTML(u)+'">'+escaparHTML(u)+'</option>'; }).join('');
   grp.style.display = '';
   // Auto-sync gerencias checkboxes
   document.querySelectorAll('#gerChecks input').forEach(function(cb) {
@@ -1466,7 +1466,7 @@ function openEditarUsuario(id){
   document.getElementById('swActivo').classList.toggle('on', u.activo);
   document.getElementById('btnGuardarUsr').innerHTML='<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg> Guardar cambios';
   document.getElementById('modalFooterLeft').innerHTML=
-    '<button class="btn btn-ghost" style="color:var(--color-danger)" onclick="confirmarToggle(\''+id+'\');closeModal()">'+
+    '<button class="btn btn-ghost" style="color:var(--color-danger)" data-id="'+escaparHTML(id)+'" onclick="confirmarToggle(this.dataset.id);closeModal()">'+
     (u.activo?'Desactivar cuenta':'Activar cuenta')+'</button>';
   // set gerencia from user's primary gerencia, then populate units
   var primaryGer = (u.gerencias && u.gerencias.length) ? u.gerencias[0] : '';
@@ -1658,7 +1658,7 @@ var TIPO_MV_CFG = {
 
 function tipoBadgeMV(tipo) {
   var c = TIPO_MV_CFG[tipo] || { label: tipo, bg:'#F3F4F6', color:'#6B7280' };
-  return '<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:'+c.bg+';color:'+c.color+'">'+c.label+'</span>';
+  return '<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:'+c.bg+';color:'+c.color+'">'+escaparHTML(c.label)+'</span>';
 }
 
 function renderStatsMedios() {
@@ -1714,19 +1714,19 @@ function renderMedios() {
   empty.style.display='none';
   tbody.innerHTML = list.map(function(m) {
     return '<tr>'+
-      '<td><div style="font-size:10px;font-weight:700;color:var(--color-primary);font-family:monospace;margin-bottom:2px">'+m.id+'</div>'+
-        '<div style="font-size:13px;font-weight:600;color:var(--color-text-primary)">'+m.nombre+'</div>'+
-        (m.descripcion ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px;max-width:380px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">'+m.descripcion+'</div>' : '')+
-        (m.archivo ? '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:10px;font-weight:600;color:var(--color-success-dark);background:var(--color-success-tint);border:1px solid #BBF7D0;border-radius:6px;padding:2px 7px"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="10" height="10"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>'+m.archivo.nombre+'</div>' : '')+
+      '<td><div style="font-size:10px;font-weight:700;color:var(--color-primary);font-family:monospace;margin-bottom:2px">'+escaparHTML(m.id)+'</div>'+
+        '<div style="font-size:13px;font-weight:600;color:var(--color-text-primary)">'+escaparHTML(m.nombre)+'</div>'+
+        (m.descripcion ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px;max-width:380px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">'+escaparHTML(m.descripcion)+'</div>' : '')+
+        (m.archivo ? '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:10px;font-weight:600;color:var(--color-success-dark);background:var(--color-success-tint);border:1px solid #BBF7D0;border-radius:6px;padding:2px 7px"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="10" height="10"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"/></svg>'+escaparHTML(m.archivo.nombre)+'</div>' : '')+
       '</td>'+
       '<td>'+tipoBadgeMV(m.tipo)+'</td>'+
-      '<td><div style="font-size:12px;font-weight:600;color:var(--color-text-primary)">'+m.area+'</div>'+
-        (m.unidad ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:1px">'+m.unidad+'</div>' : '')+
+      '<td><div style="font-size:12px;font-weight:600;color:var(--color-text-primary)">'+escaparHTML(m.area)+'</div>'+
+        (m.unidad ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:1px">'+escaparHTML(m.unidad)+'</div>' : '')+
       '</td>'+
-      '<td><span style="font-size:11px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;padding:2px 9px;color:var(--color-text-secondary)">'+m.formato+'</span></td>'+
+      '<td><span style="font-size:11px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px;padding:2px 9px;color:var(--color-text-secondary)">'+escaparHTML(m.formato)+'</span></td>'+
       '<td style="text-align:right"><div style="display:inline-flex;gap:6px">'+
-        '<button onclick="openEditarMedio(\''+m.id+'\')" style="background:var(--color-surface);color:var(--color-text-secondary);border:1px solid var(--color-border);padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Editar</button>'+
-        '<button onclick="confirmarEliminarMedio(\''+m.id+'\')" style="background:var(--color-danger-tint);color:var(--color-danger);border:none;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>Eliminar</button>'+
+        '<button data-id="'+escaparHTML(m.id)+'" onclick="openEditarMedio(this.dataset.id)" style="background:var(--color-surface);color:var(--color-text-secondary);border:1px solid var(--color-border);padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z"/></svg>Editar</button>'+
+        '<button data-id="'+escaparHTML(m.id)+'" onclick="confirmarEliminarMedio(this.dataset.id)" style="background:var(--color-danger-tint);color:var(--color-danger);border:none;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>Eliminar</button>'+
       '</div></td>'+
     '</tr>';
   }).join('');
@@ -1781,7 +1781,7 @@ function renderMediosGrid() {
       '<div class="mvf-ger-hd" onclick="this.closest(\'.mvf-ger\').classList.toggle(\'collapsed\')">'+
         '<span class="mvf-ger-bar" style="background:'+color+'"></span>'+
         gerFolderSvg+
-        '<span class="mvf-ger-name">'+ger+'</span>'+
+        '<span class="mvf-ger-name">'+escaparHTML(ger)+'</span>'+
         '<span class="mvf-count-badge">'+total+' medio'+(total!==1?'s':'')+'</span>'+
         chevron+
       '</div>'+
@@ -1792,7 +1792,7 @@ function renderMediosGrid() {
       html += '<div class="mvf-unit">'+
         '<div class="mvf-unit-hd" onclick="this.closest(\'.mvf-unit\').classList.toggle(\'collapsed\')">'+
           unitFolderSvg+
-          '<span class="mvf-unit-name">'+unit+'</span>'+
+          '<span class="mvf-unit-name">'+escaparHTML(unit)+'</span>'+
           '<span class="mvf-count-badge" style="font-size:10px">'+items.length+'</span>'+
           chevron+
         '</div>'+
@@ -1801,14 +1801,14 @@ function renderMediosGrid() {
       items.forEach(function(m) {
         var tc   = TIPO_MV_CFG[m.tipo] || {label:m.tipo,bg:'#F3F4F6',color:'#6B7280'};
         var path = TIPO_ICONS[m.tipo]  || TIPO_ICONS.documento;
-        html += '<div class="mvf-card" onclick="openEditarMedio(\''+m.id+'\')">'+
+        html += '<div class="mvf-card" data-id="'+escaparHTML(m.id)+'" onclick="openEditarMedio(this.dataset.id)">'+
           '<div class="mvf-card-iconwrap" style="background:'+tc.bg+'">'+
             '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="'+tc.color+'" width="19" height="19"><path stroke-linecap="round" stroke-linejoin="round" d="'+path+'"/></svg>'+
           '</div>'+
-          '<div class="mvf-card-name">'+m.nombre+'</div>'+
+          '<div class="mvf-card-name">'+escaparHTML(m.nombre)+'</div>'+
           '<div class="mvf-card-meta">'+
-            '<span class="mvf-tipo-pill" style="background:'+tc.bg+';color:'+tc.color+'">'+tc.label+'</span>'+
-            '<span class="mvf-fmt">'+m.formato+'</span>'+
+            '<span class="mvf-tipo-pill" style="background:'+tc.bg+';color:'+tc.color+'">'+escaparHTML(tc.label)+'</span>'+
+            '<span class="mvf-fmt">'+escaparHTML(m.formato)+'</span>'+
           '</div>'+
         '</div>';
       });
@@ -1890,7 +1890,7 @@ function onMedioGerenciaChange() {
   if (!ger) { grp.style.display='none'; sel.innerHTML='<option value="">Selecciona la unidad…</option>'; return; }
   var units = GER_UNITS[ger] || [];
   sel.innerHTML = '<option value="">Selecciona la unidad…</option>' +
-    units.map(function(u){return '<option value="'+u+'">'+u+'</option>';}).join('');
+    units.map(function(u){return '<option value="'+escaparHTML(u)+'">'+escaparHTML(u)+'</option>';}).join('');
   grp.style.display = '';
 }
 
@@ -1908,7 +1908,7 @@ function openEditarMedio(id) {
   document.getElementById('fMedioFormato').value=m.formato;
   document.getElementById('fMedioDesc').value=m.descripcion||'';
   document.getElementById('modalMedioFooterLeft').innerHTML=
-    '<button style="background:none;border:none;color:var(--color-danger);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="confirmarEliminarMedio(\''+id+'\');cerrarModalMedio()">Eliminar</button>';
+    '<button style="background:none;border:none;color:var(--color-danger);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" data-id="'+escaparHTML(id)+'" onclick="confirmarEliminarMedio(this.dataset.id);cerrarModalMedio()">Eliminar</button>';
   resetFileField(m.archivo||null);
   document.getElementById('modalMedio').classList.add('open');
 }

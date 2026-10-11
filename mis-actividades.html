@@ -397,8 +397,8 @@ tbody td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
     const tipoBadge = esGerencial
       ? `<span class="nivel-badge nivel-gerencial"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/></svg>Gerencial</span>`
       : (tipoActivo === 'todos'
-          ? `<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-info);">MIR</span><span class="nivel-badge ${nivel.cls}">${nivel.label}</span></div>`
-          : `<span class="nivel-badge ${nivel.cls}">${nivel.label}</span>`);
+          ? `<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start;"><span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-info);">MIR</span><span class="nivel-badge ${nivel.cls}">${escaparHTML(nivel.label)}</span></div>`
+          : `<span class="nivel-badge ${nivel.cls}">${escaparHTML(nivel.label)}</span>`);
     // Para proximo_periodo mostramos la fecha del próximo período, no la del período cerrado
     const esProximo = vistaKey === 'proximo_periodo';
     const fechaMostrar = esProximo
@@ -406,27 +406,27 @@ tbody td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
       : act.fechaLimite;
     const dias  = diasRestantes(fechaMostrar);
     const dLbl  = diasLabel(dias);
-    const url   = esGerencial ? `detalle-indicador-gerencial.html?id=${act.id}` : `detalle-actividad.html?id=${act.id}`;
+    const url   = esGerencial ? `detalle-indicador-gerencial.html?id=${encodeURIComponent(act.id)}` : `detalle-actividad.html?id=${encodeURIComponent(act.id)}`;
     return `
-      <tr style="cursor:pointer" onclick="window.location.href='${url}'">
+      <tr style="cursor:pointer" data-url="${url}" onclick="window.location.href=this.dataset.url">
         <td class="td-actividad">
           <p class="act-id">
-            ${act.id}
+            ${escaparHTML(act.id)}
           </p>
-          <p class="act-nombre">${isoBadge(act)}${act.nombreIndicador}</p>
+          <p class="act-nombre">${isoBadge(act)}${escaparHTML(act.nombreIndicador)}</p>
         </td>
-        <td><span style="font-size:12px;color:var(--color-text-secondary);line-height:1.4;">${esGerencial ? (act.area || '—') : (act.unidadResponsable || '—')}</span></td>
+        <td><span style="font-size:12px;color:var(--color-text-secondary);line-height:1.4;">${escaparHTML(esGerencial ? (act.area || '—') : (act.unidadResponsable || '—'))}</span></td>
         <td>${tipoBadge}</td>
         <td class="td-mv">${esGerencial
           ? '<span style="display:inline-flex;align-items:center;gap:5px;color:var(--color-neutral-300);"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/></svg><span style="font-size:10px;font-weight:500;letter-spacing:.01em;">Gerencial</span></span>'
-          : '<p class="mv-text">'+act.medioVerificacion+'</p>'}</td>
-        <td><span class="frec-badge">${act.frecuenciaMedicion}</span></td>
+          : '<p class="mv-text">'+escaparHTML(act.medioVerificacion)+'</p>'}</td>
+        <td><span class="frec-badge">${escaparHTML(act.frecuenciaMedicion)}</span></td>
         <td class="td-fecha">
-          <p class="fecha-val">${formatFecha(fechaMostrar)}${esProximo ? '<span style="font-size:9px;color:var(--color-text-muted);display:block;margin-top:1px">próximo período</span>' : ''}</p>
+          <p class="fecha-val">${escaparHTML(formatFecha(fechaMostrar))}${esProximo ? '<span style="font-size:9px;color:var(--color-text-muted);display:block;margin-top:1px">próximo período</span>' : ''}</p>
           <p class="fecha-dias ${dLbl.cls}">${dLbl.text}</p>
         </td>
-        <td><span class="estado-badge ${cfg.cls}">${cfg.label}</span></td>
-        <td class="td-upd">${formatFecha(act.ultimaActualizacion)}</td>
+        <td><span class="estado-badge ${escaparHTML(cfg.cls)}">${escaparHTML(cfg.label)}</span></td>
+        <td class="td-upd">${escaparHTML(formatFecha(act.ultimaActualizacion))}</td>
       </tr>`;
   }
 
@@ -442,10 +442,10 @@ tbody td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
       : act.fechaLimite;
     const dias = diasRestantes(fechaMostrar);
     const dLbl = diasLabel(dias);
-    const url = esGerencial ? `detalle-indicador-gerencial.html?id=${act.id}` : `detalle-actividad.html?id=${act.id}`;
+    const url = esGerencial ? `detalle-indicador-gerencial.html?id=${encodeURIComponent(act.id)}` : `detalle-actividad.html?id=${encodeURIComponent(act.id)}`;
     const nivelBadge = esGerencial
       ? `<span class="nivel-badge nivel-gerencial"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:10px;height:10px"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/></svg>Gerencial</span>`
-      : `<span class="nivel-badge ${nivel.cls}">${nivel.label}</span>`;
+      : `<span class="nivel-badge ${nivel.cls}">${escaparHTML(nivel.label)}</span>`;
     const tipoTag = (tipoActivo === 'todos' && !esGerencial)
       ? `<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--color-info);background:var(--color-info-tint);padding:2px 7px;border-radius:999px;">MIR</span>`
       : '';
@@ -453,38 +453,38 @@ tbody td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
     const mvText = esGerencial ? '' : (act.medioVerificacion || '');
 
     return `
-      <div class="ind-card" onclick="window.location.href='${url}'">
+      <div class="ind-card" data-url="${url}" onclick="window.location.href=this.dataset.url">
         <div class="ind-card-top">
           <div class="ind-card-top-left">
-            <span class="ind-card-id">${act.id}</span>
+            <span class="ind-card-id">${escaparHTML(act.id)}</span>
             ${nivelBadge}
             ${tipoTag}
           </div>
           <div class="ind-card-top-right">
-            <span class="estado-badge ${cfg.cls}">${cfg.label}</span>
+            <span class="estado-badge ${escaparHTML(cfg.cls)}">${escaparHTML(cfg.label)}</span>
             <a class="btn-act ${cfg.btnCls}" href="${url}" onclick="event.stopPropagation()">${cfg.accion}</a>
           </div>
         </div>
         <div class="ind-card-body">
-          <p class="ind-card-nombre">${isoBadge(act)}${act.nombreIndicador}</p>
-          <p class="ind-card-area">${area}</p>
+          <p class="ind-card-nombre">${isoBadge(act)}${escaparHTML(act.nombreIndicador)}</p>
+          <p class="ind-card-area">${escaparHTML(area)}</p>
         </div>
         <div class="ind-card-meta">
           <div class="ind-card-meta-item">
             <p class="ind-card-meta-label">Frecuencia</p>
-            <p class="ind-card-meta-val">${act.frecuenciaMedicion}</p>
+            <p class="ind-card-meta-val">${escaparHTML(act.frecuenciaMedicion)}</p>
           </div>
           <div class="ind-card-meta-item">
             <p class="ind-card-meta-label">${esProximo ? 'Próximo período' : 'Fecha límite'}</p>
-            <p class="ind-card-meta-val">${formatFecha(fechaMostrar)}</p>
+            <p class="ind-card-meta-val">${escaparHTML(formatFecha(fechaMostrar))}</p>
             <p class="ind-card-meta-sub ${dLbl.cls}">${dLbl.text}</p>
           </div>
           <div class="ind-card-meta-item">
             <p class="ind-card-meta-label">Última actualización</p>
-            <p class="ind-card-meta-val">${formatFecha(act.ultimaActualizacion)}</p>
+            <p class="ind-card-meta-val">${escaparHTML(formatFecha(act.ultimaActualizacion))}</p>
           </div>
         </div>
-        ${mvText ? `<div class="ind-card-mv"><span class="ind-card-mv-label">Medio de verif.</span><p class="ind-card-mv-text">${mvText}</p></div>` : ''}
+        ${mvText ? `<div class="ind-card-mv"><span class="ind-card-mv-label">Medio de verif.</span><p class="ind-card-mv-text">${escaparHTML(mvText)}</p></div>` : ''}
       </div>`;
   }
 
@@ -556,7 +556,7 @@ tbody td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
         cards.innerHTML = `<div style="background:var(--color-bg);border-radius:var(--radius-card);padding:56px 24px;text-align:center;"><p class="empty-title" style="margin-bottom:4px">Sin resultados</p><p class="empty-sub">No hay indicadores que coincidan con los filtros.</p></div>`;
       } else {
         try { cards.innerHTML = data.map(renderCard).join(''); }
-        catch(e) { cards.innerHTML = `<p style="padding:24px;color:var(--color-danger)">${e.message}</p>`; console.error(e); }
+        catch(e) { cards.innerHTML = `<p style="padding:24px;color:var(--color-danger)">${escaparHTML(e.message)}</p>`; console.error(e); }
       }
     } else {
       if (!data.length) {
@@ -566,7 +566,7 @@ tbody td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
           body.innerHTML = data.map(renderRow).join('');
         } catch(e) {
           body.innerHTML = `<tr><td colspan="8" style="padding:24px;color:var(--color-danger);font-size:13px">
-            <strong>Error de renderizado:</strong> ${e.message}<br>
+            <strong>Error de renderizado:</strong> ${escaparHTML(e.message)}<br>
             <small style="color:var(--color-text-muted)">Revisa la consola del navegador (F12) para más detalles.</small>
           </td></tr>`;
           console.error('renderRow error:', e);

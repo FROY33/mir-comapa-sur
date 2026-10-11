@@ -66,7 +66,7 @@
 
   function opciones(select, primera, lista) {
     select.innerHTML = '<option value="">' + primera + '</option>' + lista.map(function (x) {
-      return '<option value="' + x.id + '">' + x.nombre.replace(/</g, '&lt;') + '</option>';
+      return '<option value="' + escaparHTML(x.id) + '">' + escaparHTML(x.nombre) + '</option>';
     }).join('');
   }
 

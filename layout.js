@@ -155,20 +155,22 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── ITEMS DE NOTIFICACIONES ──────────────────────────────────────────────
   const notifItemsHtml = notifs.length
     ? notifs.slice(0, 7).map(n => `
-        <div class="hnp-item ${n.leida ? '' : 'unread'}" data-id="${n.id}">
-          <div class="hnp-dot ${n.leida ? 'read' : n.icono}"></div>
+        <div class="hnp-item ${n.leida ? '' : 'unread'}" data-id="${escaparHTML(n.id)}">
+          <div class="hnp-dot ${n.leida ? 'read' : escaparHTML(n.icono)}"></div>
           <div class="hnp-body">
-            <p class="hnp-item-title">${n.titulo}</p>
-            <p class="hnp-item-msg">${n.mensaje}</p>
+            <p class="hnp-item-title">${escaparHTML(n.titulo)}</p>
+            <p class="hnp-item-msg">${escaparHTML(n.mensaje)}</p>
             <div class="hnp-item-meta">
-              <span class="hnp-item-time">${n.fecha} · ${n.hora}</span>
-              ${n.actividadId ? `<span class="hnp-act-id">${n.actividadId}</span>` : ''}
+              <span class="hnp-item-time">${escaparHTML(n.fecha)} · ${escaparHTML(n.hora)}</span>
+              ${n.actividadId ? `<span class="hnp-act-id">${escaparHTML(n.actividadId)}</span>` : ''}
             </div>
           </div>
         </div>`).join('')
     : '<div class="hnp-empty">Sin notificaciones.</div>';
 
   // ── HTML DEL HEADER ──────────────────────────────────────────────────────
+  // Nombre, gerencia y rol salen de la cookie de perfil (editable en el navegador) y las
+  // notificaciones, de datos: todo pasa por escaparHTML (session.js) antes de entrar al HTML.
   const headerHtml = `
     <header class="app-header" id="appHeader">
       <span class="h-brand">MIR COMAPA Sur</span>
@@ -197,14 +199,14 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="h-sep"></div>
 
         <!-- Role badge -->
-        <span class="h-role-badge ${roleClass}">${user.rol}</span>
+        <span class="h-role-badge ${roleClass}">${escaparHTML(user.rol)}</span>
 
         <!-- User -->
         <div class="h-user-wrap">
-          <div class="h-avatar ${roleClass === 'role-admin' ? 'role-admin' : ''}">${user.iniciales}</div>
+          <div class="h-avatar ${roleClass === 'role-admin' ? 'role-admin' : ''}">${escaparHTML(user.iniciales)}</div>
           <div class="h-user-info">
-            <span class="h-user-name">${user.nombre}</span>
-            <span class="h-user-sub">${user.gerencia}</span>
+            <span class="h-user-name">${escaparHTML(user.nombre)}</span>
+            <span class="h-user-sub">${escaparHTML(user.gerencia)}</span>
           </div>
         </div>
 

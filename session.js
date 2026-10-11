@@ -14,6 +14,26 @@
 
 var API = (typeof window !== 'undefined' && window.COMAPA_API_BASE) || '';
 
+/**
+ * Escapa un dato para meterlo en HTML armado como texto (innerHTML, insertAdjacentHTML),
+ * tanto en el contenido como dentro de un atributo entre comillas. Sin esto, un nombre como
+ * `<img src=x onerror=...>` ejecutaría código en la sesión de quien lo vea.
+ *
+ * Reglas de uso en las vistas:
+ * - texto suelto: mejor `el.textContent = dato`, que no interpreta nada;
+ * - dentro de HTML: `'<p>' + escaparHTML(dato) + '</p>'`;
+ * - en una URL: `'pagina.html?id=' + encodeURIComponent(dato)` (en atributo con comillas dobles);
+ * - en un manejador en línea, nunca el dato en el código: `data-id="${escaparHTML(id)}"`
+ *   y `onclick="f(this.dataset.id)"`. Escapar para HTML no basta ahí: el navegador
+ *   des-escapa el atributo antes de ejecutarlo.
+ */
+function escaparHTML(texto) {
+  if (texto === null || texto === undefined) return '';
+  return String(texto).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
 // Cookie legible con el perfil para mostrar. NO es una credencial: el token está en
 // una cookie HttpOnly que este código no puede ver (CA-3). Existe para que la sesión
 // se conozca de forma síncrona, sin que cada página tenga que esperar una petición.
