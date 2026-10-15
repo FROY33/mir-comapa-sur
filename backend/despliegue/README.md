@@ -23,8 +23,8 @@ Navegador ──HTTPS──▶ Cloudflare ──túnel──▶ cloudflared ─�
 | `comapa-respaldo.service`, `comapa-respaldo.timer` | `/etc/systemd/system/` | Respaldo diario a las 02:30, 14 días de retención |
 | `api.env.ejemplo`, `sitio.env.ejemplo`, `dueno.env.ejemplo` | `/etc/comapa-mir/*.env` | Variables. Los reales no se versionan |
 | `cloudflared.yml.ejemplo` | `/etc/cloudflared/config.yml` | El túnel expone solo el sitio |
-| `desplegar.sh` | — | Actualizar: código, compilación, migraciones, permisos, reinicio y verificación |
-| `respaldar.sh` | — | Lo corre el timer |
+| `desplegar.sh` | — | Actualizar: código, compilación, respaldo, migraciones, permisos, reinicio y verificación |
+| `respaldar.sh` | — | Lo corren el timer y `desplegar.sh` antes de migrar |
 
 ## Instalación inicial
 
@@ -81,6 +81,9 @@ sudo /opt/comapa-mir/backend/despliegue/desplegar.sh
 ```
 
 Si algo falla (compilación, migración, permisos), se detiene antes de reiniciar.
+
+Antes de migrar toma un respaldo en `/var/backups/comapa-mir`; si el respaldo falla, no migra. Si una
+migración falla, imprime cómo restaurar ese respaldo.
 
 ## Checklist de seguridad
 

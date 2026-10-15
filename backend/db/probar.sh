@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Prueba de punta a punta sobre una base vacía y desechable:
+# Prueba de punta a punta sobre bases desechables:
 #   1. crea la base   2. aplica todas las migraciones   3. corre pruebas/restricciones.sql
-#   4. revierte todas las migraciones   5. borra la base
+#   4. revierte todas las migraciones
+#   5. actualización con datos: recrea la base de S1, la llena con la semilla y las fixtures, aplica
+#      las migraciones nuevas y comprueba que ninguna tabla perdió filas (CA-1 de las fichas de modelo)
+#   6. borra la base
 #
 #   ./probar.sh            (usa la base comapa_mir_prueba en el servidor local)
 
@@ -35,5 +38,37 @@ restantes=$(psql "$DATABASE_URL" -X -At -c \
   "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name <> 'schema_migrations'")
 [ "$restantes" -eq 0 ] && ok "La base quedó vacía: todas las migraciones se pueden revertir" \
   || { echo "  ✗ Quedaron $restantes tablas después de revertir" >&2; exit 1; }
+
+paso "5. Actualización sobre la base de S1 con datos"
+# Última migración de S1. Al cerrar un sprint, súbela a su última migración.
+BASE_S1=20261010000001
+limpiar
+createdb "$BASE"
+MIGRAR_HASTA="$BASE_S1" "$AQUI/migrar.sh" up >/dev/null
+ok "Esquema de S1 (hasta $BASE_S1)"
+SEMILLA_PASSWORD="${SEMILLA_PASSWORD:-prueba-actualizacion-local}" \
+  "$AQUI/sembrar.sh" --con-fixtures >/dev/null
+ok "Semilla y fixtures cargadas"
+
+# Filas por tabla
+CONTAR="SELECT string_agg(format('%s %s', t, (xpath('/row/n/text()',
+          query_to_xml(format('SELECT count(*) AS n FROM %I', t), false, true, '')))[1]::text), E'\n' ORDER BY t)
+        FROM unnest(ARRAY(SELECT table_name::text FROM information_schema.tables
+                          WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+                            AND table_name <> 'schema_migrations')) AS t"
+antes="$(psql "$DATABASE_URL" -X -At -c "$CONTAR")"
+
+"$AQUI/migrar.sh" up
+despues="$(psql "$DATABASE_URL" -X -At -c "$CONTAR")"
+
+perdidas=0
+while read -r tabla n; do
+  m="$(awk -v t="$tabla" '$1 == t { print $2 }' <<<"$despues")"
+  if [ -z "$m" ]; then echo "  ✗ La tabla $tabla desapareció" >&2; perdidas=1
+  elif [ "$m" -lt "$n" ]; then echo "  ✗ $tabla: $n filas antes, $m después" >&2; perdidas=1
+  fi
+done <<<"$antes"
+[ "$perdidas" -eq 0 ] || exit 1
+ok "Ninguna tabla de S1 perdió filas ($(wc -l <<<"$antes" | tr -d ' ') tablas, $(awk '{ s += $2 } END { print s }' <<<"$antes") filas)"
 
 paso "Todo en orden."

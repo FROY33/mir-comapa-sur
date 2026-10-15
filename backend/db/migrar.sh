@@ -6,6 +6,9 @@
 #   ./migrar.sh down     revierte la última aplicada
 #   ./migrar.sh status   muestra qué está aplicado
 #
+# MIGRAR_HASTA=<versión> limita `up` a esa versión y las anteriores (lo usa probar.sh para recrear la
+# base de un sprint anterior).
+#
 # Base destino: DATABASE_URL; si no está en el entorno, la de backend/.env; si tampoco, postgres:///comapa_mir
 
 set -euo pipefail
@@ -43,6 +46,7 @@ case "${1:-status}" in
     for f in "$DIR"/*.sql; do
       nombre="$(basename "$f" .sql)"
       version="${nombre%%_*}"
+      if [ -n "${MIGRAR_HASTA:-}" ] && [[ "$version" > "$MIGRAR_HASTA" ]]; then break; fi
       if grep -qx "$version" <<<"$hechas"; then continue; fi
       { seccion up "$f"; echo "INSERT INTO schema_migrations (version) VALUES ('$version');"; } \
         | "${PSQL[@]}" --single-transaction -f - >/dev/null \

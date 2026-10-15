@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Actualiza COMAPA MIR en el servidor: código, dependencias, compilación, migraciones, permisos y
-# reinicio, con verificación al final. Se corre como root desde /opt/comapa-mir.
+# Actualiza COMAPA MIR en el servidor: código, dependencias, compilación, respaldo, migraciones,
+# permisos y reinicio, con verificación al final. Se corre como root desde /opt/comapa-mir.
 #
 #   sudo /opt/comapa-mir/backend/despliegue/desplegar.sh
 #
@@ -17,9 +17,19 @@ sudo -u comapa npm ci
 sudo -u comapa npm run build
 sudo -u comapa npm prune --omit=dev   # en ejecución solo queda pg y bcryptjs
 
-echo "→ Migraciones y permisos (con el dueño de las tablas)"
 set -a; source /etc/comapa-mir/dueno.env; set +a
-db/migrar.sh up
+
+# Respaldo inmediatamente antes de migrar: el del timer puede tener casi un día. Si el respaldo
+# falla, no se migra.
+echo "→ Respaldo previo a las migraciones"
+despliegue/respaldar.sh
+
+echo "→ Migraciones y permisos (con el dueño de las tablas)"
+db/migrar.sh up || {
+  echo "✗ La migración falló; esa migración no se aplicó y los servicios siguen con la versión anterior." >&2
+  echo "  Si hay que volver al estado previo: pg_restore --clean --if-exists -d \"\$DATABASE_URL\" <respaldo de arriba>" >&2
+  exit 1
+}
 psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -v app=comapa_app -f db/permisos.sql
 
 echo "→ Reinicio"

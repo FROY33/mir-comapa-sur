@@ -14,7 +14,7 @@ PostgreSQL 14 o superior. Migraciones en SQL puro, versionadas en `migrations/`,
 ```bash
 createdb comapa_mir
 cd backend/db
-./migrar.sh up                     # aplica las 8 migraciones, cada una en su transacción
+./migrar.sh up                     # aplica las migraciones pendientes, cada una en su transacción
 ./migrar.sh status                 # qué está aplicado
 ```
 
@@ -32,9 +32,25 @@ Para revertir la última migración: `./migrar.sh down`.
 ./probar.sh
 ```
 
-Crea una base desechable, aplica todo, corre `pruebas/restricciones.sql` (58 pruebas), revierte
-todas las migraciones y borra la base. Las pruebas intentan duplicados, referencias inválidas y
+Crea una base desechable, aplica todo, corre `pruebas/restricciones.sql` (58 pruebas) y revierte
+todas las migraciones. Después recrea la base de S1 (`MIGRAR_HASTA=$BASE_S1`), la llena con la semilla
+y las fixtures, aplica las migraciones nuevas y falla si alguna tabla desaparece o pierde filas
+(CA-1: «migraciones ejecutables en una base nueva y en la base del sprint 1»). Al final borra la base. Las pruebas intentan duplicados, referencias inválidas y
 estados fuera de regla, y cubren varias frecuencias, varios Enlaces por gerencia y periodos anteriores.
+
+## Reglas para migraciones nuevas
+
+- **Una migración aplicada no se edita.** `migrar.sh` reconoce las migraciones por versión, sin checksum:
+  en producción un cambio a un archivo ya aplicado se ignora sin aviso. Se corrige con otra migración.
+- **Primero se agrega, después se quita.** `desplegar.sh` migra antes de reiniciar, así que la versión
+  anterior de la API corre unos segundos sobre el esquema nuevo. Renombrar o borrar una columna que el
+  código usa se hace en dos despliegues: agregar y migrar datos en uno, quitar lo viejo en el siguiente.
+- **Cada tabla nueva lleva sus permisos** en `permisos.sql` y su prueba en `pruebas/permisos.test.ts`;
+  sin eso, la app recibe «permission denied» después de desplegar.
+- **Una migración de datos dice si su `down` pierde información**, y si es así lo deja escrito en el archivo.
+- **`probar.sh` pasa completo**, incluido el paso 5 (actualización con datos).
+- **Desplegar respalda primero:** `desplegar.sh` corre `respaldar.sh` antes de migrar y no migra si el
+  respaldo falla. Cualquier script que toque la base del servidor fuera del despliegue respalda igual.
 
 ## Tablas de S1
 
@@ -91,7 +107,6 @@ Estas tablas quedan para las HU correspondientes; mientras tanto:
 - **Sin MEDIOS_VERIFICACION**: el medio de verificación va como texto en `indicadores`.
 - **Sin VALIDACIONES_PERIODO**: la validación del Admin por gerencia y corte mensual no tiene tabla aún.
   El corte se obtiene del mes de `periodos_reporte.fin_periodo`.
-- **Sin sesiones**: entran con la HU de inicio de sesión. `login_intentos` ya existe (HU-R7-06).
 - **Días hábiles**: no hay calendario de festivos; el backend cuenta lunes a viernes al calcular
   `fecha_limite`, que se guarda al crear el periodo y no se recalcula.
 - **Número de periodo**: la base no valida que `numero` no exceda los periodos de la frecuencia
