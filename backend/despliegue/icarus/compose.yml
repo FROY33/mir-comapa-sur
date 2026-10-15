@@ -1,0 +1,24 @@
+# PostgreSQL de COMAPA MIR en icarus. Solo en 127.0.0.1:5433 (el 5432 es de elsoberano).
+#   docker compose -f backend/despliegue/icarus/compose.yml --env-file ~/comapa-mir-config/postgres.env up -d
+name: comapa-mir
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: comapa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '127.0.0.1:5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
