@@ -49,6 +49,10 @@ Tomados para poder migrar; cambiarlos es barato.
 | `sentido_meta`: ascendente o descendente | `indicadores.sentido_meta` | 24e |
 | El Admin también tiene gerencia y unidad | `usuarios` | 5 |
 | Zona horaria de la sesión: `America/Monterrey` (Tamaulipas, sin horario de verano) | `backend/src/bd.ts` | — |
+| Consulta MIR (HU-R8-01 CA_2): cada indicador muestra el reporte de su periodo abierto más reciente; si no tiene ninguno abierto, el del último cerrado. Con varias frecuencias abiertas, cada uno va con la suya | `src/datos/consultaMir.ts` | Ficha R8-01: «cómo elegir periodo con varias frecuencias abiertas» |
+| Consulta MIR (CA_4): un reporte en `pendiente_carga` o `borrador` no cuenta como «reporte en el periodo»: N/A y su avance no se muestra. El % usa las reglas de HU-R4-11 RN_3 (acumulable, fracción), que extienden la fórmula simple de CA_4 | `src/datos/consultaMir.ts` | ¿El Revisor ve el avance de un borrador? (Recomendación: no, como las metas, HU-R4-03 RN_1) |
+| Consulta MIR solo lista MIR (`tipo = 'mir'`); los gerenciales no entran (el RQM no los menciona y el prototipo no los tenía ahí). Los desactivados sí, marcados (HU-R4-11 CA_5) | `src/datos/consultaMir.ts` | **PO:** el Revisor no tiene hoy ninguna pantalla donde ver los gerenciales de su gerencia; ¿dónde deben verse? |
+| Meta anual de la Consulta MIR: la de la meta `meta_validada` vigente del ejercicio del periodo mostrado; sin meta validada, «—» | `src/datos/consultaMir.ts` | — |
 
 ## Abiertas
 
