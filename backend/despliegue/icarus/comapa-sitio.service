@@ -1,0 +1,39 @@
+# Sitio de COMAPA MIR en icarus: páginas + proxy a la API. Solo en 127.0.0.1:3088; cloudflared apunta aquí.
+# Instalar (icarus): sudo -n systemctl link /home/developer/comapa-mir/backend/despliegue/icarus/comapa-sitio.service && sudo -n systemctl enable --now comapa-sitio
+[Unit]
+Description=COMAPA MIR — Sitio
+After=network-online.target comapa-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=developer
+WorkingDirectory=/home/developer/comapa-mir/backend
+EnvironmentFile=/home/developer/comapa-mir-config/sitio.env
+ExecStart=/usr/local/lib/nodejs/node-v22.21.1-linux-x64/bin/node dist/sitio.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+# Endurecimiento: sin privilegios, sistema de archivos de solo lectura salvo lo indispensable
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

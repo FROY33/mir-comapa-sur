@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Respaldo comprimido de la base en /var/backups/comapa-mir, legible solo por root. Conserva 14 días.
+# Respaldo comprimido de la base en $RESPALDO_DESTINO (por defecto /var/backups/comapa-mir). Conserva 14 días.
 # Restaurar: pg_restore --clean --if-exists -d "$DATABASE_URL" <archivo>.dump
 set -euo pipefail
-DESTINO=/var/backups/comapa-mir
+DESTINO="${RESPALDO_DESTINO:-/var/backups/comapa-mir}"
 mkdir -p "$DESTINO" && chmod 700 "$DESTINO"
 ARCHIVO="$DESTINO/comapa_mir_$(date +%Y-%m-%d_%H%M).dump"
 pg_dump --format=custom --no-owner --file="$ARCHIVO" "$DATABASE_URL"

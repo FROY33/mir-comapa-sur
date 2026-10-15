@@ -1,0 +1,12 @@
+# Respaldo diario de la base de COMAPA MIR en icarus (lo dispara comapa-respaldo.timer). Conserva 14 días.
+[Unit]
+Description=COMAPA MIR — respaldo de la base
+After=docker.service
+
+[Service]
+Type=oneshot
+User=developer
+EnvironmentFile=/home/developer/comapa-mir-config/dueno.env
+Environment=RESPALDO_DESTINO=/home/developer/backups/comapa-mir
+ExecStart=/home/developer/comapa-mir/backend/despliegue/respaldar.sh
+UMask=0077
