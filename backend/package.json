@@ -16,6 +16,7 @@
     "bd:migrar": "db/migrar.sh up",
     "bd:estado": "db/migrar.sh status",
     "bd:sembrar": "db/sembrar.sh",
+    "bd:importar-catalogo": "tsx db/semilla/importar-csv-unificada.ts",
     "test": "NODE_ENV=test tsx pruebas/preparar.ts && NODE_ENV=test tsx --test pruebas/*.test.ts"
   },
   "dependencies": {

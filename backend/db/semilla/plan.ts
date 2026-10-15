@@ -20,9 +20,13 @@ export interface Plan {
   modo: 'demostracion' | 'inicial'
   fixtures: boolean
   soloVerificar: boolean
+  /** Solo el catálogo de indicadores sobre una base del sprint 1 (S2-TEC-02). */
+  catalogo: boolean
+  /** Con --catalogo: repetir una carga ya registrada, sin pisar lo que se editó desde la pantalla. */
+  forzar: boolean
 }
 
-const BANDERAS = new Set(['--con-fixtures', '--verificar'])
+const BANDERAS = new Set(['--con-fixtures', '--verificar', '--catalogo', '--forzar'])
 const HOSTS_LOCALES = new Set(['', 'localhost', '127.0.0.1', '[::1]', '::1'])
 export const LARGO_MINIMO_PASSWORD = 12
 
@@ -44,6 +48,12 @@ export function planDeCarga(argv: string[], entorno: Entorno, url: string): Plan
     throw new ErrorPlan(`Opción desconocida: ${desconocidas.join(' ')}. Válidas: ${[...BANDERAS].join(', ')}`)
   }
   const fixtures = argv.includes('--con-fixtures')
+  const catalogo = argv.includes('--catalogo')
+  const forzar = argv.includes('--forzar')
+  if (forzar && !catalogo) throw new ErrorPlan('--forzar solo se usa con --catalogo.')
+  if (catalogo && (fixtures || argv.includes('--verificar'))) {
+    throw new ErrorPlan('--catalogo no se combina con --con-fixtures ni con --verificar.')
+  }
   const modo = entorno !== 'production' && esBaseLocal(url) ? 'demostracion' : 'inicial'
 
   if (fixtures && modo === 'inicial') {
@@ -51,7 +61,7 @@ export function planDeCarga(argv: string[], entorno: Entorno, url: string): Plan
       ? 'Las fixtures de prueba no se cargan en producción (CA-4).'
       : `Las fixtures de prueba solo se cargan en una base local o de pruebas, y el destino es ${destino(url)} (CA-4).`)
   }
-  return { modo, fixtures, soloVerificar: argv.includes('--verificar') }
+  return { modo, fixtures, soloVerificar: argv.includes('--verificar'), catalogo, forzar }
 }
 
 export function passwordInicial(env: NodeJS.ProcessEnv): string {

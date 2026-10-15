@@ -8,6 +8,7 @@ import { listarFrecuencias } from './datos/frecuencias.js'
 import { crearManejador } from './http.js'
 import { cambiarPassword } from './cuenta.js'
 import * as indicadores from './indicadores.js'
+import * as indicadoresAdmin from './indicadoresAdmin.js'
 import * as pendientes from './pendientes.js'
 import type { Log } from './log.js'
 import type { Rol } from './rutas.js'
@@ -53,6 +54,14 @@ export function crearApp(
     'GET /api/admin/ventanas': protegida(['admin'], ciclos.ventanas(bd)),
     'PUT /api/admin/ventanas': protegida(['admin'], ciclos.guardarVentanas(bd)),
     'POST /api/admin/ciclos/abrir': protegida(['admin'], ciclos.abrirAhora(bd)),
+    // Gestión de indicadores — catálogo administrable (HU-R4-11)
+    'GET /api/admin/indicadores': protegida(['admin'], indicadoresAdmin.listar(bd)),
+    'GET /api/admin/indicadores/catalogo': protegida(['admin'], indicadoresAdmin.catalogo(bd)),
+    'GET /api/admin/indicadores/:id': protegida(['admin'], indicadoresAdmin.detalle(bd)),
+    'POST /api/admin/indicadores': protegida(['admin'], indicadoresAdmin.crear(bd)),
+    'PUT /api/admin/indicadores/:id': protegida(['admin'], indicadoresAdmin.editar(bd)),
+    'POST /api/admin/indicadores/:id/desactivar': protegida(['admin'], indicadoresAdmin.desactivar(bd)),
+    'POST /api/admin/indicadores/:id/reactivar': protegida(['admin'], indicadoresAdmin.reactivar(bd)),
     // Gestión de usuarios (HU-R7-07)
     'GET /api/admin/catalogo': protegida(['admin'], usuarios.catalogo(bd)),
     'GET /api/admin/usuarios': protegida(['admin'], usuarios.listar(bd)),

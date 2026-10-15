@@ -24,11 +24,9 @@ export const GERENCIAS: Gerencia[] = [
     alias: ['Administrativa', 'Gerencia Administrativa'] },
   { clave: 'TEC', nombre: 'Gerencia Técnica', activo: true,
     alias: ['Técnica', 'Gerencia Técnica'] },
-  // La migración solo nombra PLA, COM, ADM y TEC. Gerencia General existe en
-  // mir-gerencias-data.js pero no tiene un solo indicador en ninguna fuente, así que
-  // se exporta inactiva. La clave 'GEN' la acuñamos aquí; no viene del esquema.
-  // Pendiente: DECISIONES.md pregunta 5. Ver INCONSISTENCIAS.md §1.
-  { clave: 'GEN', nombre: 'Gerencia General', activo: false,
+  // El CSV institucional (2026.09.14-MIR-COMAPA_UNIFICADA) confirma 2 indicadores
+  // de Gerencia General (Fin + Propósito). Activa desde la importación del catálogo.
+  { clave: 'GEN', nombre: 'Gerencia General', activo: true,
     alias: ['General', 'Gerencia General'] },
 ]
 

@@ -4,3 +4,4 @@ revisor.admin@comapa.mx,Laura Vega,revisor,ADM,Coordinación General Administrat
 revisor.comercial@comapa.mx,Rosario Díaz,revisor,COM,Coordinación General Comercial,Las fixtures lo citan como responsableRevisor de 24 indicadores de COM y no tiene cuenta en el prototipo
 revisor.tecnica@comapa.mx,Miguel Ángel Pérez,revisor,TEC,Coordinación General Técnica,Las fixtures lo citan como responsableRevisor de 40 indicadores de TEC y no tiene cuenta en el prototipo
 revisor@comapa.mx,Carlos Mendoza,revisor,PLA,Coordinación General de Planeación Estratégica,Corrige su gerencia: session.js lo registra en TEC pero las fixtures lo ponen revisando los 14 indicadores de PLA y TEC ya tiene a Miguel Ángel Pérez. Ver INCONSISTENCIAS.md 18
+revisor.general@comapa.mx,Revisor de prueba GEN,revisor,GEN,Gerencia General,Gerencia General se activó con 2 indicadores MIR (ticket 2) y no tiene Revisor en el prototipo; cuenta solo de prueba (TEC-04 CA-5)

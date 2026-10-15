@@ -87,6 +87,10 @@ describe('la app funciona con el rol de permisos mínimos', () => {
     assert.equal((await pedir('POST', `/api/admin/usuarios/${alta.cuerpo.usuario.id}/desactivar`)).status, 200)
     assert.equal((await pedir('PUT', '/api/admin/ventanas', { dias: { mensual: 9 } })).status, 200)
     assert.equal((await pedir('POST', '/api/admin/ciclos/abrir')).status, 200)
+    // Catálogo de indicadores (HU-R4-11): el rol escribe en indicadores
+    const id = (await pedir('GET', '/api/admin/indicadores')).cuerpo.indicadores[0].id
+    assert.equal((await pedir('POST', `/api/admin/indicadores/${id}/desactivar`)).status, 200)
+    assert.equal((await pedir('POST', `/api/admin/indicadores/${id}/reactivar`)).status, 200)
     assert.equal((await pedir('POST', '/api/auth/logout')).status, 200)
   })
 })

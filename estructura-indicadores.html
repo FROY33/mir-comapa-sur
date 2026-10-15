@@ -9,9 +9,6 @@
   <script src="session.js"></script>
   <script src="guardia.js"></script>
   <script src="vistas-mir.js"></script>
-  <script src="mir-gerencias-data.js"></script>
-  <script src="mir-actividades-data.js"></script>
-  <script src="demo-data.js"></script>
   <style>
 *,*::before,*::after {margin:0;padding:0;box-sizing:border-box;}
 body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface);color:var(--color-text-primary);display:flex;min-height:100vh;}
@@ -189,7 +186,7 @@ td {padding:10px 14px;vertical-align:middle;}
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
       <span class="nav-label">Configuración</span>
     </a>
-    <div class="avatar-xs">AD</div>
+    <div class="avatar-xs" id="avatarEl">AD</div>
   </div>
 </nav>
 
@@ -253,25 +250,17 @@ td {padding:10px 14px;vertical-align:middle;}
       </div>
       <select class="filter-select" id="filterGerencia" onchange="applyFilters()">
         <option value="">Todas las gerencias</option>
-        <option value="planeacion">Planeación Estratégica</option>
-        <option value="tecnica">Gerencia Técnica</option>
-        <option value="comercial">Gerencia Comercial</option>
-        <option value="administrativa">Gerencia Administrativa</option>
       </select>
       <select class="filter-select" id="filterNivel" onchange="applyFilters()">
         <option value="">Todos los niveles</option>
-        <option value="F">Fin (F)</option>
-        <option value="P">Propósito (P)</option>
-        <option value="C">Componente (C)</option>
-        <option value="A">Actividad (A)</option>
       </select>
       <select class="filter-select" id="filterFrecuencia" onchange="applyFilters()">
         <option value="">Todas las frecuencias</option>
-        <option value="Mensual">Mensual</option>
-        <option value="Bimestral">Bimestral</option>
-        <option value="Trimestral">Trimestral</option>
-        <option value="Semestral">Semestral</option>
-        <option value="Anual">Anual</option>
+      </select>
+      <select class="filter-select" id="filterEstado" onchange="applyFilters()">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
       </select>
       <button class="filter-clear" onclick="clearFilters()">Limpiar</button>
     </div>
@@ -319,10 +308,7 @@ td {padding:10px 14px;vertical-align:middle;}
     </div>
     <div class="rp-divider"></div>
     <p class="rp-section-title">Por gerencia</p>
-    <div class="rp-stat-row"><span class="rp-stat-label">Planeación</span><span class="rp-stat-val" id="rpPla">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Técnica</span><span class="rp-stat-val" id="rpTec">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Comercial</span><span class="rp-stat-val" id="rpCom">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Administrativa</span><span class="rp-stat-val" id="rpAdm">—</span></div>
+    <div id="rpGerenciaStats"></div>
     <div class="rp-divider"></div>
     <p class="rp-section-title">Por tipo de medición</p>
     <div class="rp-stat-row"><span class="rp-stat-label">Tipo fracción</span><span class="rp-badge purple" id="rpFrac">—</span></div>
@@ -365,15 +351,11 @@ td {padding:10px 14px;vertical-align:middle;}
                 <label class="form-label">Gerencia <span class="req">*</span></label>
                 <select class="form-select" id="fGerencia" onchange="updateIdSuggestion()">
                   <option value="">Seleccionar…</option>
-                  <option value="planeacion">Planeación Estratégica</option>
-                  <option value="tecnica">Gerencia Técnica</option>
-                  <option value="comercial">Gerencia Comercial</option>
-                  <option value="administrativa">Gerencia Administrativa</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label">Clave del indicador <span class="req">*</span></label>
-                <input class="form-input" id="fClave" type="text" placeholder="Ej. COM-ACT-13" style="font-family:monospace;font-size:12px;">
+                <input class="form-input" id="fClave" type="text" placeholder="Ej. COM-1.2.3" style="font-family:monospace;font-size:12px;">
                 <p class="form-hint" id="claveHint">Se generará automáticamente al elegir gerencia</p>
               </div>
             </div>
@@ -381,10 +363,10 @@ td {padding:10px 14px;vertical-align:middle;}
             <div class="form-group">
               <label class="form-label">Nivel del indicador <span class="req">*</span></label>
               <div class="nivel-options">
-                <div class="nivel-option"><input type="radio" name="fNivel" id="nF" value="F"><label for="nF"><span class="nivel-letter">F</span>Fin</label></div>
-                <div class="nivel-option"><input type="radio" name="fNivel" id="nP" value="P"><label for="nP"><span class="nivel-letter">P</span>Propósito</label></div>
-                <div class="nivel-option"><input type="radio" name="fNivel" id="nC" value="C"><label for="nC"><span class="nivel-letter">C</span>Componente</label></div>
-                <div class="nivel-option"><input type="radio" name="fNivel" id="nA" value="A" checked><label for="nA"><span class="nivel-letter">A</span>Actividad</label></div>
+                <div class="nivel-option"><input type="radio" name="fNivel" id="nF" value="fin"><label for="nF"><span class="nivel-letter">F</span>Fin</label></div>
+                <div class="nivel-option"><input type="radio" name="fNivel" id="nP" value="proposito"><label for="nP"><span class="nivel-letter">P</span>Propósito</label></div>
+                <div class="nivel-option"><input type="radio" name="fNivel" id="nC" value="componente"><label for="nC"><span class="nivel-letter">C</span>Componente</label></div>
+                <div class="nivel-option"><input type="radio" name="fNivel" id="nA" value="actividad" checked><label for="nA"><span class="nivel-letter">A</span>Actividad</label></div>
               </div>
             </div>
 
@@ -401,10 +383,15 @@ td {padding:10px 14px;vertical-align:middle;}
             <div class="form-group">
               <label class="form-label">Medio de verificación normado</label>
               <div class="mv-options">
-                <div class="mv-option"><input type="radio" name="fMV" id="mvI" value="Interno" checked><label for="mvI">Interno</label></div>
-                <div class="mv-option"><input type="radio" name="fMV" id="mvE" value="Externo"><label for="mvE">Externo</label></div>
-                <div class="mv-option"><input type="radio" name="fMV" id="mvM" value="Mixto"><label for="mvM">Mixto</label></div>
+                <div class="mv-option"><input type="radio" name="fMV" id="mvI" value="interno" checked><label for="mvI">Interno</label></div>
+                <div class="mv-option"><input type="radio" name="fMV" id="mvE" value="externo"><label for="mvE">Externo</label></div>
+                <div class="mv-option"><input type="radio" name="fMV" id="mvM" value="mixto"><label for="mvM">Mixto</label></div>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="fMedioTexto">Medio de verificación (documento o fuente)</label>
+              <input class="form-input" id="fMedioTexto" type="text" placeholder="Ej. Reporte Financiero">
             </div>
 
             <div class="acc-continue">
@@ -435,11 +422,6 @@ td {padding:10px 14px;vertical-align:middle;}
                 <label class="form-label">Frecuencia de reporte <span class="req">*</span></label>
                 <select class="form-select" id="fFrecuencia">
                   <option value="">Seleccionar…</option>
-                  <option value="Mensual">Mensual</option>
-                  <option value="Bimestral">Bimestral</option>
-                  <option value="Trimestral">Trimestral</option>
-                  <option value="Semestral">Semestral</option>
-                  <option value="Anual">Anual</option>
                 </select>
               </div>
               <div class="form-group">
@@ -547,36 +529,6 @@ let SEC_UNLOCKED = { 1: true, 2: false };
   document.getElementById('rpRole').textContent    = u.rol || 'Administrador';
 })();
 
-// ── Build indicator list ──────────────────────────────────────────────────────
-function buildIndicators() {
-  var list = [];
-  if (typeof GERENCIAS_MIR === 'undefined') return list;
-  GERENCIAS_MIR.forEach(function(g) {
-    var source = (g.usaDataReal && typeof ACTIVIDADES_ENLACE !== 'undefined')
-      ? ACTIVIDADES_ENLACE.filter(function(a) { return a.gerencia === g.gerenciaName; })
-      : (g.indicadores || []);
-    source.forEach(function(act) {
-      list.push({
-        id: act.id, nombre: act.nombreIndicador || act.nombre,
-        gerencia: g.id, gerenciaNombre: g.nombre, gerenciaColor: g.color,
-        nivel: act.nivel || 'A',
-        frecuencia: act.frecuenciaMedicion || act.frecuencia || 'Mensual',
-        unidad: act.unidadMedida || act.unidad || '%',
-        acumulable: !!act.acumulable,
-        tieneDenominador: !!act.tieneDenominador,
-        denominadorFijo: false,
-        denomFijoVal: null,
-        numLabel: act.numerador || '',
-        denLabel: act.denominador || '',
-        formula: act.metodoCalculo || '',
-        descripcion: act.resumenNarrativo || act.descripcion || '',
-        medioVerificacion: act.medioVerificacion || 'Interno',
-        estado: 'activo', isNew: false,
-      });
-    });
-  });
-  return list;
-}
 
 // ── Table ─────────────────────────────────────────────────────────────────────
 function renderTable() {
@@ -661,14 +613,15 @@ function updateStats() {
   document.getElementById('kpiAcum').textContent    = ac;
   document.getElementById('totalBadge').textContent = t;
   document.getElementById('tabCount').textContent   = t;
-  document.getElementById('rpTotal').textContent    = t;
-  document.getElementById('rpPla').textContent      = pl;
-  document.getElementById('rpTec').textContent      = te;
-  document.getElementById('rpCom').textContent      = co;
-  document.getElementById('rpAdm').textContent      = ad;
-  document.getElementById('rpFrac').textContent     = fr;
-  document.getElementById('rpAcumRp').textContent   = ac;
-  document.getElementById('rpDenFijo').textContent  = df;
+  var el;
+  if((el=document.getElementById('rpTotal')))    el.textContent = t;
+  if((el=document.getElementById('rpPla')))      el.textContent = pl;
+  if((el=document.getElementById('rpTec')))      el.textContent = te;
+  if((el=document.getElementById('rpCom')))      el.textContent = co;
+  if((el=document.getElementById('rpAdm')))      el.textContent = ad;
+  if((el=document.getElementById('rpFrac')))     el.textContent = fr;
+  if((el=document.getElementById('rpAcumRp')))   el.textContent = ac;
+  if((el=document.getElementById('rpDenFijo')))  el.textContent = df;
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
@@ -752,6 +705,7 @@ function validateTab(n) {
     if (!document.getElementById('fGerencia').value)         { showToast('Selecciona la gerencia'); return false; }
     if (!document.getElementById('fClave').value.trim())     { showToast('Ingresa la clave del indicador'); return false; }
     if (!document.getElementById('fNombre').value.trim())    { showToast('Ingresa el nombre del indicador'); return false; }
+    if (!document.getElementById('fMedioTexto').value.trim()) { showToast('Ingresa el medio de verificación'); return false; }
     return true;
   }
   if (n===2) {
@@ -765,7 +719,7 @@ function validateTab(n) {
 // ── Form ──────────────────────────────────────────────────────────────────────
 function resetForm() {
   ['fGerencia','fFrecuencia'].forEach(function(id){ document.getElementById(id).value=''; });
-  ['fClave','fNombre','fDescripcion','fUnidad','fNumLabel','fDenLabel','fFormula','fDenomFijoVal'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['fClave','fNombre','fDescripcion','fUnidad','fNumLabel','fDenLabel','fFormula','fDenomFijoVal','fMedioTexto'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('fDenomFijo').checked = false;
   document.getElementById('claveHint').textContent = 'Se generará automáticamente al elegir gerencia';
   document.getElementById('fracFields').style.display = 'none';
@@ -833,45 +787,6 @@ document.getElementById('fDenomFijo').addEventListener('change', function() {
   if (!this.checked) document.getElementById('fDenomFijoVal').value = '';
 });
 
-// ── Save ──────────────────────────────────────────────────────────────────────
-function saveIndicator() {
-  if (!validateTab(1)) { setAccordionOpen(1, true); return; }
-  if (!validateTab(2)) { setAccordionOpen(2, true); return; }
-  var ger   = document.getElementById('fGerencia').value;
-  var gData = typeof GERENCIAS_MIR!=='undefined' ? GERENCIAS_MIR.find(function(g){ return g.id===ger; }) : null;
-  var nivel = document.querySelector('input[name=fNivel]:checked');
-  var denomFijo = document.getElementById('fDenomFijo').checked;
-  var ind = {
-    id:               document.getElementById('fClave').value.trim().toUpperCase(),
-    nombre:           document.getElementById('fNombre').value.trim(),
-    descripcion:      document.getElementById('fDescripcion').value.trim(),
-    gerencia:         ger,
-    gerenciaNombre:   gData ? gData.nombre : ger,
-    gerenciaColor:    gData ? gData.color : GERENCIA_COLORS[ger]||'#6B7280',
-    nivel:            nivel ? nivel.value : 'A',
-    frecuencia:       document.getElementById('fFrecuencia').value,
-    unidad:           document.getElementById('fUnidad').value.trim(),
-    acumulable:       SW.acum,
-    tieneDenominador: SW.frac,
-    numLabel:         document.getElementById('fNumLabel').value.trim(),
-    denLabel:         document.getElementById('fDenLabel').value.trim(),
-    denominadorFijo:  SW.frac && denomFijo,
-    denomFijoVal:     SW.frac && denomFijo ? (parseFloat(document.getElementById('fDenomFijoVal').value)||null) : null,
-    formula:          document.getElementById('fFormula').value.trim(),
-    medioVerificacion:(document.querySelector('input[name=fMV]:checked')||{}).value||'Interno',
-    estado:           'activo', isNew: !EDITING_ID,
-  };
-  if (EDITING_ID) {
-    var idx = ALL.findIndex(function(i){ return i.id===EDITING_ID; });
-    if (idx>=0) ALL[idx]=ind;
-  } else {
-    if (ALL.find(function(i){ return i.id===ind.id; })) { showToast('Ya existe un indicador con esa clave'); return; }
-    ALL.unshift(ind);
-  }
-  FILTERED=[...ALL]; PAGE=1; renderTable(); renderPagination(); updateStats();
-  closeModal(); showToast(EDITING_ID?'Indicador actualizado':'Indicador registrado', true);
-}
-
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg, ok) {
   var t=document.getElementById('toast');
@@ -881,10 +796,12 @@ function showToast(msg, ok) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 (function init() {
-  ALL=buildIndicators(); FILTERED=ALL.slice();
+  // La lista llega de la base: indicadores-admin.js la pide a la API al cargar (CA-4a)
+  ALL=[]; FILTERED=[];
   renderTable(); renderPagination(); updateStats();
 })();
 </script>
+<script src="indicadores-admin.js"></script>
 <script src="dev-toolbar.js"></script>
 </body>
 </html>

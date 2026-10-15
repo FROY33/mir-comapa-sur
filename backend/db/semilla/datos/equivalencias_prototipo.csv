@@ -1,0 +1,124 @@
+codigo_prototipo,codigo,gerencia_clave,nivel,nombre,estado
+ADM-ACT-42,ADM-3.1.1,ADM,componente,Porcentaje de avance del programa operativo anual.,renombrado
+ADM-ACT-43,ADM-3.1.2,ADM,componente,Porcentaje de avance en la implementación de “Aqua 360”,renombrado
+ADM-ACT-44,ADM-3.2.1,ADM,componente,Porcentaje de solicitudes de soporte técnico realizadas,renombrado
+ADM-ACT-45,ADM-3.2.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-46,ADM-3.2.3,ADM,actividad,Porcentaje del Programa de mantenimiento TI anual ejecutada,renombrado
+ADM-ACT-47,ADM-3.2.4,ADM,actividad,Porcentaje de Solicitudes Desarrollo y Modificación a Módulos del Sistema,renombrado
+ADM-ACT-48,ADM-3.2.5,ADM,actividad,Porcentaje de protección de información,renombrado
+ADM-ACT-49,ADM-3.2.6,ADM,actividad,Porcentaje de sistemas informáticos y comunicaciones en operación,renombrado
+ADM-ACT-50,ADM-3.3.1,ADM,componente,Porcentaje de cumplimiento a pedidos,renombrado
+ADM-ACT-51,ADM-3.4.1,ADM,componente,Porcentaje de personal competente,renombrado
+ADM-ACT-52,ADM-3.4.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-53,ADM-3.4.3,ADM,actividad,Porcentaje de cumplimiento del programa de capacitación,renombrado
+ADM-ACT-54,ADM-3.5.1,ADM,componente,Número de asesorías brindadas,renombrado
+ADM-ACT-55,ADM-3.5.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-56,ADM-3.5.3,ADM,actividad,Informes de representación,renombrado
+ADM-ACT-57,ADM-3.6.1,ADM,actividad,Número de informes financieros entregados,renombrado
+ADM-ACT-58,ADM-3.6.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-59,ADM-3.6.3,ADM,actividad,Número de informes financieros entregados,renombrado
+ADM-ACT-60,ADM-3.6.4,ADM,actividad,Número de requerimientos,renombrado
+ADM-ACT-61,ADM-3.6.5,ADM,actividad,Porcentaje de cumplimiento de observaciones al informe financiero,renombrado
+ADM-ACT-62,ADM-3.7.1,ADM,componente,Porcentaje de conciliaciones bancarias realizadas,renombrado
+ADM-ACT-63,ADM-3.7.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-64,ADM-3.7.3,ADM,actividad,Porcentaje de cumplimiento de pago de cuentas,renombrado
+ADM-ACT-65,ADM-3.7.4,ADM,actividad,Porcentaje de pagos autorizados,renombrado
+ADM-ACT-66,ADM-3.7.5,ADM,actividad,Porcentaje de ingresos recaudados,renombrado
+ADM-ACT-67,ADM-3.8.1,ADM,componente,Porcentaje de solicitudes con pedido,renombrado
+ADM-ACT-68,ADM-3.8.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-69,ADM-3.9.1,ADM,componente,"Porcentaje de seguimiento de los programas de salud, seguridad y medio ambiente",renombrado
+ADM-ACT-70,ADM-3.9.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-71,ADM-3.9.3,ADM,actividad,Número de procedimientos elaborados y actualizados,renombrado
+ADM-ACT-72,ADM-3.9.4,ADM,actividad,Número de programas de salud gestionados,renombrado
+ADM-ACT-73,ADM-3.9.5,ADM,actividad,Número de programas de medio ambiente gestionados,renombrado
+ADM-ACT-74,ADM-3.9.6,ADM,actividad,Porcentaje de personal con EPP y EEP suministrados,renombrado
+ADM-ACT-75,ADM-3.10.1,ADM,componente,Porcentaje de presupuesto sostenible gestionado,renombrado
+ADM-ACT-76,ADM-3.10.2,ADM,actividad,Porcentaje de metas ejecutadas,renombrado
+ADM-ACT-77,ADM-3.10.3,ADM,actividad,Porcentaje de avance de ingreso recaudado,renombrado
+ADM-ACT-78,ADM-3.10.4,ADM,actividad,Porcentaje de avance de egresos devengados,renombrado
+ADM-ACT-79,ADM-3.11.1,ADM,componente,Porcentaje de acciones de difusión y concientización realizadas,renombrado
+ADM-ACT-80,ADM-3.11.2,ADM,actividad,Número de seguidores impactados a través de campañas,renombrado
+ADM-ACT-81,ADM-3.11.3,ADM,actividad,Porcentaje de notas de prensa escrita publicadas,renombrado
+ADM-ACT-82,ADM-3.11.4,ADM,actividad,Porcentaje de notas digitales publicadas,renombrado
+ADM-ACT-83,ADM-3.11.5,ADM,actividad,Número de personas impactados a través de campañas,renombrado
+ADM-COMP-41,ADM-3,ADM,proposito,Porcentaje de ejecución del presupuesto administrativo autorizado,renombrado
+ADM-PROP-124,,ADM,proposito,Porcentaje de ejecución del presupuesto administrativo autorizado,sin_equivalente
+COM-ACT-125,,COM,actividad,Porcentaje de metas ejecutadas,sin_equivalente
+COM-ACT-18,COM-2.1.1,COM,componente,Porcentaje de avance del programa operativo anual.,renombrado
+COM-ACT-19,COM-2.1.2,COM,componente,Porcentaje de avance de “Aqua 360” implementado,renombrado
+COM-ACT-20,COM-2.2.1,COM,componente,Porcentaje de medición ejecutado,renombrado
+COM-ACT-21,COM-2.2.2,COM,actividad,Porcentaje de metas ejecutadas,renombrado
+COM-ACT-22,COM-2.2.3,COM,actividad,Variación de anomalías atendidas,renombrado
+COM-ACT-23,COM-2.2.4,COM,actividad,Porcentaje de micromedición,renombrado
+COM-ACT-24,COM-2.2.5,COM,actividad,Porcentaje de medidores instalados,renombrado
+COM-ACT-25,COM-2.2.6,COM,actividad,Porcentaje de cumplimiento al programa de escuadras modificadas,renombrado
+COM-ACT-26,COM-2.2.7,COM,actividad,Porcentaje de cambios de tarifa,renombrado
+COM-ACT-27,COM-2.3.1,COM,componente,Porcentaje de contratación realizada,renombrado
+COM-ACT-28,COM-2.3.2,COM,actividad,Porcentaje de metas ejecutadas,renombrado
+COM-ACT-29,COM-2.3.3,COM,actividad,Porcentaje de solicitudes,renombrado
+COM-ACT-30,COM-2.4.1,COM,componente,Reducir usuarios en rezago,renombrado
+COM-ACT-31,COM-2.4.2,COM,actividad,Porcentaje de metas ejecutadas,renombrado
+COM-ACT-32,COM-2.4.3,COM,actividad,Importe recuperado por limitaciones,renombrado
+COM-ACT-33,COM-2.5.1,COM,componente,Porcentaje de usuarios en ventanilla atendidos,renombrado
+COM-ACT-34,COM-2.5.2,COM,actividad,Porcentaje de metas ejecutadas,renombrado
+COM-ACT-35,COM-2.5.3,COM,actividad,Porcentaje de cierre de solicitudes atendidas,renombrado
+COM-ACT-36,COM-2.6.1,COM,componente,Atención a la Industria y el Comercio,renombrado
+COM-ACT-37,COM-2.6.2,COM,actividad,Porcentaje de metas ejecutadas,renombrado
+COM-ACT-38,COM-2.6.3,COM,actividad,Porcentaje de cambio de tarifa aplicada,renombrado
+COM-ACT-39,COM-2.7.1,COM,componente,Porcentaje de aplicación de tarifa preferencial,renombrado
+COM-ACT-40,COM-2.7.2,COM,actividad,Porcentaje de metas ejecutadas,renombrado
+COM-COMP-17,COM-2,COM,proposito,Porcentaje de eficiencia comercial,renombrado
+PLA-ACT-10,PLA-1.2.5,PLA,actividad,Porcentaje de indicadores evaluados en tiempo,renombrado
+PLA-ACT-11,PLA-1.3.1,PLA,componente,Porcentaje de avance de proyectos estratégicos,renombrado
+PLA-ACT-12,PLA-1.3.2,PLA,actividad,Porcentaje de sesiones realizadas conforme a calendario,renombrado
+PLA-ACT-13,PLA-1.3.3,PLA,actividad,Porcentaje de sesiones realizadas conforme a calendario,renombrado
+PLA-ACT-14,PLA-1.4.1,PLA,componente,Porcentaje de plantas en operación,renombrado
+PLA-ACT-15,PLA-1.4.2,PLA,actividad,Porcentaje de cumplimiento a los parámetros de calidad del agua NOM-001-SEMARNAT-2021,renombrado
+PLA-ACT-16,PLA-1.4.3,PLA,actividad,Porcentaje de cumplimiento al Programa Anual de Supervisión de Plantas de Tratamiento de Aguas Residuales,renombrado
+PLA-ACT-4,PLA-1.1.1,PLA,componente,Porcentaje de cumplimiento del POA,renombrado
+PLA-ACT-5,PLA-1.1.2,PLA,actividad,Porcentaje de elaboración del POA,renombrado
+PLA-ACT-6,PLA-1.2.1,PLA,componente,Porcentaje de cumplimiento al Plan de Trabajo del Objetivo 1 del SGC,renombrado
+PLA-ACT-7,PLA-1.2.2,PLA,actividad,Porcentaje de Cumplimiento del Plan de Auditoría de Mantenimiento,renombrado
+PLA-ACT-8,PLA-1.2.3,PLA,actividad,Porcentaje de Cumplimiento del Plan de Auditoría de Mantenimiento,renombrado
+PLA-ACT-9,PLA-1.2.4,PLA,actividad,Porcentaje de Cumplimiento del Programa de Revisiones por la Dirección,renombrado
+PLA-COMP-3,PLA-1,PLA,proposito,Porcentaje de avance de Plan Maestro 2025-2028,renombrado
+TEC-ACT-100,TEC-4.2.14,TEC,actividad,Número de pagos realizados,renombrado
+TEC-ACT-101,TEC-4.3.1,TEC,componente,Porcentaje de proyectos elaborados,renombrado
+TEC-ACT-102,TEC-4.3.2,TEC,actividad,Porcentaje de metas ejecutadas,renombrado
+TEC-ACT-103,TEC-4.3.3,TEC,actividad,Número de factibilidades validadas,renombrado
+TEC-ACT-104,TEC-4.3.4,TEC,actividad,Número de procesos de contratación ejecutados,renombrado
+TEC-ACT-105,TEC-4.3.5,TEC,actividad,Porcentaje de avance físico,renombrado
+TEC-ACT-106,TEC-4.3.6,TEC,actividad,Porcentaje de avance financiero,renombrado
+TEC-ACT-107,TEC-4.3.7,TEC,actividad,Presupuesto elaborado,renombrado
+TEC-ACT-108,TEC-4.3.8,TEC,actividad,Tabla de precios actualizadas,renombrado
+TEC-ACT-109,TEC-4.3.9,TEC,actividad,Porcentaje de obras contratadas y externas supervisadas,renombrado
+TEC-ACT-110,TEC-4.3.10,TEC,actividad,Equipos en operación,renombrado
+TEC-ACT-111,TEC-4.4.1,TEC,componente,Porcentaje de kilómetros de redes atendidos,renombrado
+TEC-ACT-112,TEC-4.4.2,TEC,actividad,Porcentaje de metas ejecutadas,renombrado
+TEC-ACT-113,TEC-4.4.3,TEC,actividad,Porcentaje de atención de fugas de agua,renombrado
+TEC-ACT-114,TEC-4.4.4,TEC,actividad,Metros de tuberia sondeada,renombrado
+TEC-ACT-115,TEC-4.4.5,TEC,actividad,Porcentaje de desazolves atendidos,renombrado
+TEC-ACT-116,TEC-4.4.6,TEC,actividad,Porcentaje de instalaciones realizadas,renombrado
+TEC-ACT-117,TEC-4.4.7,TEC,actividad,Válvulas de desfogue repuestas e instaladas,renombrado
+TEC-ACT-118,TEC-4.4.8,TEC,actividad,Lavados de red de distribución realizados,renombrado
+TEC-ACT-119,TEC-4.4.9,TEC,actividad,Pavimentos repuestos (m2),renombrado
+TEC-ACT-120,TEC-4.5.1,TEC,componente,Número de programas federales y estatales gestionados,renombrado
+TEC-ACT-121,TEC-4.5.2,TEC,actividad,Porcentaje de metas ejecutadas,renombrado
+TEC-ACT-122,TEC-4.5.3,TEC,actividad,Programa anual de obras entregado,renombrado
+TEC-ACT-123,TEC-4.5.4,TEC,actividad,Paquetes de obra aprobados,renombrado
+TEC-ACT-85,TEC-4.1.1,TEC,componente,Porcentaje de avance del programa operativo anual,renombrado
+TEC-ACT-86,TEC-4.1.2,TEC,componente,Porcentaje de avance en la implementación de “Aqua 360”,renombrado
+TEC-ACT-87,TEC-4.2.1,TEC,componente,Porcentaje de eficiencia operativa,renombrado
+TEC-ACT-88,TEC-4.2.2,TEC,actividad,Porcentaje de metas ejecutadas,renombrado
+TEC-ACT-89,TEC-4.2.3,TEC,actividad,Porcentaje de equipos operativos funcionales,renombrado
+TEC-ACT-90,TEC-4.2.4,TEC,actividad,Consumo de reactivos,renombrado
+TEC-ACT-91,TEC-4.2.5,TEC,actividad,Consumo de energía eléctrica,renombrado
+TEC-ACT-92,TEC-4.2.6,TEC,actividad,Porcentaje de carcamos operativos revisados,renombrado
+TEC-ACT-93,TEC-4.2.7,TEC,actividad,Porcentaje de carcamos operativos revisados,renombrado
+TEC-ACT-94,TEC-4.2.8,TEC,actividad,Porcentaje de carcamos operativos revisados,renombrado
+TEC-ACT-95,TEC-4.2.9,TEC,actividad,Porcentaje de muestras de agua que cumplen norma,renombrado
+TEC-ACT-96,TEC-4.2.10,TEC,actividad,Cantidades de presión enviada,renombrado
+TEC-ACT-97,TEC-4.2.11,TEC,actividad,Cantidades de presión enviada,renombrado
+TEC-ACT-98,TEC-4.2.12,TEC,actividad,Volumen en caudal capturado,renombrado
+TEC-ACT-99,TEC-4.2.13,TEC,actividad,Volumen a la red enviado,renombrado
+TEC-COMP-84,TEC-4,TEC,proposito,Porcentaje de eficiencia física,renombrado

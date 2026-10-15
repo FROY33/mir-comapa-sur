@@ -36,7 +36,23 @@ fuera de una base local o `_test`, aunque falte `NODE_ENV`: el destino se imprim
 
 ```sh
 npx tsx db/semilla/extraer.ts
+npx tsx db/semilla/importar-csv-unificada.ts   # siempre después: catálogo institucional y fixtures
 ```
+
+`extraer.ts` escribe los indicadores y las fixtures con los códigos del prototipo (`ADM-ACT-42`…);
+`importar-csv-unificada.ts` reemplaza los MIR por el catálogo institucional (`ADM-3.1.1`…) y
+reasigna cada fixture al indicador equivalente, con el código original en
+`indicador_codigo_prototipo`. Las que no tienen equivalente libre se listan en `CONCILIACION.md`.
+
+`--catalogo` (S2-TEC-02) renombra cada MIR del prototipo a su código institucional según
+`datos/equivalencias_prototipo.csv` (mismo `id`, sus reportes se conservan), hace upsert por código,
+desactiva sin borrar los que no tienen equivalente y registra `catalogo_importado` en la bitácora
+(conteos y sha256 de `indicadores.csv`). Con ese evento previo se niega (HU-R4-11 RN_4) y el sembrado
+normal deja de escribir indicadores; `--forzar` lo repite sin sobrescribir los campos editados desde
+la pantalla y los lista al terminar. La edición se reconoce por los eventos `indicador_edicion` /
+`indicador_editado`, que solo guardan los campos de la foto de la API (código, nombre, tipo, nivel,
+gerencia, frecuencia, tipo de cálculo, acumulable, unidad de medida, activo, tipo de indicador y medio
+de verificación).
 
 Determinista: misma entrada, mismos bytes. Las filas se ordenan por clave natural y
 `manifest.json` guarda `sha256` por archivo, así que dos corridas se comparan byte a byte
@@ -73,7 +89,8 @@ shasum -a 256 db/semilla/datos/*.csv > /tmp/h1 && npx tsx db/semilla/extraer.ts 
 | `indicadores.csv` | 155 | `indicadores` | `codigo` |
 | `periodos.csv` | 28 | `periodos_reporte` | `frecuencia` + `ejercicio` + `numero` |
 | `fixtures_reportes.csv` | 123 | `reportes` | `indicador_codigo` + `periodo_frecuencia` + `periodo_numero` |
-| `usuarios_prueba.csv` | 5 | `usuarios` | `email` (cuentas de prueba: los responsables que las fixtures citan y no existen en el prototipo) |
+| `fixtures_sinteticas.csv` | 1 | `reportes` | como `fixtures_reportes.csv`; datos de prueba para gerencias sin reportes en el prototipo (Gerencia General). El importador no la reescribe |
+| `usuarios_prueba.csv` | 6 | `usuarios` | `email` (cuentas de prueba: los responsables que las fixtures citan y no existen en el prototipo, y el Revisor de prueba de Gerencia General) |
 | `catalogo_mir_193.csv` | 193 | — | `codigo` (catálogo de abril; espacio de IDs disjunto, no se carga) |
 
 Las claves son las mismas que hace cumplir el esquema: `UNIQUE (organizacion_id, clave)` en

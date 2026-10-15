@@ -1,0 +1,2 @@
+# Datos de la semilla: manifest.json guarda su sha256, así que van con LF en cualquier sistema
+backend/db/semilla/datos/*.csv text eol=lf

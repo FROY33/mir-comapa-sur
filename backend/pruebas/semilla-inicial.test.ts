@@ -68,7 +68,7 @@ describe('carga inicial en producción', () => {
   const PASSWORD = 'contrasena-inicial-de-prueba'
   let bd: BD
 
-  const sembrar = (...args: string[]) => spawnSync('db/sembrar.sh', args, {
+  const sembrar = (...args: string[]) => spawnSync('bash', ['db/sembrar.sh', ...args], {
     encoding: 'utf8',
     env: {
       ...process.env, NODE_ENV: 'production', DATABASE_URL: url.toString(),
@@ -88,7 +88,7 @@ describe('carga inicial en producción', () => {
     const base = url.pathname.slice(1)
     await administrar(`DROP DATABASE IF EXISTS ${base} WITH (FORCE)`)
     await administrar(`CREATE DATABASE ${base}`)
-    execFileSync('db/migrar.sh', ['up'], { stdio: 'pipe', env: { ...process.env, DATABASE_URL: url.toString() } })
+    execFileSync('bash', ['db/migrar.sh', 'up'], { stdio: 'pipe', env: { ...process.env, DATABASE_URL: url.toString() } })
     bd = crearBD({ ...configBD, url: url.toString() }, crearLog(() => {}))
   })
   after(async () => {
@@ -126,7 +126,7 @@ describe('carga inicial en producción', () => {
   })
 
   test('sin SEMILLA_PASSWORD sale con error', () => {
-    const r = spawnSync('db/sembrar.sh', [], {
+    const r = spawnSync('bash', ['db/sembrar.sh'], {
       encoding: 'utf8',
       env: { ...process.env, NODE_ENV: 'production', DATABASE_URL: url.toString(), SEMILLA_PASSWORD: '' },
     })

@@ -9,16 +9,17 @@
 //   tsx cargar.ts                  definición (+ usuarios de demostración si la base es local)
 //   tsx cargar.ts --con-fixtures   agrega los reportes de prueba (solo base local o de pruebas, CA-4)
 //   tsx cargar.ts --verificar      no escribe; solo reporta qué hay en la base
+//   tsx cargar.ts --catalogo       solo el catálogo institucional sobre una base del sprint 1 (una vez; ver catalogo.ts)
+//   tsx cargar.ts --catalogo --forzar   lo repite sin pisar lo que el Administrador editó desde la pantalla
 
 import bcrypt from 'bcryptjs'
 import { crearBD, type BD, type Ejecutor } from '../../src/bd.js'
 import { cargarConfig } from '../../src/config.js'
 import { crearLog } from '../../src/log.js'
+import { cargarIndicadores, catalogoImportado, ErrorCatalogo, importarCatalogo } from './catalogo.js'
 import { booleano, leerCsv, numeroONulo, vacioANulo } from './csv.js'
+import { cargarGerencias, cargarOrganizacion, cargarUnidades } from './organizacion.js'
 import { adminInicial, destino, ErrorPlan, passwordInicial, planDeCarga, type AdminInicial, type Plan } from './plan.js'
-
-/** La organización es una sola en S1; existe para no migrar de forma destructiva después. */
-const ORGANIZACION = 'COMAPA Sur'
 
 /** bcrypt con 12 rondas o más (DICCIONARIO.md, usuarios.password_hash). */
 const RONDAS_BCRYPT = 12
@@ -32,47 +33,11 @@ async function cargar(bd: BD, plan: Plan, cuentas: Cuentas): Promise<Resumen[]> 
   const resumen: Resumen[] = []
 
   return bd.transaccion(async (tx) => {
-    // 1. Organización
-    const [org] = await tx.consultar<{ id: string }>(
-      `INSERT INTO organizaciones (nombre) VALUES ($1)
-       ON CONFLICT (nombre) DO UPDATE SET nombre = EXCLUDED.nombre
-       RETURNING id`, [ORGANIZACION])
-    if (org === undefined) throw new Error('No se pudo registrar la organización')
-    const organizacionId = org.id
-
-    // 2. Gerencias
-    const gerencias = leerCsv('gerencias.csv')
-    const idGerencia = new Map<string, string>()
-    for (const g of gerencias) {
-      const [fila] = await tx.consultar<{ id: string }>(
-        `INSERT INTO gerencias (organizacion_id, clave, nombre, titular_nombre, titular_cargo, activo)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT (organizacion_id, clave) DO UPDATE
-           SET nombre = EXCLUDED.nombre, titular_nombre = EXCLUDED.titular_nombre,
-               titular_cargo = EXCLUDED.titular_cargo, activo = EXCLUDED.activo
-         RETURNING id`,
-        [organizacionId, g.clave, g.nombre, vacioANulo(g.titular_nombre), vacioANulo(g.titular_cargo), booleano(g.activo)])
-      if (fila === undefined) throw new Error(`Gerencia ${g.clave}: sin id`)
-      idGerencia.set(g.clave!, fila.id)
-    }
-    resumen.push({ tabla: 'gerencias', filas: gerencias.length, procesados: gerencias.length })
-
-    // 3. Unidades
-    const unidades = leerCsv('unidades.csv')
-    const idUnidad = new Map<string, string>()
-    for (const u of unidades) {
-      const gerenciaId = idGerencia.get(u.gerencia_clave!)
-      if (gerenciaId === undefined) throw new Error(`Unidad "${u.nombre}": gerencia ${u.gerencia_clave} desconocida`)
-      const [fila] = await tx.consultar<{ id: string }>(
-        `INSERT INTO unidades (gerencia_id, nombre, es_coord_general, activo)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (gerencia_id, nombre) DO UPDATE
-           SET es_coord_general = EXCLUDED.es_coord_general, activo = EXCLUDED.activo
-         RETURNING id`,
-        [gerenciaId, u.nombre, booleano(u.es_coord_general), booleano(u.activo)])
-      if (fila === undefined) throw new Error(`Unidad ${u.nombre}: sin id`)
-      idUnidad.set(`${u.gerencia_clave}||${u.nombre}`, fila.id)
-    }
+    // 1-3. Organización, gerencias y unidades
+    const organizacionId = await cargarOrganizacion(tx)
+    const { idGerencia, filas: nGerencias } = await cargarGerencias(tx, organizacionId)
+    resumen.push({ tabla: 'gerencias', filas: nGerencias, procesados: nGerencias })
+    const { idUnidad, filas: nUnidades } = await cargarUnidades(tx, idGerencia)
     // Una unidad renombrada en el CSV deja la vieja sin uso: se desactiva, no se borra
     // (puede tener usuarios o indicadores). Solo en demostración, donde el CSV manda.
     if (plan.modo === 'demostracion') {
@@ -81,7 +46,7 @@ async function cargar(bd: BD, plan: Plan, cuentas: Cuentas): Promise<Resumen[]> 
           WHERE u.activo AND u.gerencia_id = ANY($1::uuid[]) AND NOT (u.id = ANY($2::uuid[]))`,
         [[...idGerencia.values()], [...idUnidad.values()]])
     }
-    resumen.push({ tabla: 'unidades', filas: unidades.length, procesados: unidades.length })
+    resumen.push({ tabla: 'unidades', filas: nUnidades, procesados: nUnidades })
 
     // 4. Usuarios. En demostración: los del prototipo más los de prueba, y una fila de
     //    usuarios_prueba.csv corrige a la del mismo correo en usuarios.csv. En la carga
@@ -126,48 +91,14 @@ async function cargar(bd: BD, plan: Plan, cuentas: Cuentas): Promise<Resumen[]> 
     }
     resumen.push({ tabla: 'usuarios', filas: usuarios.length, procesados: usuarios.length })
 
-    // 5. Indicadores. parent_id se resuelve en una segunda pasada porque un padre
-    //    puede venir después que su hijo en el archivo.
-    const indicadores = leerCsv('indicadores.csv')
-    for (const i of indicadores) {
-      const gerenciaId = idGerencia.get(i.gerencia_clave!)
-      if (gerenciaId === undefined) throw new Error(`${i.codigo}: gerencia ${i.gerencia_clave} desconocida`)
-      const unidadId = i.unidad_nombre ? idUnidad.get(`${i.gerencia_clave}||${i.unidad_nombre}`) ?? null : null
-      await tx.consultar(
-        `INSERT INTO indicadores (
-           gerencia_id, unidad_id, codigo, tipo, nivel, numero, nombre, resumen_narrativo,
-           tipo_indicador, unidad_medida, frecuencia, tipo_calculo, formula, numerador_desc,
-           denominador_desc, denominador_fijo, acumulable, sentido_meta, medio_verificacion,
-           origen_mv, supuestos, es_iso, observaciones_mir, activo)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
-         ON CONFLICT (codigo) DO UPDATE SET
-           gerencia_id = EXCLUDED.gerencia_id, unidad_id = EXCLUDED.unidad_id,
-           tipo = EXCLUDED.tipo, nivel = EXCLUDED.nivel, numero = EXCLUDED.numero,
-           nombre = EXCLUDED.nombre, resumen_narrativo = EXCLUDED.resumen_narrativo,
-           tipo_indicador = EXCLUDED.tipo_indicador, unidad_medida = EXCLUDED.unidad_medida,
-           frecuencia = EXCLUDED.frecuencia, tipo_calculo = EXCLUDED.tipo_calculo,
-           formula = EXCLUDED.formula, numerador_desc = EXCLUDED.numerador_desc,
-           denominador_desc = EXCLUDED.denominador_desc, denominador_fijo = EXCLUDED.denominador_fijo,
-           medio_verificacion = EXCLUDED.medio_verificacion, origen_mv = EXCLUDED.origen_mv,
-           acumulable = EXCLUDED.acumulable, sentido_meta = EXCLUDED.sentido_meta,
-           supuestos = EXCLUDED.supuestos, es_iso = EXCLUDED.es_iso,
-           observaciones_mir = EXCLUDED.observaciones_mir, activo = EXCLUDED.activo`,
-        [gerenciaId, unidadId, i.codigo, i.tipo, vacioANulo(i.nivel), vacioANulo(i.numero),
-         i.nombre, vacioANulo(i.resumen_narrativo), vacioANulo(i.tipo_indicador), i.unidad_medida,
-         i.frecuencia, i.tipo_calculo, vacioANulo(i.formula), vacioANulo(i.numerador_desc),
-         vacioANulo(i.denominador_desc), numeroONulo(i.denominador_fijo), booleano(i.acumulable),
-         i.sentido_meta, vacioANulo(i.medio_verificacion), vacioANulo(i.origen_mv),
-         vacioANulo(i.supuestos), booleano(i.es_iso), vacioANulo(i.observaciones_mir), booleano(i.activo)])
+    // 5. Indicadores. Una vez importado el catálogo (--catalogo) se mantienen desde la pantalla
+    //    del catálogo: la carga completa ya no los toca, para no revertir lo que se editó.
+    if (await catalogoImportado(tx)) {
+      resumen.push({ tabla: 'indicadores (ya importados)', filas: 0, procesados: 0 })
+    } else {
+      const { filas } = await cargarIndicadores(tx, idGerencia, idUnidad)
+      resumen.push({ tabla: 'indicadores', filas, procesados: filas })
     }
-    // Sin parent_codigo en el CSV, el padre se quita; un padre que no existe es un error del CSV
-    for (const i of indicadores) {
-      const filas = await tx.consultar(
-        `UPDATE indicadores SET parent_id = (SELECT id FROM indicadores WHERE codigo = $2)
-          WHERE codigo = $1 AND ($2::text IS NULL OR EXISTS (SELECT 1 FROM indicadores WHERE codigo = $2))
-         RETURNING id`, [i.codigo, vacioANulo(i.parent_codigo)])
-      if (filas.length === 0) throw new Error(`${i.codigo}: el padre ${i.parent_codigo} no existe`)
-    }
-    resumen.push({ tabla: 'indicadores', filas: indicadores.length, procesados: indicadores.length })
 
     // 6. Periodos de reporte
     const periodos = leerCsv('periodos.csv')
@@ -197,7 +128,9 @@ async function cargar(bd: BD, plan: Plan, cuentas: Cuentas): Promise<Resumen[]> 
 
     const idIndicador = new Map((await tx.consultar<{ codigo: string; id: string }>(
       'SELECT codigo, id FROM indicadores')).map((i) => [i.codigo, i.id]))
-    const fixtures = leerCsv('fixtures_reportes.csv')
+    // fixtures_sinteticas.csv: datos de prueba para gerencias sin reportes en el prototipo (Gerencia
+    // General, activa desde el ticket 2). El importador del catálogo no la reescribe (TEC-04 CA-5).
+    const fixtures = [...leerCsv('fixtures_reportes.csv'), ...leerCsv('fixtures_sinteticas.csv')]
     let procesados = 0
     for (const f of fixtures) {
       const indicadorId = idIndicador.get(f.indicador_codigo!)
@@ -247,7 +180,7 @@ let plan: Plan
 let cuentas: Cuentas
 try {
   plan = planDeCarga(process.argv.slice(2), config.entorno, config.bd.url)
-  cuentas = plan.soloVerificar ? { password: '' } : {
+  cuentas = plan.soloVerificar || plan.catalogo ? { password: '' } : {
     password: passwordInicial(process.env),
     admin: plan.modo === 'inicial' ? adminInicial(process.env) : undefined,
   }
@@ -258,11 +191,18 @@ try {
 }
 
 const bd = crearBD(config.bd, crearLog(() => {}))
-console.log(`Destino: ${destino(config.bd.url)} · modo ${plan.modo}${plan.fixtures ? ' con fixtures' : ''}`)
+console.log(`Destino: ${destino(config.bd.url)} · modo ${plan.catalogo ? 'catálogo' + (plan.forzar ? ' forzado' : '') : plan.modo}${plan.fixtures ? ' con fixtures' : ''}`)
 
 try {
   const yaCargada = Number((await contar(bd)).usuarios) > 0
-  if (plan.soloVerificar) {
+  if (plan.catalogo) {
+    const r = await importarCatalogo(bd, plan.forzar)
+    for (const [concepto, n] of Object.entries(r.conteos)) console.log(`  ${concepto.replace(/_/g, ' ').padEnd(20)} ${String(n).padStart(4)}`)
+    console.log(`  sha256 de indicadores.csv ${r.sha256}`)
+    for (const d of r.desactivados) console.log(`  desactivado: ${d.codigo} (${d.reportes} reportes conservados)`)
+    for (const n of r.no_sobrescritos) console.log(`  no sobrescrito: ${n.codigo} (${n.campos.join(', ')}), lo editó el Administrador`)
+    console.log()
+  } else if (plan.soloVerificar) {
     // solo reporta
   } else if (plan.modo === 'inicial' && yaCargada) {
     console.log('La base ya tiene usuarios: la carga inicial no se repite (no se cambió nada).')
@@ -275,6 +215,10 @@ try {
   for (const [tabla, n] of Object.entries(await contar(bd))) {
     console.log(`  ${tabla.padEnd(22)} ${String(n).padStart(4)}`)
   }
+} catch (err) {
+  if (!(err instanceof ErrorCatalogo)) throw err
+  console.error(`✗ ${err.message}`)
+  process.exitCode = 1
 } finally {
   await bd.cerrar()
 }

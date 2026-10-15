@@ -17,7 +17,7 @@ const PASSWORD_PRUEBAS = 'semilla-de-pruebas-2026'
 
 /** Corre la carga contra la base de pruebas. */
 function sembrar(...args: string[]) {
-  execFileSync('db/sembrar.sh', args, {
+  execFileSync('bash', ['db/sembrar.sh', ...args], {
     stdio: 'pipe',
     env: { ...process.env, DATABASE_URL: configBD.url, SEMILLA_PASSWORD: PASSWORD_PRUEBAS },
   })

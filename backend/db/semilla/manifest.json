@@ -11,7 +11,8 @@
     "indicadores_gerenciales": 32,
     "periodos": 28,
     "catalogo_mir_193": 193,
-    "fixtures_reportes": 123
+    "fixtures_reportes": 123,
+    "equivalencias_prototipo": 123
   },
   "integridad": {
     "gerencias_desconocidas": [],
@@ -61,7 +62,7 @@
       "Pedro Sánchez"
     ],
     "fixtures_sin_enviado_por": 21,
-    "jerarquia_con_padre": 116,
+    "jerarquia_con_padre": 117,
     "jerarquia_sin_padre": [],
     "numeros_ambiguos": [],
     "frecuencias_sin_periodo_concluido": [
@@ -71,10 +72,7 @@
     "unidades_solo_citadas_por_usuarios": [
       "GEN||Gerencia General"
     ],
-    "tipo_indicador_vacio": [
-      "COM-ACT-26",
-      "COM-ACT-36"
-    ],
+    "tipo_indicador_vacio": [],
     "borradores_sinteticos_ca5": [
       "ADM-ACT-45",
       "COM-ACT-125",
@@ -109,12 +107,12 @@
     {
       "archivo": "datos/gerencias.csv",
       "filas": 5,
-      "sha256": "0d583f1e020c31544fa5fc4dd9ce42aa2d4a06da6e77055af75eedf74917dc90"
+      "sha256": "86bc669b244d9c363d542d43c8a961ffafacff9bcbf5450ca1d7f2d700920270"
     },
     {
       "archivo": "datos/unidades.csv",
       "filas": 34,
-      "sha256": "f7a2e29ac2c9c0213f9f46e51d75cfacd6cc592e27c55998276394402528f9fc"
+      "sha256": "6a89f3d3698ad7b15b37a42c538533ab091a6c305bb7958a990782a9081b26be"
     },
     {
       "archivo": "datos/usuarios.csv",
@@ -124,7 +122,7 @@
     {
       "archivo": "datos/indicadores.csv",
       "filas": 155,
-      "sha256": "5f86952b0153eb18a0a93a4e0ca708838b4a50684c649082ba66f452a146a658"
+      "sha256": "f281c5abadb52d8e9f2d3e42a29a7536c0bd7e82608df57339c94df839e93ca1"
     },
     {
       "archivo": "datos/periodos.csv",
@@ -139,7 +137,13 @@
     {
       "archivo": "datos/fixtures_reportes.csv",
       "filas": 123,
-      "sha256": "9e6138e778d1e7737bf8ae9eae358f92e8d78f21f6d15b87cb3ca647f3d07050"
+      "sha256": "830e7b006a8ed5a4b1029b2e799dfb2fe1f423ba3fba4a88aa93b308c683898d"
+    },
+    {
+      "archivo": "datos/equivalencias_prototipo.csv",
+      "filas": 123,
+      "sha256": "739873df923268ee3d63bba3c6d66076412f0d1bf0c8a90b00284173fded47ef"
     }
-  ]
+  ],
+  "catalogo_fuente_sha256": "1ff29b403d3dcf3bf6ac1ace2c688a71fc4f07e8951de1345ffbad5608ed4466"
 }

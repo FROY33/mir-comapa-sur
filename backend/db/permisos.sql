@@ -21,7 +21,8 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"app";
 GRANT USAGE ON SCHEMA public TO :"app";
 
-GRANT SELECT                         ON schema_migrations, gerencias, unidades, indicadores TO :"app";
+GRANT SELECT                         ON schema_migrations, gerencias, unidades TO :"app";
+GRANT SELECT, INSERT, UPDATE         ON indicadores      TO :"app";   -- catálogo del Admin (HU-R4-11); nunca DELETE (RN_2)
 -- Los triggers de reportes leen la versión del indicador al generar un reporte (R3-01); los medios
 -- se leen con el indicador. Escribir versiones solo lo hace el trigger de INDICADORES (dueño).
 GRANT SELECT                         ON indicador_versiones, medios_verificacion TO :"app";
