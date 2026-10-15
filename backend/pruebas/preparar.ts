@@ -17,4 +17,5 @@ await cliente.query(`DROP DATABASE IF EXISTS ${base} WITH (FORCE)`)
 await cliente.query(`CREATE DATABASE ${base}`)
 await cliente.end()
 
-execFileSync('db/migrar.sh', ['up'], { stdio: 'inherit', env: { ...process.env, DATABASE_URL: bd.url } })
+// Por bash y no directo: en Windows no se puede ejecutar un .sh con execFileSync
+execFileSync('bash', ['db/migrar.sh', 'up'], { stdio: 'inherit', env: { ...process.env, DATABASE_URL: bd.url } })

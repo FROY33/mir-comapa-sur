@@ -28,11 +28,14 @@ ok "$BASE creada"
 paso "2. Migraciones"
 "$AQUI/migrar.sh" up
 
+# psql de Windows no conoce /dev/null
+case "${OSTYPE:-}" in msys*|cygwin*) NULO=NUL ;; *) NULO=/dev/null ;; esac
+
 paso "3. Pruebas SQL (restricciones de TEC-02, modelo de metas…)"
 for f in "$AQUI"/pruebas/*.sql; do
   case "$(basename "$f")" in apoyo.sql|datos-base.sql|resultado.sql|actualizacion.sql) continue ;; esac
   printf '  %s\n' "$(basename "$f")"
-  psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f "$f"
+  psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -v nulo="$NULO" -f "$f"
 done
 
 paso "4. Reversión completa"
@@ -74,7 +77,7 @@ while read -r tabla n; do
 done <<<"$antes"
 [ "$perdidas" -eq 0 ] || exit 1
 # Comprobaciones específicas de las migraciones de datos (qué debe seguir siendo cierto con datos reales)
-psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f "$AQUI/pruebas/actualizacion.sql"
+psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -v nulo="$NULO" -f "$AQUI/pruebas/actualizacion.sql"
 ok "Ninguna tabla de S1 perdió filas ($(wc -l <<<"$antes" | tr -d ' ') tablas, $(awk '{ s += $2 } END { print s }' <<<"$antes") filas)"
 
 paso "Todo en orden."

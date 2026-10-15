@@ -19,8 +19,10 @@ import { cargarGerencias, cargarOrganizacion, cargarUnidades } from './organizac
 
 export class ErrorCatalogo extends Error {}
 
-/** Acciones con que la API registra la edición de un indicador (el issue 005 las renombrará). */
-const EDICIONES = ['indicador_edicion', 'indicador_editado']
+/** Acción con que la API registra la edición de un indicador (nombre del RQM). */
+const EDICION = 'indicador_editado'
+/** Un cambio programado que se aplicó al abrir un periodo: también es una edición del Administrador (antes/despues). */
+const CAMBIO_APLICADO = 'cambio_programado_aplicado'
 const ACCION_CARGA = 'catalogo_importado'
 
 // Columna de la tabla → cómo se saca del renglón del CSV. gerencia_id y unidad_id se agregan aparte.
@@ -114,7 +116,7 @@ async function camposEditados(tx: Ejecutor, desdeId: string): Promise<Protegidos
     `SELECT i.codigo, b.accion, b.detalle
        FROM bitacora b JOIN indicadores i ON i.id = b.indicador_id
       WHERE b.id > $1 AND b.accion = ANY($2)`,
-    [desdeId, [...EDICIONES, 'indicador_desactivado', 'indicador_reactivado']])
+    [desdeId, [EDICION, CAMBIO_APLICADO, 'indicador_desactivado', 'indicador_reactivado']])
   const protegidos: Protegidos = new Map()
   const marcar = (codigo: string, campo: string) => {
     const columna = COLUMNA_DE_FOTO[campo] ?? campo

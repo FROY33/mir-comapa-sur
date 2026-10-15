@@ -9,6 +9,7 @@ import { crearManejador } from './http.js'
 import { cambiarPassword } from './cuenta.js'
 import * as indicadores from './indicadores.js'
 import * as indicadoresAdmin from './indicadoresAdmin.js'
+import * as indicadoresCambios from './indicadoresCambios.js'
 import * as pendientes from './pendientes.js'
 import type { Log } from './log.js'
 import type { Rol } from './rutas.js'
@@ -62,6 +63,7 @@ export function crearApp(
     'PUT /api/admin/indicadores/:id': protegida(['admin'], indicadoresAdmin.editar(bd)),
     'POST /api/admin/indicadores/:id/desactivar': protegida(['admin'], indicadoresAdmin.desactivar(bd)),
     'POST /api/admin/indicadores/:id/reactivar': protegida(['admin'], indicadoresAdmin.reactivar(bd)),
+    'POST /api/admin/cambios-programados/:id/cancelar': protegida(['admin'], indicadoresCambios.cancelar(bd)),
     // Gestión de usuarios (HU-R7-07)
     'GET /api/admin/catalogo': protegida(['admin'], usuarios.catalogo(bd)),
     'GET /api/admin/usuarios': protegida(['admin'], usuarios.listar(bd)),

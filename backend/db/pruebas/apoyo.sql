@@ -6,7 +6,12 @@
 \pset format unaligned
 
 BEGIN;
-\o /dev/null
+-- En Windows no hay /dev/null: psql ... -v nulo=NUL (probar.sh lo pasa)
+\if :{?nulo}
+\else
+  \set nulo /dev/null
+\endif
+\o :nulo
 
 CREATE TEMP TABLE _resultados (n serial, descripcion text);
 

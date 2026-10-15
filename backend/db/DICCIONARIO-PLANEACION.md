@@ -111,10 +111,12 @@ Meta de un indicador en un ejercicio, versionada (CA-2). Una sola versión vigen
 | enviada_por/at | uuid, timestamptz | sí | | enviada_at obligatoria desde `meta_enviada` | |
 | validada_por/at | uuid, timestamptz | sí | | validada_at ⇔ `meta_validada` | |
 | lock_version | integer | no | `0` | | Control optimista; sube en cada UPDATE |
+| indicador_version_id | uuid | no | | FK (indicador_version_id, indicador_id) → indicador_versiones; fija | Versión del indicador con que se creó la meta (20261015000001). Su frecuencia valida `metas_periodo` y la usa el cumplimiento (HU-R4-11 RN_3) |
 | created_at / updated_at | timestamptz | no | `now()` | | |
 
 `metas_planeacion_proteccion`: las metas no se borran; una versión histórica no se modifica; ninguna cambia
-de indicador, ejercicio ni versión.
+de indicador, ejercicio ni versión. `metas_planeacion_version`: toma la versión vigente del indicador al crear la
+meta y no deja cambiarla. Una versión de indicador que usa una meta queda congelada, igual que la de un reporte.
 
 ## metas_periodo
 
@@ -143,4 +145,7 @@ versión histórica.
 ## Permisos del rol de la app
 
 `SELECT` en `indicador_versiones` y `medios_verificacion` (el trigger de reportes lee la versión al generar
-reportes en R3-01). Ciclos y metas: sin permisos hasta que el código de R4 los use.
+reportes en R3-01). `SELECT` en `ciclos_planeacion`, `metas_planeacion` y `metas_periodo` para el catálogo
+administrable (HU-R4-11: decidir la vigencia futura y calcular el cumplimiento); escribirlas llega con sus HU de R4.
+La app edita `indicadores` (HU-R4-11) sin escribir `indicador_versiones` ni `medios_verificacion`: los triggers
+`indicadores_versionar` e `indicadores_alinear_medio` corren como dueño (`SECURITY DEFINER`, 20261015000001).

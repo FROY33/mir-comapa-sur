@@ -38,6 +38,11 @@ erDiagram
 
 ## 1. Metas por ejercicio
 
+> **Migrado** (S2-TEC-01, ticket 3): INDICADOR_CAMBIOS_PROGRAMADOS como `indicador_cambios_programados` en
+> `migrations/20261015000002_cambios_programados.sql`, tabla aparte y no la columna `vigente_desde_periodo`
+> (decisión de Arquitectura en [DECISIONES.md](DECISIONES.md)); detalle en [DICCIONARIO.md](DICCIONARIO.md).
+> Sigue pendiente en este bloque: SOLICITUDES_CAMBIO_META (HU-R4-12).
+
 HU-R4-01 a HU-R4-12. Las metas viven fuera de INDICADORES y por ejercicio, de modo que el mismo indicador tiene una meta distinta cada año.
 
 **CICLOS_PLANEACION**, **METAS** (migrada como `metas_planeacion`) y **METAS_PERIODO**: migradas el 14/10/2026, ver

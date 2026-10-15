@@ -61,7 +61,7 @@ describe('apertura de ciclos (base propia)', () => {
     const base = url.pathname.slice(1)
     await administrar(`DROP DATABASE IF EXISTS ${base} WITH (FORCE)`)
     await administrar(`CREATE DATABASE ${base}`)
-    execFileSync('db/migrar.sh', ['up'], { stdio: 'pipe', env: { ...process.env, DATABASE_URL: url.toString() } })
+    execFileSync('bash', ['db/migrar.sh', 'up'], { stdio: 'pipe', env: { ...process.env, DATABASE_URL: url.toString() } })
     bd = crearBD({ ...configBD, url: url.toString() }, crearLog(() => {}))
     const [org] = await bd.consultar<{ id: string }>(`INSERT INTO organizaciones (nombre) VALUES ('COMAPA') RETURNING id`)
     const [g] = await bd.consultar<{ id: string }>(`INSERT INTO gerencias (organizacion_id, clave, nombre) VALUES ($1, 'G', 'G') RETURNING id`, [org!.id])

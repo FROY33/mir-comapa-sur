@@ -81,6 +81,11 @@ td {padding:10px 14px;vertical-align:middle;}
 .step-num {width:18px;height:18px;border-radius:50%;background:var(--color-neutral-100);color:var(--color-text-secondary);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
 .modal-tab.active .step-num {background:var(--color-primary);color:white;}
 .modal-tab.done .step-num {background:var(--color-success-tint);color:var(--color-success);}
+.cambios-programados {border:1px solid var(--color-warning-text);background:var(--color-warning-tint);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:12px;}
+.cambios-programados .cambios-titulo {font-weight:700;color:var(--color-warning-text);margin:0 0 4px;}
+.cambios-programados .cambios-nota {margin:0 0 6px;color:var(--color-text-secondary);}
+.cambios-programados ul {margin:0 0 8px 18px;padding:0;}
+.cambios-programados .btn-cancelar-cambio {font:inherit;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid var(--color-border);background:var(--color-surface,#fff);cursor:pointer;}
 .modal-body {flex:1;overflow-y:auto;padding:20px 24px;}
 .footer-right {display:flex;gap:8px;}
 .tab-panel {display:none;}
@@ -108,6 +113,10 @@ td {padding:10px 14px;vertical-align:middle;}
 .toggle-desc {font-size:11px;color:var(--color-text-secondary);margin-top:2px;line-height:1.4;}
 .toggle-switch {width:40px;height:22px;border-radius:11px;background:var(--color-border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
 .toggle-switch.on {background:var(--color-primary);}
+.toggle-switch:focus-visible, .acc-hdr:focus-visible, .modal-close:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}
+.has-error {border-color:#B91C1C !important;}
+.field-error {font-size:11px;color:#B91C1C;margin-top:4px;}
+.form-check {display:flex;align-items:center;gap:8px;font-size:13px;}
 .toggle-knob {position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
 .toggle-switch.on .toggle-knob {left:21px;}
 .frac-subfields {margin-top:12px;}
@@ -319,22 +328,25 @@ td {padding:10px 14px;vertical-align:middle;}
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="overlayClick(event)">
-  <div class="modal-card">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-header">
       <div>
         <p class="modal-title" id="modalTitle">Nuevo indicador</p>
         <p class="modal-subtitle" id="modalSubtitle">Completa los dos pasos para registrar el indicador</p>
       </div>
-      <button class="modal-close" onclick="closeModal()">
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
     <div class="modal-body">
 
+      <!-- Cambios con vigencia futura (HU-R4-11 CA_4): solo al editar un indicador con reportes o metas -->
+      <div id="cambiosProgramados" class="cambios-programados" style="display:none"></div>
+
       <!-- ACORDEÓN 1: DATOS GENERALES -->
       <div class="acc-item" id="acc1">
-        <div class="acc-hdr" id="acc1Hdr" onclick="expandSection(1)">
+        <div class="acc-hdr" id="acc1Hdr" onclick="expandSection(1)" onkeydown="activarConTeclado(event)" role="button" tabindex="0">
           <div class="acc-hdr-left">
             <span class="acc-num active" id="acc1Num">1</span>
             <div class="acc-title-wrap">
@@ -348,41 +360,63 @@ td {padding:10px 14px;vertical-align:middle;}
           <div class="acc-body-inner">
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Gerencia <span class="req">*</span></label>
+                <label class="form-label" for="fGerencia">Gerencia <span class="req">*</span></label>
                 <select class="form-select" id="fGerencia" onchange="updateIdSuggestion()">
                   <option value="">Seleccionar…</option>
                 </select>
+                <p class="field-error" id="err-gerencia_id" role="alert" style="display:none"></p>
               </div>
               <div class="form-group">
-                <label class="form-label">Clave del indicador <span class="req">*</span></label>
+                <label class="form-label" for="fClave">Clave del indicador <span class="req">*</span></label>
                 <input class="form-input" id="fClave" type="text" placeholder="Ej. COM-1.2.3" style="font-family:monospace;font-size:12px;">
                 <p class="form-hint" id="claveHint">Se generará automáticamente al elegir gerencia</p>
+                <p class="field-error" id="err-codigo" role="alert" style="display:none"></p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="fTipo">Tipo de indicador en el sistema <span class="req">*</span></label>
+                <select class="form-select" id="fTipo">
+                  <option value="mir">MIR</option>
+                  <option value="gerencial">Gerencial</option>
+                </select>
+                <p class="field-error" id="err-tipo" role="alert" style="display:none"></p>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fUnidadResp">Unidad responsable</label>
+                <select class="form-select" id="fUnidadResp">
+                  <option value="">Sin unidad asignada</option>
+                </select>
+                <p class="field-error" id="err-unidad_id" role="alert" style="display:none"></p>
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Nivel del indicador <span class="req">*</span></label>
-              <div class="nivel-options">
+              <label class="form-label" id="fNivelEtiqueta">Nivel del indicador <span class="req">*</span></label>
+              <div class="nivel-options" role="radiogroup" aria-labelledby="fNivelEtiqueta" id="fNivelGrupo">
                 <div class="nivel-option"><input type="radio" name="fNivel" id="nF" value="fin"><label for="nF"><span class="nivel-letter">F</span>Fin</label></div>
                 <div class="nivel-option"><input type="radio" name="fNivel" id="nP" value="proposito"><label for="nP"><span class="nivel-letter">P</span>Propósito</label></div>
                 <div class="nivel-option"><input type="radio" name="fNivel" id="nC" value="componente"><label for="nC"><span class="nivel-letter">C</span>Componente</label></div>
                 <div class="nivel-option"><input type="radio" name="fNivel" id="nA" value="actividad" checked><label for="nA"><span class="nivel-letter">A</span>Actividad</label></div>
               </div>
+              <p class="field-error" id="err-nivel" role="alert" style="display:none"></p>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Nombre del indicador <span class="req">*</span></label>
+              <label class="form-label" for="fNombre">Nombre del indicador <span class="req">*</span></label>
               <input class="form-input" id="fNombre" type="text" placeholder="Ej. Porcentaje de medidores instalados en servicio activo">
+              <p class="field-error" id="err-nombre" role="alert" style="display:none"></p>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Descripción del indicador</label>
+              <label class="form-label" for="fDescripcion">Descripción del indicador</label>
               <textarea class="form-textarea" id="fDescripcion" placeholder="Describe qué mide este indicador, su relevancia y cómo se interpreta el resultado…"></textarea>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Medio de verificación normado</label>
-              <div class="mv-options">
+              <label class="form-label" id="fMVEtiqueta">Origen del medio de verificación</label>
+              <div class="mv-options" role="radiogroup" aria-labelledby="fMVEtiqueta">
                 <div class="mv-option"><input type="radio" name="fMV" id="mvI" value="interno" checked><label for="mvI">Interno</label></div>
                 <div class="mv-option"><input type="radio" name="fMV" id="mvE" value="externo"><label for="mvE">Externo</label></div>
                 <div class="mv-option"><input type="radio" name="fMV" id="mvM" value="mixto"><label for="mvM">Mixto</label></div>
@@ -390,8 +424,12 @@ td {padding:10px 14px;vertical-align:middle;}
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="fMedioTexto">Medio de verificación (documento o fuente)</label>
-              <input class="form-input" id="fMedioTexto" type="text" placeholder="Ej. Reporte Financiero">
+              <label class="form-label" for="fMedioId">Medio de verificación (documento o fuente)</label>
+              <select class="form-select" id="fMedioId">
+                <option value="">Seleccionar…</option>
+              </select>
+              <p class="form-hint">Obligatorio para los indicadores MIR; en un gerencial puede quedar vacío.</p>
+              <p class="field-error" id="err-medio_verificacion_id" role="alert" style="display:none"></p>
             </div>
 
             <div class="acc-continue">
@@ -406,7 +444,7 @@ td {padding:10px 14px;vertical-align:middle;}
 
       <!-- ACORDEÓN 2: CONFIGURACIÓN DE MEDICIÓN -->
       <div class="acc-item" id="acc2">
-        <div class="acc-hdr locked" id="acc2Hdr" onclick="expandSection(2)">
+        <div class="acc-hdr locked" id="acc2Hdr" onclick="expandSection(2)" onkeydown="activarConTeclado(event)" role="button" tabindex="0">
           <div class="acc-hdr-left">
             <span class="acc-num" id="acc2Num">2</span>
             <div class="acc-title-wrap">
@@ -419,14 +457,16 @@ td {padding:10px 14px;vertical-align:middle;}
           <div class="acc-body-inner">
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Frecuencia de reporte <span class="req">*</span></label>
+                <label class="form-label" for="fFrecuencia">Frecuencia de reporte <span class="req">*</span></label>
                 <select class="form-select" id="fFrecuencia">
                   <option value="">Seleccionar…</option>
                 </select>
+                <p class="field-error" id="err-frecuencia" role="alert" style="display:none"></p>
               </div>
               <div class="form-group">
-                <label class="form-label">Unidad de medida <span class="req">*</span></label>
+                <label class="form-label" for="fUnidad">Unidad de medida <span class="req">*</span></label>
                 <input class="form-input" id="fUnidad" type="text" placeholder="%, m³, conexiones, días…">
+                <p class="field-error" id="err-unidad_medida" role="alert" style="display:none"></p>
               </div>
             </div>
 
@@ -436,23 +476,24 @@ td {padding:10px 14px;vertical-align:middle;}
             <div class="toggle-section">
               <div class="toggle-item" id="tiAcum">
                 <div class="toggle-info">
-                  <p class="toggle-label">¿Indicador acumulable?</p>
+                  <p class="toggle-label" id="lblAcum">¿Indicador acumulable?</p>
                   <p class="toggle-desc">Los valores de cada período se suman para obtener el total del ejercicio (Ej. conexiones nuevas)</p>
                 </div>
-                <div class="toggle-switch" id="swAcum" onclick="toggleField('acum')">
+                <div class="toggle-switch" id="swAcum" onclick="toggleField('acum')" onkeydown="activarConTeclado(event)" role="switch" tabindex="0" aria-checked="false" aria-labelledby="lblAcum">
                   <div class="toggle-knob"></div>
                 </div>
               </div>
               <div class="toggle-item" id="tiFrac">
                 <div class="toggle-info">
-                  <p class="toggle-label">¿Indicador tipo fracción?</p>
+                  <p class="toggle-label" id="lblFrac">¿Indicador tipo fracción?</p>
                   <p class="toggle-desc">Se calcula como numerador / denominador (porcentaje o razón)</p>
                 </div>
-                <div class="toggle-switch" id="swFrac" onclick="toggleField('frac')">
+                <div class="toggle-switch" id="swFrac" onclick="toggleField('frac')" onkeydown="activarConTeclado(event)" role="switch" tabindex="0" aria-checked="false" aria-labelledby="lblFrac">
                   <div class="toggle-knob"></div>
                 </div>
               </div>
             </div>
+            <p class="field-error" id="err-acumulable" role="alert" style="display:none"></p><p class="field-error" id="err-tipo_calculo" role="alert" style="display:none"></p>
 
             <div id="fracFields" style="display:none" class="frac-subfields">
               <div class="form-row" style="margin-top:12px;">
@@ -483,13 +524,39 @@ td {padding:10px 14px;vertical-align:middle;}
 
             <div class="form-divider"></div>
             <div class="formula-row form-group">
-              <label class="form-label">Fórmula de cálculo</label>
+              <label class="form-label" for="fFormula">Fórmula de cálculo</label>
               <div class="formula-input-wrap">
                 <span class="formula-prefix">f =</span>
                 <input class="form-input" id="fFormula" type="text" placeholder="(Numerador / Denominador) × 100">
               </div>
               <p class="form-hint">Describe la expresión matemática para calcular el indicador. Ej: (Medidores activos / Total tomas) × 100</p>
             </div>
+
+            <div class="form-divider"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="fTipoIndicador">Clasificación del indicador</label>
+                <select class="form-select" id="fTipoIndicador">
+                  <option value="">Sin clasificar</option>
+                  <option value="estrategico">Estratégico</option>
+                  <option value="gestion">De gestión</option>
+                </select>
+                <p class="field-error" id="err-tipo_indicador" role="alert" style="display:none"></p>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fSentido">Sentido de la meta</label>
+                <select class="form-select" id="fSentido">
+                  <option value="ascendente">Ascendente (más es mejor)</option>
+                  <option value="descendente">Descendente (menos es mejor)</option>
+                </select>
+                <p class="field-error" id="err-sentido_meta" role="alert" style="display:none"></p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fSupuestos">Supuestos</label>
+              <textarea class="form-textarea" id="fSupuestos" placeholder="Condiciones externas que deben cumplirse para lograr la meta"></textarea>
+            </div>
+            <label class="form-check"><input type="checkbox" id="fIso"> Indicador del sistema de gestión de calidad (ISO)</label>
           </div>
         </div>
       </div>
@@ -705,7 +772,6 @@ function validateTab(n) {
     if (!document.getElementById('fGerencia').value)         { showToast('Selecciona la gerencia'); return false; }
     if (!document.getElementById('fClave').value.trim())     { showToast('Ingresa la clave del indicador'); return false; }
     if (!document.getElementById('fNombre').value.trim())    { showToast('Ingresa el nombre del indicador'); return false; }
-    if (!document.getElementById('fMedioTexto').value.trim()) { showToast('Ingresa el medio de verificación'); return false; }
     return true;
   }
   if (n===2) {
@@ -719,7 +785,7 @@ function validateTab(n) {
 // ── Form ──────────────────────────────────────────────────────────────────────
 function resetForm() {
   ['fGerencia','fFrecuencia'].forEach(function(id){ document.getElementById(id).value=''; });
-  ['fClave','fNombre','fDescripcion','fUnidad','fNumLabel','fDenLabel','fFormula','fDenomFijoVal','fMedioTexto'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['fClave','fNombre','fDescripcion','fUnidad','fNumLabel','fDenLabel','fFormula','fDenomFijoVal','fSupuestos'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('fDenomFijo').checked = false;
   document.getElementById('claveHint').textContent = 'Se generará automáticamente al elegir gerencia';
   document.getElementById('fracFields').style.display = 'none';
@@ -802,6 +868,8 @@ function showToast(msg, ok) {
 })();
 </script>
 <script src="indicadores-admin.js"></script>
+<script src="indicadores-admin-form.js"></script>
+<script src="indicadores-admin-cambios.js"></script>
 <script src="dev-toolbar.js"></script>
 </body>
 </html>

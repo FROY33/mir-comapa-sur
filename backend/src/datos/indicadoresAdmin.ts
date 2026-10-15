@@ -24,6 +24,7 @@ export interface IndicadorCompleto {
   acumulable: boolean
   sentido_meta: string
   medio_verificacion: string | null
+  medio_verificacion_id: string | null
   origen_mv: string | null
   supuestos: string | null
   es_iso: boolean
@@ -54,7 +55,8 @@ export interface DatosIndicador {
   denominadorFijo: number | null
   acumulable: boolean
   sentidoMeta: string
-  medioVerificacion: string | null
+  medioVerificacion: string | null       // texto = nombre del medio elegido (lo escribe validar())
+  medioVerificacionId: string | null
   origenMv: string | null
   supuestos: string | null
   esIso: boolean
@@ -101,7 +103,7 @@ function mapearIndicador(f: any): IndicadorCompleto {
     numerador_desc: f.numerador_desc, denominador_desc: f.denominador_desc,
     denominador_fijo: f.denominador_fijo != null ? Number(f.denominador_fijo) : null,
     acumulable: f.acumulable, sentido_meta: f.sentido_meta,
-    medio_verificacion: f.medio_verificacion, origen_mv: f.origen_mv,
+    medio_verificacion: f.medio_verificacion, medio_verificacion_id: f.medio_verificacion_id, origen_mv: f.origen_mv,
     supuestos: f.supuestos, es_iso: f.es_iso,
     observaciones_mir: f.observaciones_mir, activo: f.activo,
     gerencia: { id: f.gerencia_id, clave: f.gerencia_clave, nombre: f.gerencia_nombre },
@@ -150,7 +152,11 @@ export async function catalogoIndicadores(bd: Ejecutor) {
   const frecuencias = await bd.consultar<{ clave: string; nombre: string; meses: number }>(
     `SELECT clave, nombre, meses FROM frecuencias ORDER BY meses`,
   )
+  // Provisional: solo alimenta el <select> del formulario; la consulta y el mantenimiento de medios son del ticket 4 (S2-TEC-03)
+  const medios = await bd.consultar<{ id: string; nombre: string }>(
+    `SELECT id, nombre FROM medios_verificacion WHERE activo ORDER BY nombre`)
   return {
+    medios_verificacion: medios,
     gerencias: gerencias.map(g => ({
       ...g,
       unidades: unidades.filter(u => u.gerencia_id === g.id).map(u => ({ id: u.id, nombre: u.nombre })),
@@ -172,8 +178,8 @@ export async function crearIndicador(bd: Ejecutor, d: DatosIndicador): Promise<s
        gerencia_id, unidad_id, codigo, tipo, nivel, numero, nombre, resumen_narrativo,
        tipo_indicador, unidad_medida, frecuencia, tipo_calculo, formula, numerador_desc,
        denominador_desc, denominador_fijo, acumulable, sentido_meta, medio_verificacion,
-       origen_mv, supuestos, es_iso, observaciones_mir, activo)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,true)
+       origen_mv, supuestos, es_iso, observaciones_mir, medio_verificacion_id, activo)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,true)
      RETURNING id`,
     [
       d.gerenciaId, d.unidadId, d.codigo, d.tipo,
@@ -181,7 +187,7 @@ export async function crearIndicador(bd: Ejecutor, d: DatosIndicador): Promise<s
       d.tipoIndicador, d.unidadMedida, d.frecuencia, d.tipoCalculo,
       d.formula, d.numeradorDesc, d.denominadorDesc, d.denominadorFijo,
       d.acumulable, d.sentidoMeta, d.medioVerificacion,
-      d.origenMv, d.supuestos, d.esIso, d.observacionesMir,
+      d.origenMv, d.supuestos, d.esIso, d.observacionesMir, d.medioVerificacionId,
     ],
   )
   return fila!.id
@@ -195,7 +201,7 @@ export async function actualizarIndicador(bd: Ejecutor, id: string, d: DatosIndi
        frecuencia = $12, tipo_calculo = $13, formula = $14, numerador_desc = $15,
        denominador_desc = $16, denominador_fijo = $17, acumulable = $18, sentido_meta = $19,
        medio_verificacion = $20, origen_mv = $21, supuestos = $22, es_iso = $23,
-       observaciones_mir = $24
+       observaciones_mir = $24, medio_verificacion_id = $25
      WHERE id = $1`,
     [
       id,
@@ -204,7 +210,7 @@ export async function actualizarIndicador(bd: Ejecutor, id: string, d: DatosIndi
       d.tipoIndicador, d.unidadMedida, d.frecuencia, d.tipoCalculo,
       d.formula, d.numeradorDesc, d.denominadorDesc, d.denominadorFijo,
       d.acumulable, d.sentidoMeta, d.medioVerificacion,
-      d.origenMv, d.supuestos, d.esIso, d.observacionesMir,
+      d.origenMv, d.supuestos, d.esIso, d.observacionesMir, d.medioVerificacionId,
     ],
   )
 }
@@ -233,6 +239,13 @@ export async function unidadEsDeGerencia(bd: Ejecutor, unidadId: string, gerenci
     `SELECT 1 FROM unidades WHERE id = $1 AND gerencia_id = $2`, [unidadId, gerenciaId],
   )
   return fila !== undefined
+}
+
+/** Nombre del medio de verificación si existe y está activo (HU-R4-11 CA_2). */
+export async function nombreDeMedioActivo(bd: Ejecutor, medioId: string): Promise<string | undefined> {
+  const [fila] = await bd.consultar<{ nombre: string }>(
+    `SELECT nombre FROM medios_verificacion WHERE id = $1 AND activo`, [medioId])
+  return fila?.nombre
 }
 
 export async function frecuenciaExiste(bd: Ejecutor, clave: string): Promise<boolean> {

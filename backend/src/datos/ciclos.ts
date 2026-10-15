@@ -15,6 +15,7 @@
 //     (nacerían vencidos).
 
 import type { Ejecutor } from '../bd.js'
+import { aplicarCambiosProgramados } from './cambiosProgramados.js'
 
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
                'septiembre', 'octubre', 'noviembre', 'diciembre']
@@ -69,7 +70,8 @@ export interface Apertura { frecuencia: string; etiqueta: string; fecha_limite: 
  * Abre el periodo que toca de cada frecuencia y genera un reporte `pendiente_carga` por cada
  * indicador activo de esa frecuencia (CA_3, RN_3). Idempotente: un periodo existente conserva su
  * fecha límite y un reporte existente no se duplica, así que correrlo de nuevo no cambia nada.
- * Un indicador sin meta validada genera su reporte igual (RN_4).
+ * Un indicador sin meta validada genera su reporte igual (RN_4). Antes de generar los reportes aplica los
+ * cambios programados de los indicadores de esa frecuencia cuya vigencia llegó (HU-R4-11 CA_4), en la misma transacción.
  */
 export async function abrirCiclos(tx: Ejecutor, hoy: string): Promise<Apertura[]> {
   const frecuencias = await tx.consultar<{ clave: string; meses: number; dias_habiles: number }>(
@@ -90,6 +92,8 @@ export async function abrirCiclos(tx: Ejecutor, hoy: string): Promise<Apertura[]
       [p.frecuencia, p.ejercicio, p.numero])
     // Un periodo que el Administrador ya cerró no se reabre ni recibe reportes nuevos
     if (periodo!.estado !== 'abierto') continue
+    // Cambios del catálogo con vigencia futura (HU-R4-11 CA_4): entran con este periodo, antes de generar sus reportes
+    await aplicarCambiosProgramados(tx, hoy, { frecuencia: f.clave })
     const creados = await tx.consultar(
       `INSERT INTO reportes (indicador_id, periodo_id)
        SELECT i.id, $1 FROM indicadores i WHERE i.activo AND i.frecuencia = $2

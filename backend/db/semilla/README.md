@@ -49,8 +49,8 @@ reasigna cada fixture al indicador equivalente, con el código original en
 desactiva sin borrar los que no tienen equivalente y registra `catalogo_importado` en la bitácora
 (conteos y sha256 de `indicadores.csv`). Con ese evento previo se niega (HU-R4-11 RN_4) y el sembrado
 normal deja de escribir indicadores; `--forzar` lo repite sin sobrescribir los campos editados desde
-la pantalla y los lista al terminar. La edición se reconoce por los eventos `indicador_edicion` /
-`indicador_editado`, que solo guardan los campos de la foto de la API (código, nombre, tipo, nivel,
+la pantalla y los lista al terminar. La edición se reconoce por el evento `indicador_editado`
+(y `indicador_desactivado` / `indicador_reactivado` para `activo`), que solo guardan los campos de la foto de la API (código, nombre, tipo, nivel,
 gerencia, frecuencia, tipo de cálculo, acumulable, unidad de medida, activo, tipo de indicador y medio
 de verificación).
 

@@ -18,7 +18,9 @@ import { configBD } from './apoyo.js'
 const base = `${nombreBase(configBD.url).replace(/_test$/, '')}_permisos_test`
 const rol = `comapa_app_${randomUUID().slice(0, 8)}`
 const urlDueño = new URL(configBD.url); urlDueño.pathname = `/${base}`
-const urlApp = new URL(urlDueño.toString()); urlApp.username = rol
+// Con contraseña: un servidor con autenticación scram (p. ej. Windows) rechaza un rol sin ella
+const claveRol = randomUUID()
+const urlApp = new URL(urlDueño.toString()); urlApp.username = rol; urlApp.password = claveRol
 
 async function comoDueño(sql: string, bd = 'postgres') {
   const u = new URL(configBD.url); u.pathname = `/${bd}`
@@ -35,8 +37,9 @@ const PASSWORD = 'Contrasena-Permisos-2026'
 before(async () => {
   await comoDueño(`DROP DATABASE IF EXISTS ${base} WITH (FORCE)`)
   await comoDueño(`CREATE DATABASE ${base}`)
-  execFileSync('db/migrar.sh', ['up'], { stdio: 'pipe', env: { ...process.env, DATABASE_URL: urlDueño.toString() } })
-  await comoDueño(`CREATE ROLE ${rol} LOGIN`)
+  // Por bash y no directo: en Windows no se puede ejecutar un .sh con execFileSync
+  execFileSync('bash', ['db/migrar.sh', 'up'], { stdio: 'pipe', env: { ...process.env, DATABASE_URL: urlDueño.toString() } })
+  await comoDueño(`CREATE ROLE ${rol} LOGIN PASSWORD '${claveRol}'`)
   execFileSync('psql', [urlDueño.toString(), '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-v', `app=${rol}`, '-f', 'db/permisos.sql'], { stdio: 'pipe' })
   // Datos mínimos, como los dejaría la carga inicial (con el dueño)
   const hash = await bcrypt.hash(PASSWORD, 12)
@@ -108,12 +111,41 @@ describe('con el modelo de versiones y metas', () => {
     await app.consultar('SELECT count(*) FROM medios_verificacion')
   })
 
-  test('no escribe versiones ni metas: eso llega con sus HU', async () => {
+  test('no escribe versiones, medios ni metas directamente; las metas solo las lee (HU-R4-11 CA_4 y RN_3)', async () => {
     const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
     await intentar(`UPDATE indicador_versiones SET definicion = '{}'`)
     await intentar(`INSERT INTO medios_verificacion (nombre) VALUES ('x')`)
-    await intentar('SELECT count(*) FROM metas_planeacion')
-    await intentar('SELECT count(*) FROM ciclos_planeacion')
+    await app.consultar('SELECT count(*) FROM metas_planeacion')
+    await app.consultar('SELECT count(*) FROM metas_periodo')
+    await app.consultar('SELECT count(*) FROM ciclos_planeacion')
+    await intentar(`INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision)
+                    VALUES (2099, '2098-11-01', '2098-11-20', '2098-11-25')`)
+    await intentar('DELETE FROM metas_planeacion')
+  })
+
+  test('al editar un indicador, los triggers versionan y dan de alta el medio aunque la app no escriba esas tablas (HU-R4-11 CA_1)', async () => {
+    const [antes] = await app.consultar<{ n: number }>(`SELECT count(*)::int AS n FROM indicador_versiones v
+      JOIN indicadores i ON i.id = v.indicador_id WHERE i.codigo = 'IND-1'`)
+    await app.consultar(`UPDATE indicadores SET frecuencia = 'trimestral', medio_verificacion = 'Medio nuevo de permisos'
+                          WHERE codigo = 'IND-1'`)
+    const [despues] = await app.consultar<{ n: number; medio: string | null }>(`SELECT count(*)::int AS n,
+      max(m.nombre) AS medio FROM indicador_versiones v JOIN indicadores i ON i.id = v.indicador_id
+      LEFT JOIN medios_verificacion m ON m.id = i.medio_verificacion_id WHERE i.codigo = 'IND-1'`)
+    assert.equal(despues!.n, antes!.n + 1, 'la versión usada por el reporte quedó congelada y se creó otra')
+    assert.equal(despues!.medio, 'Medio nuevo de permisos')
+  })
+})
+
+describe('programa, aplica y cancela cambios del indicador (HU-R4-11 CA_4)', () => {
+  test('lee e inserta cambios programados y los marca aplicados o cancelados, sin poder borrarlos', async () => {
+    const [ind] = await app.consultar<{ id: string }>(`SELECT id FROM indicadores WHERE codigo = 'IND-1'`)
+    await app.consultar(`INSERT INTO indicador_cambios_programados (indicador_id, valores, vigente_desde)
+                         VALUES ($1, '{"acumulable": true}', '2090-01-01')`, [ind!.id])
+    await app.consultar('SELECT * FROM indicador_cambios_programados')
+    await app.consultar(`UPDATE indicador_cambios_programados SET aplicado_at = now() WHERE indicador_id = $1`, [ind!.id])
+    await assert.rejects(app.consultar('DELETE FROM indicador_cambios_programados'), Error)
+    await assert.rejects(app.consultar('TRUNCATE indicador_cambios_programados'), Error)
+    await assert.rejects(app.consultar('ALTER TABLE indicador_cambios_programados DISABLE TRIGGER ALL'), Error)
   })
 })
 

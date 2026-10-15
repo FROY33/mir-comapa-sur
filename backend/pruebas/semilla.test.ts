@@ -104,10 +104,13 @@ describe('carga inicial', () => {
   })
 
   test('CA-5: cada reporte pertenece a la gerencia de su indicador', async () => {
-    // Para probar aislamiento, un reporte no puede quedar en otra gerencia que su indicador
+    // Para probar aislamiento, un reporte no puede quedar en otra gerencia que su indicador. Solo los de la
+    // semilla: en la base compartida otras pruebas aplican cambios programados (HU-R4-11 CA_4) y ahí el
+    // reporte conserva, a propósito, la gerencia con que se creó
     assert.equal(await uno<string>(
       `SELECT count(*) FROM reportes r JOIN indicadores i ON i.id = r.indicador_id
-       WHERE r.gerencia_id <> i.gerencia_id`), '0')
+       WHERE r.gerencia_id <> i.gerencia_id
+         AND r.gerencia_id IN (SELECT id FROM gerencias WHERE organizacion_id = ${ORG})`), '0')
     assert.ok(Number(await uno<string>(
       `SELECT count(DISTINCT gerencia_id) FROM reportes`)) >= 2, 'los reportes no cubren dos gerencias')
   })
@@ -200,7 +203,8 @@ describe('carga inicial', () => {
       `SELECT count(*) FROM reportes r
        JOIN indicadores i ON i.id = r.indicador_id
        JOIN periodos_reporte p ON p.id = r.periodo_id
-       WHERE p.frecuencia <> i.frecuencia`), '0')
+       WHERE p.frecuencia <> i.frecuencia
+         AND r.gerencia_id IN (SELECT id FROM gerencias WHERE organizacion_id = ${ORG})`), '0')   // solo la semilla (ver arriba)
   })
 
   test('CA-4: sin --con-fixtures se carga la definición pero ningún reporte', () => {

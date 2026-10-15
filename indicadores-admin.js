@@ -1,6 +1,7 @@
 // indicadores-admin.js — Conecta la sección «Estructura de Indicadores» con la API (R4).
 // Se carga después del script en línea de estructura-indicadores.html; reemplaza las
-// funciones de datos y renderizado para usar /api/admin/indicadores en vez de archivos
+// funciones de datos y renderizado (el formulario vive en indicadores-admin-form.js) para usar
+// /api/admin/indicadores en vez de archivos
 // locales del prototipo. Sigue el mismo patrón que usuarios-admin.js.
 
 (function () {
@@ -44,6 +45,7 @@
       resumenNarrativo: ind.resumen_narrativo || '',
       tipoIndicador: ind.tipo_indicador || '',
       medioVerificacion: ind.medio_verificacion || '',
+      medioVerificacionId: ind.medio_verificacion_id || null,
       origenMv: ind.origen_mv || '',
       sentidoMeta: ind.sentido_meta || 'ascendente',
       supuestos: ind.supuestos || '',
@@ -52,6 +54,13 @@
       activo: ind.activo,
     };
   }
+
+  // Lo que el formulario (indicadores-admin-form.js) toma de esta pantalla
+  window.IndicadoresAdmin = {
+    api: api,
+    catalogo: function () { return CATALOGO; },
+    opciones: function (select, primera, lista) { return opciones(select, primera, lista); },
+  };
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -88,6 +97,7 @@
             ' (' + corto + ')</option>';
         }).join('');
 
+      if (window.llenarCatalogoFormulario) window.llenarCatalogoFormulario(CATALOGO);
       updateStats();
     });
   }
@@ -247,125 +257,6 @@
   };
 
   window.deleteIndicator = function (id) { window.desactivarIndicador(id); };
-
-  // ── Modal ─────────────────────────────────────────────────────────────────
-
-  window.openModal = function (id) {
-    EDITING_ID = id || null;
-    SW = { acum: false, frac: false };
-    resetForm();
-    if (id) {
-      var ind = ALL.find(function (i) { return i._id === id; });
-      if (!ind) return;
-      document.getElementById('modalTitle').textContent = 'Editar indicador';
-      document.getElementById('modalSubtitle').textContent = ind.codigo;
-      populateForm(ind);
-      SEC_UNLOCKED[1] = true;
-      SEC_UNLOCKED[2] = true;
-      setAccordionOpen(1, false);
-      setAccordionOpen(2, true);
-    } else {
-      document.getElementById('modalTitle').textContent = 'Nuevo indicador';
-      document.getElementById('modalSubtitle').textContent = 'Completa las dos secciones para registrar el indicador';
-      SEC_UNLOCKED[1] = true;
-      SEC_UNLOCKED[2] = false;
-      setAccordionOpen(1, true);
-      setAccordionOpen(2, false);
-    }
-    document.getElementById('modalOverlay').classList.add('open');
-  };
-
-  window.populateForm = function (ind) {
-    document.getElementById('fGerencia').value = ind.gerenciaId;
-    document.getElementById('fClave').value = ind.codigo;
-    document.getElementById('fNombre').value = ind.nombre;
-    document.getElementById('fDescripcion').value = ind.resumenNarrativo || '';
-    document.getElementById('fFrecuencia').value = ind.frecuencia;
-    document.getElementById('fUnidad').value = ind.unidadMedida || '';
-    document.getElementById('fFormula').value = ind.formula || '';
-
-    var nEl = document.querySelector('input[name=fNivel][value="' + (ind.nivel || 'actividad') + '"]');
-    if (nEl) nEl.checked = true;
-
-    var mvEl = document.querySelector('input[name=fMV][value="' + (ind.origenMv || 'interno') + '"]');
-    if (mvEl) mvEl.checked = true;
-    document.getElementById('fMedioTexto').value = ind.medioVerificacion || '';
-
-    setToggle('acum', !!ind.acumulable);
-    setToggle('frac', ind.tieneDenominador);
-    if (ind.tieneDenominador) {
-      document.getElementById('fNumLabel').value = ind.numeradorDesc || '';
-      document.getElementById('fDenLabel').value = ind.denominadorDesc || '';
-      document.getElementById('fDenomFijo').checked = ind.denominadorFijo;
-      if (ind.denominadorFijo) {
-        document.getElementById('denomFijoValRow').style.display = 'block';
-        document.getElementById('fDenomFijoVal').value = ind.denominadorFijoVal || '';
-      }
-    }
-  };
-
-  window.updateIdSuggestion = function () {
-    var gerenciaId = document.getElementById('fGerencia').value;
-    if (!gerenciaId || !CATALOGO) return;
-    var gerencia = CATALOGO.gerencias.find(function (g) { return g.id === gerenciaId; });
-    if (!gerencia) return;
-    var n = ALL.filter(function (i) { return i.gerenciaClave === gerencia.clave; }).length + 1;
-    var sug = gerencia.clave + '-' + n;
-    if (!document.getElementById('fClave').value) document.getElementById('fClave').value = sug;
-    document.getElementById('claveHint').textContent = 'Sugerida: ' + sug;
-  };
-
-  // ── Guardar ───────────────────────────────────────────────────────────────
-
-  window.saveIndicator = function () {
-    if (!validateTab(1)) { setAccordionOpen(1, true); return; }
-    if (!validateTab(2)) { setAccordionOpen(2, true); return; }
-
-    var nivel = document.querySelector('input[name=fNivel]:checked');
-    var mv = document.querySelector('input[name=fMV]:checked');
-    var esFraccion = SW.frac;
-    // Al editar, los campos que el formulario no muestra se conservan (el PUT reemplaza todo)
-    var previo = EDITING_ID ? ALL.find(function (i) { return i._id === EDITING_ID; }) : null;
-
-    var datos = {
-      gerencia_id: document.getElementById('fGerencia').value,
-      codigo: document.getElementById('fClave').value.trim().toUpperCase(),
-      tipo: previo ? previo.tipo : 'mir',
-      nivel: nivel ? nivel.value : 'actividad',
-      nombre: document.getElementById('fNombre').value.trim(),
-      resumen_narrativo: document.getElementById('fDescripcion').value.trim() || null,
-      unidad_medida: document.getElementById('fUnidad').value.trim(),
-      frecuencia: document.getElementById('fFrecuencia').value,
-      tipo_calculo: esFraccion ? 'fraccion' : 'valor_directo',
-      acumulable: SW.acum,
-      sentido_meta: previo ? previo.sentidoMeta : 'ascendente',
-      medio_verificacion: document.getElementById('fMedioTexto').value.trim(),
-      origen_mv: mv ? mv.value : 'interno',
-      formula: document.getElementById('fFormula').value.trim() || null,
-      numerador_desc: esFraccion ? (document.getElementById('fNumLabel').value.trim() || null) : null,
-      denominador_desc: esFraccion ? (document.getElementById('fDenLabel').value.trim() || null) : null,
-      denominador_fijo: (esFraccion && document.getElementById('fDenomFijo').checked)
-        ? (parseFloat(document.getElementById('fDenomFijoVal').value) || null)
-        : null,
-      unidad_id: previo ? previo.unidadId : null,
-      numero: previo ? (previo.numero || null) : null,
-      tipo_indicador: previo ? (previo.tipoIndicador || null) : null,
-      supuestos: previo ? (previo.supuestos || null) : null,
-      es_iso: previo ? !!previo.esIso : false,
-      observaciones_mir: previo ? (previo.observacionesMir || null) : null,
-    };
-
-    var ruta = EDITING_ID
-      ? '/api/admin/indicadores/' + EDITING_ID
-      : '/api/admin/indicadores';
-
-    api(EDITING_ID ? 'PUT' : 'POST', ruta, datos).then(function (r) {
-      if (!r.ok) { showToast(r.d.mensaje || 'No se pudo guardar el indicador'); return; }
-      closeModal();
-      showToast(EDITING_ID ? 'Indicador actualizado' : 'Indicador registrado', true);
-      cargarIndicadores();
-    });
-  };
 
   // ── Init ──────────────────────────────────────────────────────────────────
   ALL = [];

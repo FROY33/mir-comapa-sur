@@ -139,6 +139,7 @@ erDiagram
 | REPORTES_PERIODO | columnas de cierre en `reportes` | Era 1:1 con REPORTES; el congelado vive en la misma fila |
 | USUARIO_GERENCIAS | — | Eliminada: los indicadores son de la gerencia y cada usuario tiene una sola |
 | MEDIOS_VERIFICACION, CICLOS_PLANEACION, METAS_PLANEACION, METAS_PERIODO + versiones del indicador | ver [DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md) | 14/10/2026 |
+| INDICADOR_CAMBIOS_PROGRAMADOS | `indicador_cambios_programados` | S2-TEC-01; mismo nombre que el RQM (la columna `vigente_desde_periodo` no se usa, ver [DECISIONES.md](DECISIONES.md)) |
 | COMENTARIOS, EVIDENCIAS, REPORTE_VERSIONES, VALIDACIONES_PERIODO… | — | Extensión futura, ver [EXTENSION.md](EXTENSION.md) |
 
 ---
@@ -399,6 +400,34 @@ Los eventos de bloqueo y desbloqueo van a `bitacora` con `entidad = 'acceso'` y 
 | ultimo_intento_at | timestamptz | no | `now()` | | Último fallo registrado |
 | bloqueado_hasta | timestamptz | sí | | | NULL = sin bloqueo; vencido = la cuenta se abre y el siguiente fallo cuenta desde 1 |
 
+## indicador_cambios_programados
+
+INDICADOR_CAMBIOS_PROGRAMADOS (HU-R4-11 CA_4). Cambios de gerencia, frecuencia, tipo de cálculo y acumulable
+de un indicador **con reportes o metas**: no se escriben en `indicadores` al editar, se guardan aquí con los
+valores nuevos y se aplican al abrir el siguiente periodo. Los reportes y las metas ya creados no cambian
+(apuntan a su versión del indicador, ver [DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md)). Tabla aparte y no `vigente_desde_periodo` en INDICADORES, por decisión de Arquitectura
+([DECISIONES.md](DECISIONES.md)). Nada se borra.
+
+| Campo | Tipo | Nulo | Default | Restricciones | Descripción |
+|---|---|---|---|---|---|
+| id | uuid | no | `gen_random_uuid()` | PK | |
+| indicador_id | uuid | no | | FK → indicadores | |
+| valores | jsonb | no | | Objeto no vacío cuyas claves son solo `gerencia_id`, `unidad_id`, `frecuencia`, `tipo_calculo`, `acumulable` | Solo los valores nuevos, con el nombre de la columna. `unidad_id` viaja con un cambio de gerencia |
+| vigente_desde | date | no | | | Apertura del siguiente periodo de la frecuencia que tenía el indicador al programarlo |
+| creado_por | uuid | sí | | FK → usuarios | Administrador que lo programó |
+| created_at | timestamptz | no | `now()` | | |
+| aplicado_at | timestamptz | sí | | No junto con `cancelado_at` | Lo fija la apertura del periodo, en su transacción |
+| cancelado_at | timestamptz | sí | | No junto con `aplicado_at` | Cancelado por el Administrador antes de que abra el periodo |
+| cancelado_por | uuid | sí | | FK → usuarios; solo con `cancelado_at` | |
+
+**Quién escribe y cuándo aplica.** La API de edición del catálogo (`PUT /api/admin/indicadores/:id`) inserta;
+`POST /api/admin/cambios-programados/:id/cancelar` cancela. `aplicarCambiosProgramados` (`src/datos/cambiosProgramados.ts`)
+aplica los pendientes con `vigente_desde <= hoy` dentro de la transacción de `abrirCiclos` (periodo de reporte de
+su frecuencia), antes de generar los reportes. Abrir un ciclo de planeación debe llamarla igual (ticket 8, pendiente).
+Un indicador tiene a lo sumo un cambio pendiente: uno nuevo cancela y reemplaza al anterior (conserva sus valores).
+Cada paso queda en la bitácora: `cambio_programado`, `cambio_programado_cancelado` y `cambio_programado_aplicado`
+(con `antes`, `despues` y `vigente_desde`).
+
 ---
 
 ## Índices
@@ -414,6 +443,8 @@ Los eventos de bloqueo y desbloqueo van a `bitacora` con `entidad = 'acceso'` y 
 | `reportes_periodo_gerencia_estado` | reportes | Bandejas y tableros del periodo |
 | `reportes_gerencia_estado` | reportes | KPIs por gerencia |
 | `bitacora_indicador`, `bitacora_entidad`, `bitacora_usuario` | bitacora | Historial por indicador, por registro y por usuario |
+| `indicador_cambios_pendiente` (único parcial) | indicador_cambios_programados | Un cambio pendiente por indicador |
+| `indicador_cambios_por_vigencia` (parcial) | indicador_cambios_programados | Qué cambios toca aplicar al abrir un periodo |
 
 ## Triggers
 
@@ -423,6 +454,8 @@ Los eventos de bloqueo y desbloqueo van a `bitacora` con `entidad = 'acceso'` y 
 | `reportes_foto` | reportes | Copia la configuración del indicador al crear; rechaza indicadores inexistentes o inactivos |
 | `reportes_proteccion` | reportes | Impide borrar, cambiar la foto o editar un reporte cerrado o incumplido sin autorización; sube `lock_version` |
 | `bitacora_sin_cambios`, `bitacora_sin_truncate` | bitacora | Solo inserción |
+| `meta_versiones_sin_cambios` | meta_versiones | Solo inserción (`solo_insercion()`) |
+| `cambios_programados_proteccion` | indicador_cambios_programados | Impide borrar, cambiar lo programado o tocar uno ya aplicado o cancelado |
 
 ## Cobertura de TEC-01
 

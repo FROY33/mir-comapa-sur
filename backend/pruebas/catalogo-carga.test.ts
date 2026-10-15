@@ -121,6 +121,16 @@ describe('carga del catálogo sobre la base del sprint 1', () => {
       AND (coalesce(nombre,'') = '' OR coalesce(unidad_medida,'') = '' OR frecuencia IS NULL OR tipo_calculo IS NULL)`), '0')
   })
 
+  test('cada indicador con texto de medio queda ligado al medio del catálogo con ese nombre (HU-R4-11 CA_2)', async () => {
+    assert.ok(Number(await uno('SELECT count(*) FROM medios_verificacion')) > 0, 'la carga no creó medios')
+    assert.equal(await uno(`SELECT count(*) FROM indicadores i
+      LEFT JOIN medios_verificacion m ON m.id = i.medio_verificacion_id
+      WHERE btrim(coalesce(i.medio_verificacion, '')) <> ''
+        AND m.nombre IS DISTINCT FROM i.medio_verificacion`), '0')   // el trigger de S2-TEC-01 deja el texto igual al nombre del medio
+    assert.equal(await uno(`SELECT count(*) FROM indicadores WHERE tipo = 'mir' AND activo AND medio_verificacion_id IS NULL`), '0',
+      'un MIR sin medio no se podría editar desde la pantalla')
+  })
+
   test('los ids 26 y 36 del CSV se cargan como gestión (decisión de la PO)', async () => {
     assert.equal(await uno(`SELECT count(*) FROM indicadores WHERE tipo = 'mir' AND activo AND tipo_indicador IS NULL`), '0')
     for (const nombre of ['Porcentaje de cambios de tarifa', 'Atención a la Industria y el Comercio']) {
@@ -159,7 +169,7 @@ describe('carga del catálogo sobre la base del sprint 1', () => {
     await consultar(`UPDATE indicadores SET nombre = 'Nombre editado en pantalla' WHERE codigo = $1`, [editado!.codigo])
     await consultar(
       `INSERT INTO bitacora (accion, entidad, entidad_id, indicador_id, detalle)
-       SELECT 'indicador_edicion', 'indicador', id::text, id, $2::jsonb FROM indicadores WHERE codigo = $1`,
+       SELECT 'indicador_editado', 'indicador', id::text, id, $2::jsonb FROM indicadores WHERE codigo = $1`,
       [editado!.codigo, JSON.stringify({ antes: { nombre: original }, despues: { nombre: 'Nombre editado en pantalla' } })])
     // Y uno que nadie editó desde la pantalla: la recarga sí lo corrige
     await consultar(`UPDATE indicadores SET nombre = 'Cambio por fuera' WHERE codigo = $1`, [intacto!.codigo])
@@ -177,6 +187,20 @@ describe('carga del catálogo sobre la base del sprint 1', () => {
     sembrar('--catalogo', '--forzar')
     assert.equal(await uno(HUELLA_SIN_FECHAS), despues, 'la segunda recarga cambió datos')
     assert.equal(await uno('SELECT count(*) FROM indicadores'), String(catalogo.length + 2))
+  })
+
+  test('--forzar tampoco pisa un cambio programado que ya se aplicó (HU-R4-11 CA_4)', async () => {
+    const codigo = catalogo.filter((c) => c.tipo === 'mir')[2]!.codigo
+    await consultar(`UPDATE indicadores SET acumulable = NOT acumulable WHERE codigo = $1`, [codigo])
+    const acumulable = await uno('SELECT acumulable FROM indicadores WHERE codigo = $1', [codigo])
+    await consultar(
+      `INSERT INTO bitacora (accion, entidad, entidad_id, indicador_id, detalle)
+       SELECT 'cambio_programado_aplicado', 'indicador', id::text, id, $2::jsonb FROM indicadores WHERE codigo = $1`,
+      [codigo, JSON.stringify({ antes: { acumulable: !acumulable }, despues: { acumulable }, vigente_desde: '2026-11-01' })])
+
+    sembrar('--catalogo', '--forzar')
+
+    assert.equal(await uno('SELECT acumulable FROM indicadores WHERE codigo = $1', [codigo]), acumulable)
   })
 
   test('el sembrado normal ya no pisa el catálogo una vez importado', async () => {

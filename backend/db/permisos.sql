@@ -34,3 +34,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON login_intentos   TO :"app";   -- el cont
 GRANT SELECT, INSERT                 ON periodos_reporte TO :"app";   -- apertura de ciclos (R3-01)
 GRANT SELECT, INSERT                 ON reportes         TO :"app";   -- generación de reportes (R3-01)
 GRANT SELECT, INSERT                 ON bitacora         TO :"app";   -- solo inserción (TEC-05 CA-5)
+-- Catálogo administrable (HU-R4-11): lee metas para decidir la vigencia futura (CA_4) y calcular el cumplimiento (RN_3)
+GRANT SELECT                         ON ciclos_planeacion, metas_planeacion, metas_periodo TO :"app";
+-- Cambios del indicador con vigencia futura (HU-R4-11 CA_4): se programan, se aplican o cancelan (UPDATE); nunca DELETE
+GRANT SELECT, INSERT, UPDATE         ON indicador_cambios_programados TO :"app";
