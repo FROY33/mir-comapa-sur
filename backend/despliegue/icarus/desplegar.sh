@@ -44,7 +44,7 @@ trap - ERR
 
 paso "Verificación"
 for i in $(seq 1 30); do
-  curl -fsS -o /dev/null --max-time 2 http://127.0.0.1:3087/api/salud && break
+  curl -fs -o /dev/null --max-time 2 http://127.0.0.1:3087/api/salud && break
   [ "$i" -eq 30 ] && { journalctl -u comapa-api -n 30 --no-pager >&2; exit 1; }
   sleep 1
 done
