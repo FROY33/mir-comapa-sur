@@ -40,7 +40,7 @@ aplicadas() { "${PSQL[@]}" -At -c "SELECT version FROM schema_migrations ORDER B
 
 case "${1:-status}" in
   up)
-    echo "Migrando $DB"
+    echo "Migrando $(sed -E 's#(://[^:/@]+):[^@]*@#\1:***@#' <<<"$DB")"   # sin la contraseña
     hechas="$(aplicadas)"
     nuevas=0
     for f in "$DIR"/*.sql; do
