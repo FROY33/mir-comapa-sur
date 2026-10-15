@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Prueba de punta a punta sobre bases desechables:
-#   1. crea la base   2. aplica todas las migraciones   3. corre pruebas/restricciones.sql
+#   1. crea la base   2. aplica todas las migraciones   3. corre las pruebas SQL de pruebas/
 #   4. revierte todas las migraciones
 #   5. actualización con datos: recrea la base de S1, la llena con la semilla y las fixtures, aplica
 #      las migraciones nuevas y comprueba que ninguna tabla perdió filas (CA-1 de las fichas de modelo)
@@ -28,8 +28,12 @@ ok "$BASE creada"
 paso "2. Migraciones"
 "$AQUI/migrar.sh" up
 
-paso "3. Restricciones (TEC-02)"
-psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f "$AQUI/pruebas/restricciones.sql"
+paso "3. Pruebas SQL (restricciones de TEC-02, modelo de metas…)"
+for f in "$AQUI"/pruebas/*.sql; do
+  case "$(basename "$f")" in apoyo.sql|datos-base.sql|resultado.sql|actualizacion.sql) continue ;; esac
+  printf '  %s\n' "$(basename "$f")"
+  psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f "$f"
+done
 
 paso "4. Reversión completa"
 total=$(ls "$AQUI"/migrations/*.sql | wc -l | tr -d ' ')
@@ -69,6 +73,8 @@ while read -r tabla n; do
   fi
 done <<<"$antes"
 [ "$perdidas" -eq 0 ] || exit 1
+# Comprobaciones específicas de las migraciones de datos (qué debe seguir siendo cierto con datos reales)
+psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f "$AQUI/pruebas/actualizacion.sql"
 ok "Ninguna tabla de S1 perdió filas ($(wc -l <<<"$antes" | tr -d ' ') tablas, $(awk '{ s += $2 } END { print s }' <<<"$antes") filas)"
 
 paso "Todo en orden."

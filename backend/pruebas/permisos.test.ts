@@ -91,6 +91,28 @@ describe('la app funciona con el rol de permisos mínimos', () => {
   })
 })
 
+describe('con el modelo de versiones y metas', () => {
+  test('genera un reporte (el trigger toma la versión del indicador) y lee versiones y medios', async () => {
+    await comoDueño(`INSERT INTO periodos_reporte (frecuencia, ejercicio, numero, etiqueta, inicio_periodo, fin_periodo, abre_captura, fecha_limite)
+                     VALUES ('mensual', 2020, 1, 'enero-2020', '2020-01-01', '2020-01-31', '2020-02-01', '2020-02-14')`, base)
+    const r = await app.consultar<{ version: number }>(
+      `WITH n AS (INSERT INTO reportes (indicador_id, periodo_id)
+                  SELECT i.id, p.id FROM indicadores i, periodos_reporte p WHERE p.etiqueta = 'enero-2020'
+                  RETURNING indicador_version_id)
+       SELECT v.version FROM n JOIN indicador_versiones v ON v.id = n.indicador_version_id`)
+    assert.equal(r[0]?.version, 1)
+    await app.consultar('SELECT count(*) FROM medios_verificacion')
+  })
+
+  test('no escribe versiones ni metas: eso llega con sus HU', async () => {
+    const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
+    await intentar(`UPDATE indicador_versiones SET definicion = '{}'`)
+    await intentar(`INSERT INTO medios_verificacion (nombre) VALUES ('x')`)
+    await intentar('SELECT count(*) FROM metas_planeacion')
+    await intentar('SELECT count(*) FROM ciclos_planeacion')
+  })
+})
+
 describe('y no puede alterar la bitácora ni la estructura', () => {
   const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
 

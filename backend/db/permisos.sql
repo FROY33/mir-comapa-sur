@@ -22,6 +22,10 @@ REVOKE ALL ON ALL TABLES IN SCHEMA public FROM :"app";
 GRANT USAGE ON SCHEMA public TO :"app";
 
 GRANT SELECT                         ON schema_migrations, gerencias, unidades, indicadores TO :"app";
+-- Los triggers de reportes leen la versión del indicador al generar un reporte (R3-01); los medios
+-- se leen con el indicador. Escribir versiones solo lo hace el trigger de INDICADORES (dueño).
+GRANT SELECT                         ON indicador_versiones, medios_verificacion TO :"app";
+-- ciclos_planeacion, metas_planeacion y metas_periodo: sin permisos hasta que el código de R4 los use.
 GRANT SELECT, UPDATE                 ON frecuencias      TO :"app";   -- ventanas de captura (R3-01)
 GRANT SELECT, INSERT, UPDATE         ON usuarios         TO :"app";   -- gestión de usuarios (R7-07); nunca DELETE (RN_3)
 GRANT SELECT, INSERT, UPDATE         ON sesiones         TO :"app";   -- se revocan, no se borran
