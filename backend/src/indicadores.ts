@@ -18,7 +18,7 @@ const NO_ENCONTRADO: Respuesta = { status: 404, cuerpo: { error: 'no_encontrado'
  * La gerencia con la que se consulta: la de la sesión, salvo para el Administrador, que
  * puede pedir una (o ninguna: todas). Lo que mande otro rol no se lee.
  */
-function gerenciaDeConsulta(s: SolicitudConSesion, pedida: unknown): string | null {
+export function gerenciaDeConsulta(s: SolicitudConSesion, pedida: unknown): string | null {
   if (s.sesion.rol !== 'admin') return s.sesion.gerenciaId
   return typeof pedida === 'string' && UUID.test(pedida) ? pedida : null
 }

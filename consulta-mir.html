@@ -11,158 +11,7 @@
 <script src="vistas-mir.js"></script>
 <script src="mock-notifications.js"></script>
 <script src="layout.js"></script>
-<style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-surface); color: var(--color-text-primary); display: flex; min-height: 100vh; }
-.btn-detail { background: var(--color-surface); color: var(--color-primary); border: none; border-radius: var(--radius-btn); padding: 5px 12px; font-size: 11px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-.btn-detail:hover { background: var(--color-primary-tint); }
-.btn-clear { background: transparent; color: var(--color-danger); border: none; border-radius: var(--radius-btn); padding: 7px 12px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: background 0.15s; white-space: nowrap; }
-.btn-clear:hover { background: var(--color-danger-tint); }
-.btn-full { width: 100%; background: var(--color-accent); color: white; border: none; border-radius: var(--radius-btn); padding: 11px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; }
-.btn-full:hover { background: var(--color-accent-dark); }
-/* ── GERENCIA TABS ── */
-.gerencia-tabs { display: flex; gap: 4px; background: var(--color-bg); border-radius: var(--radius-card); padding: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 14px; overflow-x: auto; }
-.g-tab { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-btn); border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); cursor: pointer; transition: background 0.15s, color 0.15s; white-space: nowrap; }
-.g-tab:hover { background: var(--color-surface); color: var(--color-text-primary); }
-.g-tab.active { background: var(--color-primary); color: white; }
-.g-tab.active .tab-count { background: rgba(255,255,255,0.2); color: white; }
-.tab-count { font-size: 10px; font-weight: 700; background: var(--color-surface); color: var(--color-text-secondary); padding: 2px 7px; border-radius: var(--radius-btn); }
-/* ── FILTER PANEL ── */
-.filter-panel { background: var(--color-bg); border-radius: var(--radius-card); padding: 14px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
-.filter-search { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 8px; background: var(--color-surface); border: 1px solid transparent; border-radius: var(--radius-btn); padding: 7px 14px; transition: border-color 0.15s; }
-.filter-search:focus-within { border-color: var(--color-primary); }
-.filter-search svg { width: 14px; height: 14px; color: var(--color-text-secondary); flex-shrink: 0; }
-.filter-search input { border: none; background: transparent; font-family: inherit; font-size: 12px; color: var(--color-text-primary); flex: 1; outline: none; }
-.filter-search input::placeholder { color: var(--color-text-secondary); }
-.filter-select-wrap { position: relative; display: flex; align-items: center; background: var(--color-surface); border: 1px solid transparent; border-radius: var(--radius-btn); padding: 0 32px 0 14px; height: 34px; transition: border-color 0.15s; }
-.filter-select-wrap:focus-within { border-color: var(--color-primary); }
-.filter-select-wrap .chevron { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; color: var(--color-text-secondary); pointer-events: none; }
-.filter-select { border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--color-text-primary); cursor: pointer; outline: none; appearance: none; white-space: nowrap; }
-/* ── ACTIVE FILTERS ── */
-.filters-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
-.filters-bar.hidden { display: none; }
-.result-count { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
-.result-count strong { color: var(--color-text-primary); font-weight: 700; }
-.filter-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--color-primary-tint); color: var(--color-primary); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-btn); cursor: pointer; transition: background 0.15s; }
-.filter-chip:hover { background: #EDD5DB; }
-.filter-chip svg { width: 11px; height: 11px; }
-/* ── VIEW TOGGLE ── */
-.view-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.view-toggle { display: flex; background: var(--color-bg); border-radius: var(--radius-btn); padding: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.view-btn { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: var(--radius-btn); border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
-.view-btn:hover { color: var(--color-text-primary); }
-.view-btn.active { background: var(--color-primary); color: white; }
-.view-btn svg { width: 14px; height: 14px; }
-/* ── TABLE ── */
-.table-card { background: var(--color-bg); border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.table-scroll { overflow-x: auto; }
-.row-id { font-size: 10px; font-weight: 700; font-family: monospace; color: var(--color-text-secondary); background: var(--color-surface); padding: 3px 7px; border-radius: 6px; white-space: nowrap; }
-.td-ind { max-width: 240px; }
-.td-ind p { font-weight: 600; line-height: 1.4; }
-.td-obj { max-width: 180px; }
-.td-obj p { font-size: 11px; color: var(--color-text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.td-mv p { font-size: 11px; color: var(--color-text-secondary); max-width: 150px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.td-fuente p { font-size: 11px; color: var(--color-text-secondary); max-width: 130px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-/* ── LEVEL BADGES ── */
-.level-tag { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.level-tag.fin { background: var(--color-text-primary); color: white; }
-.level-tag.proposito { background: var(--color-text-primary); color: white; }
-.level-tag.componente { background: var(--color-text-secondary); color: white; }
-.level-tag.actividad { background: var(--color-text-muted); color: white; }
-/* ── GERENCIA CHIPS ── */
-.g-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.g-chip.pe { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.g-chip.tec { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.g-chip.com { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.g-chip.adm { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-/* ── FREQ BADGES ── */
-.freq-tag { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.freq-tag.semanal { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.mensual { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.bimestral { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.trimestral { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.semestral { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.anual { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-/* ── MV BADGES ── */
-.mv-tag { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.mv-tag.interno { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-neutral-300); }
-.mv-tag.externo { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-neutral-300); }
-.mv-tag.mixto { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-neutral-300); }
-/* ── TREE VIEW ── */
-.tree-view { display: flex; flex-direction: column; gap: 12px; }
-.tree-gerencia { background: var(--color-bg); border-radius: var(--radius-card); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.tree-g-header { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); cursor: pointer; user-select: none; }
-.tree-g-header:hover { background: #EBEBEB; }
-.tree-g-name { font-size: 14px; font-weight: 700; color: var(--color-text-primary); flex: 1; }
-.tree-g-count { font-size: 11px; color: var(--color-text-secondary); }
-.tree-chevron { width: 16px; height: 16px; color: var(--color-text-secondary); transition: transform 0.2s; flex-shrink: 0; }
-.tree-gerencia.collapsed .tree-chevron { transform: rotate(-90deg); }
-.tree-gerencia.collapsed .tree-body { display: none; }
-.tree-body { padding: 6px 0; }
-.tree-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 20px; cursor: pointer; transition: background 0.1s; }
-.tree-item:hover { background: var(--color-neutral-50); }
-.tree-item.selected { background: var(--color-primary-tint); }
-.tree-item.lv-proposito { padding-left: 40px; }
-.tree-item.lv-componente { padding-left: 60px; }
-.tree-item.lv-actividad { padding-left: 80px; }
-.tree-item-content { flex: 1; min-width: 0; }
-.tree-item-name { font-size: 12px; font-weight: 600; color: var(--color-text-primary); line-height: 1.4; }
-.tree-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 5px; }
-.tree-item-id { font-size: 10px; font-weight: 700; color: var(--color-text-secondary); font-family: monospace; }
-/* ── DETAIL DRAWER ── */
-.drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.1); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
-.drawer-backdrop.active { opacity: 1; pointer-events: auto; }
-.detail-drawer { position: fixed; top: 0; right: 0; width: 360px; height: 100vh; background: var(--color-bg); border-left: 1px solid var(--color-border); box-shadow: -8px 0 24px rgba(0,0,0,0.1); z-index: 300; display: flex; flex-direction: column; transform: translateX(360px); transition: transform 0.25s ease; }
-.detail-drawer.open { transform: translateX(0); }
-.drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--color-border); position: sticky; top: 0; background: var(--color-bg); z-index: 1; flex-shrink: 0; }
-.drawer-title { font-size: 11px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
-.drawer-close { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--color-surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--color-text-secondary); transition: background 0.15s; }
-.drawer-close:hover { background: var(--color-border); }
-.drawer-close svg { width: 14px; height: 14px; }
-.drawer-body { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
-.drawer-id-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.d-id { font-size: 11px; font-weight: 700; font-family: monospace; color: var(--color-text-secondary); background: var(--color-surface); padding: 4px 10px; border-radius: 8px; }
-.drawer-name { font-size: 14px; font-weight: 700; color: var(--color-text-primary); line-height: 1.5; }
-.d-divider { height: 1px; background: var(--color-border); flex-shrink: 0; }
-.d-field { display: flex; flex-direction: column; gap: 4px; }
-.d-label { font-size: 10px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px; }
-.d-value { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
-.d-value.code { font-family: monospace; font-size: 11px; background: var(--color-surface); padding: 8px 10px; border-radius: 8px; line-height: 1.6; display: block; }
-.drawer-footer { padding: 16px 20px; border-top: 1px solid var(--color-border); flex-shrink: 0; }
-/* ── TOOLTIPS ── */
-.tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
-.tip-icon { width: 14px; height: 14px; border-radius: 50%; background: var(--color-border); color: var(--color-text-secondary); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; cursor: help; flex-shrink: 0; line-height: 1; position: relative; }
-.tip-icon::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); background: var(--color-text-primary); color: white; font-size: 11px; line-height: 1.4; padding: 7px 10px; border-radius: 8px; white-space: normal; min-width: 160px; max-width: 220px; text-align: left; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 500; font-weight: 400; font-family: 'Plus Jakarta Sans', sans-serif; }
-.tip-icon:hover::after { opacity: 1; }
-/* ── BREADCRUMB ── */
-.breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-.breadcrumb a { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color 0.15s; }
-.breadcrumb a:hover { color: var(--color-primary); }
-.breadcrumb .sep { font-size: 12px; color: var(--color-border); }
-.breadcrumb .current { font-size: 12px; font-weight: 700; color: var(--color-text-primary); }
-/* ── UTILS ── */
-.hidden { display: none !important; }
-/* ── RESPONSIVE ── */
-@media (max-width: 1024px) {
-  .filter-panel { flex-wrap: wrap; }
-  .filter-search { min-width: 200px; }
-}
-
-@media (max-width: 860px) {
-.gerencia-tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
-.table-scroll { overflow-x: auto; }
-.td-ind { max-width: 160px; }
-.td-obj { display: none; }
-.td-fuente { display: none; }
-}
-
-@media (max-width: 640px) {
-.view-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
-.filter-panel { gap: 6px; padding: 12px 14px; }
-.filter-select-wrap { flex: 1; min-width: 130px; }
-}
-</style>
-<script src="data/mir-comapa-sur.js"></script>
+<link rel="stylesheet" href="consulta-mir.css">
 </head>
 <body>
 
@@ -171,7 +20,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
   <div class="sidebar-logo">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
   </div>
-  <div class="sidebar-nav">
+  <div class="sidebar-nav" id="navAdmin">
     <a class="nav-item" href="dashboard-admin.html" title="Inicio">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
       <span class="nav-label">Inicio</span>
@@ -205,6 +54,28 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       <span class="nav-label">Guía MIR</span>
     </div>
   </div>
+  <div class="sidebar-nav hidden" id="navRevisor">
+    <a class="nav-item" href="dashboard-revisor.html" title="Inicio">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
+      <span class="nav-label">Inicio</span>
+    </a>
+    <a class="nav-item" href="bandeja-revision.html" title="Bandeja de revisión">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"/></svg>
+      <span class="nav-label">Bandeja de revisión</span>
+    </a>
+    <a class="nav-item active" href="consulta-mir.html" title="Consulta MIR">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+      <span class="nav-label">Consulta MIR</span>
+    </a>
+    <a class="nav-item" href="planeacion-metas-revisor.html" title="Planeación">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      <span class="nav-label">Planeación</span>
+    </a>
+    <a class="nav-item" href="reportes-revisor.html" title="Reportes">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+      <span class="nav-label">Reportes</span>
+    </a>
+  </div>
   <div class="sidebar-bottom">
     <a class="nav-item" href="configuracion.html" title="Configuración">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
@@ -222,7 +93,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
 
   <!-- BREADCRUMB -->
   <div class="breadcrumb">
-    <a href="dashboard-admin.html">Inicio</a>
+    <a href="dashboard-admin.html" id="migaInicio">Inicio</a>
     <span class="sep">›</span>
     <span class="current">Consulta MIR</span>
   </div>
@@ -241,18 +112,13 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
 
   <!-- GERENCIA TABS -->
   <div class="gerencia-tabs" id="gerenciaTabs">
-    <button class="g-tab active" data-g="Todas">Todas <span class="tab-count">193</span></button>
-    <button class="g-tab" data-g="Planeación Estratégica">Planeación Estratégica <span class="tab-count">19</span></button>
-    <button class="g-tab" data-g="Técnica">Técnica <span class="tab-count">56</span></button>
-    <button class="g-tab" data-g="Comercial">Comercial <span class="tab-count">60</span></button>
-    <button class="g-tab" data-g="Administrativa">Administrativa <span class="tab-count">58</span></button>
   </div>
 
   <!-- FILTER PANEL -->
   <div class="filter-panel">
     <div class="filter-search">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-      <input type="text" id="filterSearch" placeholder="Buscar indicador, objetivo o ID...">
+      <input type="text" id="filterSearch" placeholder="Buscar por código o nombre...">
     </div>
     <div class="filter-select-wrap">
       <select class="filter-select" id="filterNivel">
@@ -267,10 +133,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     <div class="filter-select-wrap">
       <select class="filter-select" id="filterFrecuencia">
         <option value="">Frecuencia</option>
-        <option>Semanal</option>
         <option>Mensual</option>
         <option>Bimestral</option>
         <option>Trimestral</option>
+        <option>Cuatrimestral</option>
         <option>Semestral</option>
         <option>Anual</option>
       </select>
@@ -278,11 +144,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
     </div>
     <div class="filter-select-wrap">
       <select class="filter-select" id="filterUA">
-        <option value="">Unidad administrativa</option>
-        <option value="Planeación Estratégica">Planeación Estratégica</option>
-        <option value="Técnica">Técnica</option>
-        <option value="Comercial">Comercial</option>
-        <option value="Administrativa">Administrativa</option>
+        <option value="">Gerencia</option>
       </select>
       <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
     </div>
@@ -315,7 +177,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
         Vista jerárquica
       </button>
     </div>
-    <p class="result-count" id="resultCount"><strong>193</strong> indicadores encontrados</p>
+    <p class="result-count" id="resultCount">Cargando indicadores…</p>
   </div>
 
   <!-- TABLE VIEW -->
@@ -324,30 +186,25 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       <table class="data-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Gerencia</th>
-            <th>
+            <th data-orden="codigo">Código</th>
+            <th data-orden="nombre">Indicador</th>
+            <th data-orden="gerencia">Gerencia</th>
+            <th data-orden="unidad">Unidad responsable</th>
+            <th data-orden="nivel">
               <span class="tip-wrap">
-                Nivel
+                Nivel MIR
                 <span class="tip-icon" data-tip="Posición en la lógica causal de la MIR: Fin, Propósito, Componente o Actividad">?</span>
               </span>
             </th>
-            <th>Indicador</th>
-            <th>Objetivo resumido</th>
-            <th>
+            <th data-orden="frecuencia">Frecuencia</th>
+            <th data-orden="estado">
               <span class="tip-wrap">
-                Frecuencia
-                <span class="tip-icon" data-tip="Periodicidad con la que se mide y reporta el indicador">?</span>
+                Estado actual
+                <span class="tip-icon" data-tip="Estado del reporte en el periodo abierto; si no hay periodo abierto, el del último cerrado">?</span>
               </span>
             </th>
-            <th>Unidad</th>
-            <th>
-              <span class="tip-wrap">
-                Medio de verificación
-                <span class="tip-icon" data-tip="Fuente o documento que permite comprobar el valor reportado del indicador">?</span>
-              </span>
-            </th>
-            <th>Fuente</th>
+            <th data-orden="meta_anual">Meta anual</th>
+            <th data-orden="cumplimiento">% Cumplimiento</th>
             <th></th>
           </tr>
         </thead>
@@ -375,262 +232,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
   </div>
   <div class="drawer-body" id="drawerBody"></div>
   <div class="drawer-footer">
-    <button class="btn-full" id="btnVerDetalle" onclick="window.location='detalle-indicador.html?id='+(state.selected||'')">
+    <button class="btn-full" id="btnVerDetalle" onclick="window.location='detalle-indicador.html?id='+encodeURIComponent(state.selected||'')">
       Ver detalle completo
       <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
     </button>
   </div>
 </aside>
 
-<script>
-const DATA = window.MIR_DATA;
-
-const GERENCIA_ORDER = ['Planeación Estratégica','Técnica','Comercial','Administrativa'];
-const NIVEL_ORDER    = ['Fin','Propósito','Componente','Actividad'];
-
-function gClass(g)  { return {'Planeación Estratégica':'pe','Técnica':'tec','Comercial':'com','Administrativa':'adm'}[g]||'pe'; }
-function gShort(g)  { return {'Planeación Estratégica':'Planeación','Técnica':'Técnica','Comercial':'Comercial','Administrativa':'Administrativa'}[g]||g; }
-function lvClass(n) { return {'Fin':'fin','Propósito':'proposito','Componente':'componente','Actividad':'actividad'}[n]||''; }
-function frClass(f) { return {'Semanal':'semanal','Mensual':'mensual','Bimestral':'bimestral','Trimestral':'trimestral','Semestral':'semestral','Anual':'anual'}[f]||''; }
-function mvClass(t) { return {'Interno':'interno','Externo':'externo','Mixto':'mixto'}[t]||''; }
-function lvIndent(n){ return {'Fin':'','Propósito':'lv-proposito','Componente':'lv-componente','Actividad':'lv-actividad'}[n]||''; }
-
-const state = { gerencia:'Todas', nivel:'', frecuencia:'', den:'', search:'', view:'tabla', selected:null };
-
-function getFiltered() {
-  return DATA.filter(r => {
-    if (state.gerencia !== 'Todas' && r.gerencia !== state.gerencia) return false;
-    if (state.nivel && r.nivel !== state.nivel) return false;
-    if (state.frecuencia && r.frecuenciaMedicion !== state.frecuencia) return false;
-    if (state.den === 'si' && !r.tieneDenominador) return false;
-    if (state.den === 'no' && r.tieneDenominador) return false;
-    if (state.search) {
-      const q = state.search.toLowerCase();
-      if (!r.nombreIndicador.toLowerCase().includes(q) && !(r.resumenNarrativo||'').toLowerCase().includes(q) && !r.id.toLowerCase().includes(q)) return false;
-    }
-    return true;
-  });
-}
-
-function hasFilters() {
-  return state.gerencia !== 'Todas' || state.nivel || state.frecuencia || state.den || state.search;
-}
-
-function renderTable(rows) {
-  const tbody = document.getElementById('tableBody');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-state-icon"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg></div><p>No se encontraron indicadores con los filtros seleccionados.</p><button class="btn btn-primary" onclick="clearFilters()" style="margin:0 auto">Limpiar filtros</button></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = rows.map(r => `
-    <tr class="${state.selected===r.id?'selected':''}" data-id="${escaparHTML(r.id)}" onclick="openDetail(this.dataset.id)">
-      <td><span class="row-id">${escaparHTML(r.id)}</span></td>
-      <td><span class="g-chip ${gClass(r.gerencia)}">${escaparHTML(gShort(r.gerencia))}</span></td>
-      <td><span class="level-tag ${lvClass(r.nivel)}">${escaparHTML(r.nivel)}</span></td>
-      <td class="td-ind"><p>${isoBadge(r)}${escaparHTML(r.nombreIndicador)}</p></td>
-      <td class="td-obj"><p>${escaparHTML(r.resumenNarrativo || r.objetivo)}</p></td>
-      <td><span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${escaparHTML(r.frecuenciaMedicion)}</span></td>
-      <td style="font-size:11px;color:var(--color-text-secondary)">${escaparHTML(r.unidadMedida)}</td>
-      <td class="td-mv"><p>${escaparHTML(r.medioVerificacionNombre)}</p></td>
-      <td class="td-fuente"><p>${escaparHTML(r.medioVerificacionFuente || '—')}</p></td>
-      <td><button class="btn-detail" data-id="${escaparHTML(r.id)}" onclick="event.stopPropagation();window.location='detalle-indicador.html?id='+encodeURIComponent(this.dataset.id)">Ver detalle</button></td>
-    </tr>`).join('');
-}
-
-function renderTree(rows) {
-  const container = document.getElementById('viewJerarquica');
-  if (!rows.length) {
-    container.innerHTML = `<div class="empty-state" style="background:var(--color-bg);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)"><p>No se encontraron indicadores con los filtros seleccionados.</p><button class="btn btn-primary" onclick="clearFilters()" style="margin:0 auto">Limpiar filtros</button></div>`;
-    return;
-  }
-  const grouped = {};
-  rows.forEach(r => {
-    if (!grouped[r.gerencia]) grouped[r.gerencia] = {};
-    if (!grouped[r.gerencia][r.nivel]) grouped[r.gerencia][r.nivel] = [];
-    grouped[r.gerencia][r.nivel].push(r);
-  });
-  container.innerHTML = GERENCIA_ORDER.filter(g => grouped[g]).map(g => {
-    const count = Object.values(grouped[g]).flat().length;
-    const items = NIVEL_ORDER.filter(n => grouped[g][n]).map(n =>
-      grouped[g][n].map(r => `
-        <div class="tree-item ${lvIndent(r.nivel)}${state.selected===r.id?' selected':''}" data-id="${escaparHTML(r.id)}" onclick="openDetail(this.dataset.id)">
-          <div class="tree-item-content">
-            <p class="tree-item-name">${isoBadge(r)}${escaparHTML(r.nombreIndicador)}</p>
-            <div class="tree-item-meta">
-              <span class="level-tag ${lvClass(r.nivel)}">${escaparHTML(r.nivel)}</span>
-              <span class="tree-item-id">${escaparHTML(r.id)}</span>
-              <span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${escaparHTML(r.frecuenciaMedicion)}</span>
-              <span class="mv-tag ${mvClass(r.medioVerificacionTipo)}">${escaparHTML(r.medioVerificacionTipo)}</span>
-            </div>
-          </div>
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14" style="color:var(--color-text-secondary);flex-shrink:0;margin-top:3px"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-        </div>`).join('')).join('');
-    return `<div class="tree-gerencia" data-g="${escaparHTML(g)}">
-      <div class="tree-g-header" onclick="toggleTree(this.closest('.tree-gerencia'))">
-        <span class="g-chip ${gClass(g)}">${escaparHTML(g)}</span>
-        <span class="tree-g-count">${count} indicadores</span>
-        <svg class="tree-chevron" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-      </div>
-      <div class="tree-body">${items}</div>
-    </div>`;
-  }).join('');
-}
-
-function toggleTree(el) { el.classList.toggle('collapsed'); }
-
-function updateFiltersBar(rows) {
-  const bar = document.getElementById('filtersBar');
-  const chips = [];
-  if (state.nivel)     chips.push(['Nivel: '+state.nivel,    ()=>{ document.getElementById('filterNivel').value=''; state.nivel=''; render(); }]);
-  if (state.frecuencia)chips.push(['Frec.: '+state.frecuencia,()=>{ document.getElementById('filterFrecuencia').value=''; state.frecuencia=''; render(); }]);
-  if (state.den)       chips.push([state.den==='si'?'Con denominador':'Sin denominador',()=>{ document.getElementById('filterDen').value=''; state.den=''; render(); }]);
-  if (state.search)    chips.push(['"'+state.search+'"',       ()=>{ document.getElementById('filterSearch').value=''; state.search=''; render(); }]);
-
-  const countHtml = `<span class="result-count"><strong>${rows.length}</strong> indicador${rows.length!==1?'es':''} encontrado${rows.length!==1?'s':''}</span>`;
-
-  if (!chips.length) { bar.classList.add('hidden'); bar.innerHTML=''; return; }
-  bar.classList.remove('hidden');
-  bar.innerHTML = countHtml + chips.map((c,i)=>`
-    <span class="filter-chip" onclick="(${c[1].toString()})()">
-      ${escaparHTML(c[0])}
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-    </span>`).join('');
-}
-
-function render() {
-  const rows = getFiltered();
-  document.getElementById('resultCount').innerHTML = `<strong>${rows.length}</strong> indicador${rows.length!==1?'es':''} encontrado${rows.length!==1?'s':''}`;
-  document.getElementById('btnClear').classList.toggle('hidden', !hasFilters());
-  updateFiltersBar(rows);
-  if (state.view === 'tabla') renderTable(rows);
-  else renderTree(rows);
-}
-
-function openDetail(id) {
-  const r = DATA.find(d => d.id === id);
-  if (!r) return;
-  state.selected = id;
-  render();
-  document.getElementById('drawerBody').innerHTML = `
-    <div class="drawer-id-row">
-      <span class="d-id">${escaparHTML(r.id)}</span>
-      <span class="level-tag ${lvClass(r.nivel)}">${escaparHTML(r.nivel)}</span>
-      <span class="g-chip ${gClass(r.gerencia)}">${escaparHTML(gShort(r.gerencia))}</span>
-    </div>
-    <p class="drawer-name">${isoBadge(r)}${escaparHTML(r.nombreIndicador)}</p>
-    <div class="d-divider"></div>
-    <div class="d-field">
-      <span class="d-label">Gerencia</span>
-      <span class="d-value">${escaparHTML(r.gerencia)}</span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">Objetivo resumido</span>
-      <span class="d-value">${escaparHTML(r.resumenNarrativo || r.objetivo)}</span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">
-        <span class="tip-wrap">Método de cálculo
-          <span class="tip-icon" data-tip="Fórmula o procedimiento para obtener el valor del indicador">?</span>
-        </span>
-      </span>
-      <span class="d-value code">${escaparHTML(r.metodoCalculo)}</span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">
-        <span class="tip-wrap">Frecuencia de medición
-          <span class="tip-icon" data-tip="Periodicidad con la que se mide y reporta el indicador">?</span>
-        </span>
-      </span>
-      <span class="d-value"><span class="freq-tag ${frClass(r.frecuenciaMedicion)}">${escaparHTML(r.frecuenciaMedicion)}</span></span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">Unidad de medida</span>
-      <span class="d-value">${escaparHTML(r.unidadMedida)}</span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">
-        <span class="tip-wrap">Medio de verificación
-          <span class="tip-icon" data-tip="Fuente o documento que permite comprobar el valor reportado">?</span>
-        </span>
-      </span>
-      <span class="d-value">${escaparHTML(r.medioVerificacionNombre)}</span>
-      <span class="mv-tag ${mvClass(r.medioVerificacionTipo)}" style="margin-top:6px;display:inline-block">${escaparHTML(r.medioVerificacionTipo)}</span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">Fuente</span>
-      <span class="d-value">${escaparHTML(r.medioVerificacionFuente)}</span>
-    </div>
-    <div class="d-field">
-      <span class="d-label">Tiene denominador</span>
-      <span class="d-value">${r.tieneDenominador?'Sí':'No'}</span>
-    </div>`;
-  document.getElementById('detailDrawer').classList.add('open');
-  document.getElementById('backdrop').classList.add('active');
-  document.getElementById('mainContent').classList.add('drawer-open');
-}
-
-function closeDrawer() {
-  state.selected = null;
-  render();
-  document.getElementById('detailDrawer').classList.remove('open');
-  document.getElementById('backdrop').classList.remove('active');
-  document.getElementById('mainContent').classList.remove('drawer-open');
-}
-
-function clearFilters() {
-  state.gerencia = 'Todas'; state.nivel = ''; state.frecuencia = '';
-  state.den = ''; state.search = '';
-  document.getElementById('filterSearch').value = '';
-  document.getElementById('filterNivel').value = '';
-  document.getElementById('filterFrecuencia').value = '';
-  document.getElementById('filterUA').value = '';
-  document.getElementById('filterDen').value = '';
-  document.querySelectorAll('.g-tab').forEach(t => t.classList.toggle('active', t.dataset.g === 'Todas'));
-  render();
-}
-
-// Events
-function syncTabsAndDropdown(gerencia) {
-  state.gerencia = gerencia;
-  document.querySelectorAll('.g-tab').forEach(t => t.classList.toggle('active', t.dataset.g === gerencia));
-  document.getElementById('filterUA').value = gerencia === 'Todas' ? '' : gerencia;
-}
-
-document.getElementById('gerenciaTabs').addEventListener('click', e => {
-  const tab = e.target.closest('.g-tab');
-  if (!tab) return;
-  syncTabsAndDropdown(tab.dataset.g);
-  render();
-});
-
-document.getElementById('filterSearch').addEventListener('input', e => { state.search = e.target.value.trim(); render(); });
-document.getElementById('filterNivel').addEventListener('change', e => { state.nivel = e.target.value; render(); });
-document.getElementById('filterFrecuencia').addEventListener('change', e => { state.frecuencia = e.target.value; render(); });
-document.getElementById('filterUA').addEventListener('change', e => { syncTabsAndDropdown(e.target.value || 'Todas'); render(); });
-document.getElementById('filterDen').addEventListener('change', e => { state.den = e.target.value; render(); });
-document.getElementById('btnClear').addEventListener('click', clearFilters);
-document.getElementById('backdrop').addEventListener('click', closeDrawer);
-document.getElementById('drawerClose').addEventListener('click', closeDrawer);
-
-document.getElementById('btnTabla').addEventListener('click', () => {
-  state.view = 'tabla';
-  document.getElementById('btnTabla').classList.add('active');
-  document.getElementById('btnJerarquica').classList.remove('active');
-  document.getElementById('viewTabla').classList.remove('hidden');
-  document.getElementById('viewJerarquica').classList.add('hidden');
-  render();
-});
-document.getElementById('btnJerarquica').addEventListener('click', () => {
-  state.view = 'jerarquica';
-  document.getElementById('btnJerarquica').classList.add('active');
-  document.getElementById('btnTabla').classList.remove('active');
-  document.getElementById('viewJerarquica').classList.remove('hidden');
-  document.getElementById('viewTabla').classList.add('hidden');
-  render();
-});
-
-render();
-</script>
+<script src="consulta-mir.js"></script>
 <script src="dev-toolbar.js"></script>
 </body>
 </html>

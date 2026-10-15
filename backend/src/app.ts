@@ -3,6 +3,7 @@
 import { login, logout, sesion } from './auth.js'
 import { acceso, crearProtegida } from './autorizacion.js'
 import * as ciclos from './ciclos.js'
+import * as consultaMir from './consultaMir.js'
 import type { BD } from './bd.js'
 import { listarFrecuencias } from './datos/frecuencias.js'
 import { crearManejador } from './http.js'
@@ -40,6 +41,8 @@ export function crearApp(
     'GET /api/indicadores': protegida(TODOS, indicadores.listar(bd)),
     'POST /api/indicadores/buscar': protegida(TODOS, indicadores.buscar(bd)),
     'GET /api/indicadores/:id': protegida(TODOS, indicadores.detalle(bd)),
+    // Consulta MIR: Revisor y Administrador (HU-R8-01)
+    'GET /api/consulta-mir': protegida(['admin', 'revisor'], consultaMir.listar(bd)),
 
     // Periodos abiertos y su fecha límite, para los tres dashboards (HU-R3-01 CA_6)
     'GET /api/periodos/abiertos': protegida(TODOS, ciclos.abiertos(bd)),
