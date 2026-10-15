@@ -1,9 +1,36 @@
 ---
 name: desplegar
-description: Actualizar COMAPA MIR en el servidor propio (systemd + Cloudflare Tunnel) — revisión previa, desplegar.sh con respaldo antes de migrar, verificación y cómo volver atrás. Usar cuando alguien dice "despliega", "sube a producción", "actualiza el servidor", "rollback" o pregunta por los servicios comapa-api / comapa-sitio.
+description: Actualizar COMAPA MIR en producción (comapa.icarus.mx, servidor icarus; systemd + Cloudflare Tunnel) — revisión previa, desplegar.sh con respaldo antes de migrar, verificación y cómo volver atrás. Usar cuando alguien dice "despliega", "sube a producción", "actualiza el servidor", "rollback" o pregunta por los servicios comapa-api / comapa-sitio.
 ---
 
 # Desplegar
+
+**Producción: `comapa.icarus.mx`, en el servidor propio `icarus`** (instalada el 2026-10-14). Guía y
+piezas: `backend/despliegue/icarus/README.md`.
+
+```bash
+~/comapa-mir/backend/despliegue/icarus/desplegar.sh     # como developer, sin contraseña
+```
+
+Código → parar → respaldo (`~/backups/comapa-mir/`) → `npm ci` y build → migraciones y permisos →
+arrancar → verificar. API `127.0.0.1:3087`, sitio `127.0.0.1:3088`, PostgreSQL 16 en el contenedor
+`comapa-postgres` (`127.0.0.1:5433`), variables en `~/comapa-mir-config/` (fuera de git).
+
+Antes de desplegar: `main` con `npm test`, `npm run tipos` y `db/probar.sh` en verde, y revisa las
+migraciones nuevas (¿borran o renombran algo que la API usa? → dos despliegues, ver `/migracion`).
+
+Si falla con los servicios parados, el script imprime el commit anterior; la base se restaura con
+`pg_restore --clean --if-exists -d "$DATABASE_URL" <respaldo>.dump` usando `~/comapa-mir-config/dueno.env`.
+
+**Nunca `pkill`/`killall node`:** el servidor aloja ~30 apps con `node`. `sudo -n systemctl stop comapa-api`.
+
+---
+
+Lo que sigue describe la variante genérica (`backend/despliegue/`: usuario `comapa`, `/opt`, `/etc`),
+para un servidor propio de COMAPA. No aplica a icarus.
+
+# Variante genérica
+
 
 Guía completa: `backend/despliegue/README.md`. Unidades: `comapa-api` (API, `127.0.0.1:3000`),
 `comapa-sitio` (sitio, `127.0.0.1:4321`), `comapa-respaldo.timer` (02:30, 14 días). Código en `/opt/comapa-mir`.
