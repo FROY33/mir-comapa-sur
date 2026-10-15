@@ -24,7 +24,6 @@ erDiagram
     COMENTARIOS ||--o{ RESPUESTA_SECCIONES : declara
     GERENCIAS ||--o{ VALIDACIONES_PERIODO : "por corte"
     VALIDACIONES_PERIODO ||--o{ DOCUMENTOS_VALIDACION : "firma el Revisor"
-    MEDIOS_VERIFICACION |o--o{ INDICADORES : "reemplaza el texto"
     USUARIOS ||--o{ NOTIFICACIONES : recibe
 ```
 
@@ -41,51 +40,14 @@ erDiagram
 
 HU-R4-01 a HU-R4-12. Las metas viven fuera de INDICADORES y por ejercicio, de modo que el mismo indicador tiene una meta distinta cada año.
 
-**CICLOS_PLANEACION**: un ciclo por ejercicio con dos fases.
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id | uuid | PK |
-| ejercicio | smallint | UNIQUE (un ciclo por ejercicio, HU-R4-01 RN_1) |
-| inicio_captura, fin_captura | date | NOT NULL; fin > inicio (HU-R4-01 CA_3) |
-| inicio_revision | date | ≥ fin_captura |
-| cerrado_manual | boolean | El Admin cierra la revisión a mano (HU-R4-05 RN_4) |
-| abierto_por, cerrado_por | uuid | FK → usuarios |
-| abierto_at, cerrado_at | timestamptz | |
-
-La fase (captura, revisión, cerrado) **se calcula** de las fechas y de `cerrado_manual`; no se guarda.
-
-**METAS**: una fila por indicador, ejercicio y versión. Un cambio autorizado crea una versión nueva y la anterior queda como histórico (HU-R4-12 RN_3).
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id | uuid | PK |
-| indicador_id | uuid | FK → indicadores |
-| ciclo_id | uuid | FK → ciclos_planeacion |
-| version | smallint | UNIQUE (indicador_id, ciclo_id, version) |
-| vigente | boolean | Índice único parcial (indicador_id, ciclo_id) WHERE vigente |
-| estado | text | CHECK meta_pendiente, borrador_meta, meta_enviada, meta_observada, meta_corregida, meta_validada (+ fijada, cambio_en_revision según pregunta 22) |
-| intento | smallint | Sube en cada meta_observada → meta_corregida |
-| vencida, vencida_at | boolean, timestamptz | Marca de envío fuera de la fase de captura (HU-R4-02 RN_2); CHECK vencida ⇔ vencida_at |
-| meta_anual, linea_base | numeric | ≥ 0; obligatorias para enviar (HU-R4-04 CA_1) |
-| justificacion | text | Opcional |
-| enviada_por/at, validada_por/at | uuid, timestamptz | |
-
-**METAS_PERIODO**: la meta de cada periodo de una versión de meta. El periodo es un **número**, no texto, para evitar los dos formatos del prototipo ("Q1 Ene-Mar" y "T1-2026").
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| meta_id | uuid | FK → metas |
-| numero | smallint | PK (meta_id, numero); 1 a 12 / meses de la frecuencia (lo valida un trigger contra la frecuencia del indicador) |
-| meta_periodo | numeric | ≥ 0 |
-
-**Conexión con S1:** al cerrar un reporte, el backend copia a `reportes.meta_periodo_aplicada` la meta vigente con `numero = periodos_reporte.numero` del mismo ejercicio. Si el indicador es acumulable, el cumplimiento compara la suma de avances contra la suma de metas de los periodos transcurridos (HU-R4-11 RN_3).
+**CICLOS_PLANEACION**, **METAS** (migrada como `metas_planeacion`) y **METAS_PERIODO**: migradas el 14/10/2026, ver
+[DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md). Quedan por migrar, con sus HU:
 
 **META_VERSIONES**: foto de cada intento de envío de una meta (HU-R4-09 RN_2).
 
 | Campo | Tipo | Restricciones |
 |---|---|---|
-| meta_id | uuid | FK → metas |
+| meta_id | uuid | FK → metas_planeacion |
 | intento | smallint | PK (meta_id, intento) |
 | datos | jsonb | Meta anual, línea base, metas por periodo y justificación enviadas |
 | created_at, creado_por | timestamptz, uuid | |

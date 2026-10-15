@@ -3,6 +3,9 @@
 Versión 1.0 · 8 de octubre de 2026 · TEC-01 / TEC-02
 Motor: PostgreSQL 14 o superior. Fuente de verdad: `migrations/`; este documento se actualiza con cada migración.
 
+> **Versiones del indicador, medios de verificación, ciclos y metas** (migraciones del 14/10/2026):
+> [DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md).
+
 **Convenciones**
 
 - Llaves primarias `uuid` generadas por la base (`gen_random_uuid()`), salvo catálogos con clave natural (`frecuencias`) y la bitácora (entero consecutivo).
@@ -135,7 +138,8 @@ erDiagram
 | CONFIG_VENTANAS_CAPTURA | `frecuencias` | El catálogo de frecuencias y su ventana en una sola tabla |
 | REPORTES_PERIODO | columnas de cierre en `reportes` | Era 1:1 con REPORTES; el congelado vive en la misma fila |
 | USUARIO_GERENCIAS | — | Eliminada: los indicadores son de la gerencia y cada usuario tiene una sola |
-| METAS, COMENTARIOS, EVIDENCIAS, REPORTE_VERSIONES, VALIDACIONES_PERIODO… | — | Extensión futura, ver [EXTENSION.md](EXTENSION.md) |
+| MEDIOS_VERIFICACION, CICLOS_PLANEACION, METAS_PLANEACION, METAS_PERIODO + versiones del indicador | ver [DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md) | 14/10/2026 |
+| COMENTARIOS, EVIDENCIAS, REPORTE_VERSIONES, VALIDACIONES_PERIODO… | — | Extensión futura, ver [EXTENSION.md](EXTENSION.md) |
 
 ---
 
@@ -243,7 +247,8 @@ Solo la definición del indicador. No guarda estado (vive en `reportes`) ni meta
 | denominador_fijo | numeric | sí | | CHECK > 0; solo si tipo_calculo = fraccion | Valor fijo; solo lo cambia el Administrador |
 | acumulable | boolean | no | `false` | | Si sí, se compara la suma de avances contra la suma de metas |
 | sentido_meta | text | no | `'ascendente'` | CHECK `ascendente`, `descendente` | Descendente: menos es mejor (rezago, demandas) |
-| medio_verificacion | text | sí | | | Texto en S1; pasa a FK cuando exista el catálogo |
+| medio_verificacion | text | sí | | | En transición: alineado por trigger con `medio_verificacion_id`; se quitará cuando el código lea el catálogo |
+| medio_verificacion_id | uuid | sí | | FK → medios_verificacion | Un medio por indicador ([DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md)) |
 | origen_mv | text | sí | | CHECK `interno`, `externo`, `mixto` | |
 | supuestos | text | sí | | | |
 | es_iso | boolean | no | `false` | | |
@@ -285,7 +290,7 @@ Un reporte lógico por indicador y periodo (TEC-01 CA-3). El estado vive aquí y
 | indicador_id | uuid | no | | FK → indicadores; UNIQUE (indicador_id, periodo_id) | |
 | periodo_id | uuid | no | | FK (periodo_id, frecuencia) → periodos_reporte | El periodo debe ser de la frecuencia del indicador |
 
-**Foto de la configuración.** La llena un trigger al crear el reporte, siempre desde el catálogo, e impide modificarla después. Los cambios al indicador aplican solo a reportes nuevos (HU-R4-11 CA_4).
+**Foto de la configuración.** La llena un trigger al crear el reporte, siempre desde el catálogo, e impide modificarla después. Los cambios al indicador aplican solo a reportes nuevos (HU-R4-11 CA_4). Desde el 14/10/2026 cada reporte apunta además a la versión completa del indicador (`indicador_version_id`, ver [DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md)).
 
 | Campo | Tipo | Nulo | Restricciones | Descripción |
 |---|---|---|---|---|

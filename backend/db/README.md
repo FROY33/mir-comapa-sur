@@ -8,6 +8,7 @@ PostgreSQL 14 o superior. Migraciones en SQL puro, versionadas en `migrations/`,
 | [DICCIONARIO.md](DICCIONARIO.md) | Diagrama ER, tablas campo por campo, estados, índices y triggers (TEC-01) |
 | [EXTENSION.md](EXTENSION.md) | Diseño de metas, observaciones, evidencias, versiones y validación (TEC-01 CA-4) |
 | [DECISIONES.md](DECISIONES.md) | Qué está decidido, con fuente, y qué sigue abierto |
+| [DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md) | Versiones del indicador, medios de verificación, ciclos y metas |
 
 ## Instalación en una base vacía
 
@@ -32,7 +33,7 @@ Para revertir la última migración: `./migrar.sh down`.
 ./probar.sh
 ```
 
-Crea una base desechable, aplica todo, corre `pruebas/restricciones.sql` (58 pruebas) y revierte
+Crea una base desechable, aplica todo, corre las pruebas SQL de `pruebas/` (58 de restricciones y 35 del modelo de metas) y revierte
 todas las migraciones. Después recrea la base de S1 (`MIGRAR_HASTA=$BASE_S1`), la llena con la semilla
 y las fixtures, aplica las migraciones nuevas y falla si alguna tabla desaparece o pierde filas
 (CA-1: «migraciones ejecutables en una base nueva y en la base del sprint 1»). Al final borra la base. Las pruebas intentan duplicados, referencias inválidas y
@@ -52,7 +53,7 @@ estados fuera de regla, y cubren varias frecuencias, varios Enlaces por gerencia
 - **Desplegar respalda primero:** `desplegar.sh` corre `respaldar.sh` antes de migrar y no migra si el
   respaldo falla. Cualquier script que toque la base del servidor fuera del despliegue respalda igual.
 
-## Tablas de S1
+## Tablas
 
 | Tabla | Nombre en el RQM | Qué guarda |
 |---|---|---|
@@ -65,6 +66,9 @@ estados fuera de regla, y cubren varias frecuencias, varios Enlaces por gerencia
 | `periodos_reporte` | CICLOS | Un periodo por frecuencia: periodo medido y ventana de captura |
 | `reportes` | REPORTES | Un reporte lógico por indicador y periodo; aquí vive el estado |
 | `bitacora` | AUDIT_LOG | Registro de solo inserción |
+| `login_intentos`, `sesiones` | — | Bloqueo por intentos (R7-06) y sesiones en servidor (R7-01) |
+| `medios_verificacion`, `indicador_versiones` | MEDIOS_VERIFICACION, — | Un medio por indicador; versiones de su configuración ([DICCIONARIO-PLANEACION.md](DICCIONARIO-PLANEACION.md)) |
+| `ciclos_planeacion`, `metas_planeacion`, `metas_periodo` | CICLOS_PLANEACION, METAS_PLANEACION, METAS_PERIODO | Metas por indicador y ejercicio, versionadas |
 
 ## Reglas que hace cumplir la base
 
@@ -100,11 +104,11 @@ nueva que reemplaza el `CHECK`.
 
 Estas tablas quedan para las HU correspondientes; mientras tanto:
 
-- **Sin METAS**: no se puede calcular el cumplimiento. Las columnas de cierre
-  (`meta_periodo_aplicada`, `cumplimiento`, `semaforo`) existen, pero quedan vacías.
+- **Metas sin código**: las tablas existen (14/10/2026) pero ninguna HU las llena aún, así que el cumplimiento
+  no se calcula y las columnas de cierre (`meta_periodo_aplicada`, `cumplimiento`, `semaforo`) quedan vacías.
 - **Sin EVIDENCIAS**: la base no puede exigir al menos un archivo para enviar.
 - **Sin COMENTARIOS**: un reporte puede llegar a `observado` sin texto de observación.
-- **Sin MEDIOS_VERIFICACION**: el medio de verificación va como texto en `indicadores`.
+- **Medio de verificación en transición**: el catálogo existe; el código aún lee el texto de `indicadores`.
 - **Sin VALIDACIONES_PERIODO**: la validación del Admin por gerencia y corte mensual no tiene tabla aún.
   El corte se obtiene del mes de `periodos_reporte.fin_periodo`.
 - **Días hábiles**: no hay calendario de festivos; el backend cuenta lunes a viernes al calcular
