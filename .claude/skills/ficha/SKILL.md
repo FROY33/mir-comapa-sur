@@ -27,7 +27,7 @@ description: Trabajar una ficha del RQM de COMAPA MIR (HU-R…, TEC-…, R…) d
 
 ## 3. Implementar
 
-- Datos en `backend/src/datos/<tema>.ts`, ruta HTTP en `backend/src/<tema>.ts`, registro en `rutas.ts`.
+- Datos en `backend/src/datos/<tema>.ts`, ruta HTTP en `backend/src/<tema>.ts`, registro en `app.ts` (`rutas.ts` es el mapa página→rol).
 - La autorización vive en el backend (la gerencia sale de la sesión, nunca del query string).
 - Cambios de base → `/migracion`. Permisos nuevos del rol de la app → `backend/db/permisos.sql` + `pruebas/permisos.test.ts`.
 - `npm test`, `npm run tipos` y, si tocaste la base, `db/probar.sh`: todo en verde.
