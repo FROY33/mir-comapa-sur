@@ -55,6 +55,7 @@ export function crearApp(
 
     // Ciclo de planeación de metas vigente y su fase, para navegación y dashboards (PRD0_1)
     'GET /api/planeacion/ciclo-vigente': protegida(TODOS, planeacion.vigente(bd)),
+    'GET /api/planeacion/pendientes': protegida(['enlace'], planeacion.pendientes(bd)),   // metas por configurar (PRD0_1, ticket 9)
 
     // Solo Administrador: todo lo que cuelga de /api/admin/ (HU-R7-03 CA_3, CA_6)
     'POST /api/admin/planeacion/ciclos': protegida(['admin'], planeacion.abrir(bd)),   // apertura del ciclo de planeación (PRD0_1)

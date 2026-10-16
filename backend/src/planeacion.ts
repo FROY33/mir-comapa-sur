@@ -1,12 +1,14 @@
 // Planeación de metas (PRD0_1).
 //   GET /api/planeacion/ciclo-vigente   los tres roles: el ciclo no cerrado más reciente y su fase.
+//   GET /api/planeacion/pendientes      solo Enlace: sus metas por configurar en el ciclo vigente (ticket 9).
 //   POST /api/admin/planeacion/ciclos   solo Administrador: abre el ciclo de un ejercicio (ticket 8).
 //   Lo usan la navegación y el dashboard del Enlace, y la sección de Configuración.
 
 import type { SolicitudConSesion } from './autorizacion.js'
 import type { BD } from './bd.js'
 import { abrirCicloPlaneacion, CicloExistente } from './datos/aperturaCicloPlaneacion.js'
-import { cicloVigente, hoyEnBase } from './datos/cicloPlaneacion.js'
+import { cicloVigente, FASES_ABIERTAS, hoyEnBase } from './datos/cicloPlaneacion.js'
+import { ESTADOS_META_PENDIENTE, listarMetasPendientes, NIVELES_MIR, resumirMetas } from './datos/metasPendientes.js'
 import type { Respuesta } from './http.js'
 
 export const vigente = (bd: BD) => async (): Promise<Respuesta> => {
@@ -20,6 +22,31 @@ export const vigente = (bd: BD) => async (): Promise<Respuesta> => {
         inicio_captura: c.inicio_captura, fin_captura: c.fin_captura, inicio_revision: c.inicio_revision,
       },
       hoy,
+    },
+  }
+}
+
+// ── Metas pendientes (ticket 9): GET /api/planeacion/pendientes, solo Enlace ─────────────────────
+
+/** La gerencia sale siempre de la sesión: la ruta no acepta parámetro de gerencia (RN_3). */
+export const pendientes = (bd: BD) => async (s: SolicitudConSesion): Promise<Respuesta> => {
+  const hoy = await hoyEnBase(bd)
+  const c = await cicloVigente(bd, hoy)
+  if (!c || !FASES_ABIERTAS.includes(c.fase)) return { status: 200, cuerpo: { ciclo: null, hoy, metas: [] } }
+  const q = s.url.searchParams
+  const estado = q.get('estado') ?? '', nivel = q.get('nivel') ?? ''
+  const metas = await listarMetasPendientes(bd, c.id, s.sesion.gerenciaId, {
+    estado: (ESTADOS_META_PENDIENTE as readonly string[]).includes(estado) ? estado : undefined,
+    nivel: (NIVELES_MIR as readonly string[]).includes(nivel) ? nivel : undefined,
+  })
+  return {
+    status: 200,
+    cuerpo: {
+      ciclo: {
+        ejercicio: c.ejercicio, fase: c.fase,
+        inicio_captura: c.inicio_captura, fin_captura: c.fin_captura, inicio_revision: c.inicio_revision,
+      },
+      hoy, metas, resumen: resumirMetas(metas),
     },
   }
 }

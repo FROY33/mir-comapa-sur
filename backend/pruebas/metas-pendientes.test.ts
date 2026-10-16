@@ -1,0 +1,149 @@
+// PRD0_1, ticket 9: GET /api/planeacion/pendientes (HU-R4-02). Base propia (el ciclo vigente es global)
+// y metas creadas con la ayuda de pruebas, sin depender de la apertura.
+
+import assert from 'node:assert/strict'
+import { after, before, describe, test } from 'node:test'
+import { levantar } from './apoyo.js'
+import { crearCiclo, crearGerencia, crearMeta, entrar, prepararBase, type BasePlaneacion, type Gerencia } from './apoyo-planeacion.js'
+
+describe('GET /api/planeacion/pendientes (HU-R4-02)', () => {
+  let base: BasePlaneacion
+  let app: Awaited<ReturnType<typeof levantar>>
+  let com: Gerencia, otra: Gerencia
+  const cookie: Record<string, string> = {}
+  const pedir = async (quien?: string, consulta = '') => {
+    const r = await fetch(`${app.url}/api/planeacion/pendientes${consulta}`, { headers: quien ? { cookie: cookie[quien]! } : {} })
+    return { status: r.status, cuerpo: await r.json() as any }
+  }
+  const codigos = (r: { cuerpo: any }) => (r.cuerpo.metas as { codigo: string }[]).map((m) => m.codigo)
+  const borrarCiclos = async () => {
+    // TRUNCATE: las metas no se borran fila por fila (trigger de protección)
+    await base.bd.consultar('TRUNCATE metas_periodo, metas_planeacion, ciclos_planeacion CASCADE')
+  }
+
+  before(async () => {
+    base = await prepararBase('metas_pendientes')
+    app = await levantar({ url: base.url })
+    com = await crearGerencia(base.bd, 'COM')
+    otra = await crearGerencia(base.bd, 'OTR')
+    cookie.admin = await entrar(base.bd, com, 'admin', 'admin')
+    cookie.revisor = await entrar(base.bd, com, 'revisor', 'revisor')
+    cookie.enlace = await entrar(base.bd, com, 'enlace', 'enlace')
+  })
+  after(async () => { await app.cerrar(); await base.soltar() })
+
+  test('sin sesión 401; revisor y admin 403', async () => {
+    assert.equal((await pedir()).status, 401)
+    assert.equal((await pedir('revisor')).status, 403)
+    assert.equal((await pedir('admin')).status, 403)
+  })
+
+  test('sin ciclo: { ciclo: null, metas: [] } con 200', async () => {
+    const r = await pedir('enlace')
+    assert.equal(r.status, 200)
+    assert.equal(r.cuerpo.ciclo, null)
+    assert.deepEqual(r.cuerpo.metas, [])
+  })
+
+  test('ciclo cerrado o programado: { ciclo: null, metas: [] }', async () => {
+    const cerrado = await crearCiclo(base.bd, { ejercicio: 2050, inicioCaptura: -30, finCaptura: -20, cerrado: true })
+    await crearMeta(base.bd, { cicloId: cerrado, gerencia: com, codigo: 'X-CERRADO' })
+    assert.equal((await pedir('enlace')).cuerpo.ciclo, null)
+    await crearCiclo(base.bd, { ejercicio: 2051, inicioCaptura: 5, finCaptura: 15 })
+    const r = await pedir('enlace')
+    assert.equal(r.cuerpo.ciclo, null)
+    assert.deepEqual(r.cuerpo.metas, [])
+    await borrarCiclos()
+  })
+
+  describe('con un ciclo en captura', () => {
+    before(async () => {
+      const c = await crearCiclo(base.bd, { ejercicio: 2052, inicioCaptura: -3, finCaptura: 10, inicioRevision: 14 })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-B', nivel: 'componente' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-A', nivel: 'actividad' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-D', nivel: 'actividad', estado: 'borrador_meta' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-V', nivel: 'actividad', vencida: true })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-ENV', estado: 'meta_enviada' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-VAL', estado: 'meta_validada' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: otra, codigo: 'OTR-1' })
+    })
+    after(borrarCiclos)
+
+    test('CA_1: el Enlace de COM solo ve COM, también con ?gerencia_id= de otra gerencia', async () => {
+      const r = await pedir('enlace', `?gerencia_id=${otra.id}`)
+      assert.equal(r.status, 200)
+      assert.ok(codigos(r).length > 0 && codigos(r).every((c) => c.startsWith('COM-')), codigos(r).join())
+    })
+
+    test('RN_1: enviadas y validadas no aparecen; borrador y pendiente se distinguen en estado', async () => {
+      const r = await pedir('enlace')
+      assert.deepEqual(codigos(r).sort(), ['COM-A', 'COM-B', 'COM-D', 'COM-V'])
+      const por = Object.fromEntries(r.cuerpo.metas.map((m: any) => [m.codigo, m.estado]))
+      assert.equal(por['COM-D'], 'borrador_meta')
+      assert.equal(por['COM-A'], 'meta_pendiente')
+    })
+
+    test('entrega ciclo con fase y fechas, hoy y los campos de cada meta', async () => {
+      const r = await pedir('enlace')
+      assert.equal(r.cuerpo.ciclo.fase, 'captura')
+      assert.equal(r.cuerpo.ciclo.ejercicio, 2052)
+      assert.match(r.cuerpo.ciclo.fin_captura, /^\d{4}-\d{2}-\d{2}$/)
+      assert.match(r.cuerpo.hoy, /^\d{4}-\d{2}-\d{2}$/)
+      const m = r.cuerpo.metas.find((x: any) => x.codigo === 'COM-A')
+      assert.deepEqual(Object.keys(m).sort(),
+        ['codigo', 'estado', 'indicador_id', 'meta_id', 'nivel', 'nombre', 'tipo', 'vencida'])
+      assert.equal(m.nivel, 'actividad')
+      assert.equal(m.tipo, 'mir')
+    })
+
+    test('orden: vencidas primero, luego por código', async () => {
+      assert.deepEqual(codigos(await pedir('enlace')), ['COM-V', 'COM-A', 'COM-B', 'COM-D'])
+    })
+
+    test('resumen coincide con la lista', async () => {
+      const r = await pedir('enlace')
+      assert.deepEqual(r.cuerpo.resumen, { total: 4, pendientes: 3, borradores: 1, vencidas: 1 })
+      const f = await pedir('enlace', '?nivel=componente')
+      assert.deepEqual(f.cuerpo.resumen, { total: 1, pendientes: 1, borradores: 0, vencidas: 0 })
+    })
+
+    test('filtros por estado y por nivel; un valor desconocido se ignora', async () => {
+      assert.deepEqual(codigos(await pedir('enlace', '?estado=borrador_meta')), ['COM-D'])
+      assert.deepEqual(codigos(await pedir('enlace', '?nivel=componente')), ['COM-B'])
+      assert.equal(codigos(await pedir('enlace', '?estado=inventado&nivel=raro')).length, 4)
+      assert.equal(codigos(await pedir('enlace', '?estado=meta_validada')).length, 4)   // no es un estado listable: se ignora
+      assert.deepEqual(codigos(await pedir('enlace', '?estado=borrador_meta&nivel=componente')), [])
+    })
+
+    test('una reasignación del indicador no mueve la meta de gerencia', async () => {
+      const [u] = await base.bd.consultar<{ id: string }>('SELECT id FROM unidades WHERE gerencia_id = $1', [otra.id])
+      await base.bd.consultar('UPDATE indicadores SET gerencia_id = $1, unidad_id = $2 WHERE codigo = $3', [otra.id, u!.id, 'COM-B'])
+      assert.ok(codigos(await pedir('enlace')).includes('COM-B'))
+      await base.bd.consultar('UPDATE indicadores SET gerencia_id = $1, unidad_id = $2 WHERE codigo = $3', [com.id, com.unidadId, 'COM-B'])
+    })
+  })
+
+  test('CA_5: pasado fin_captura la lista sigue disponible (fuera de plazo y revisión)', async () => {
+    const c = await crearCiclo(base.bd, { ejercicio: 2053, inicioCaptura: -20, finCaptura: -5, inicioRevision: 5 })
+    await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-T', vencida: true })
+    let r = await pedir('enlace')
+    assert.equal(r.cuerpo.ciclo.fase, 'fuera_de_plazo')
+    assert.deepEqual(codigos(r), ['COM-T'])
+    await borrarCiclos()
+    const rev = await crearCiclo(base.bd, { ejercicio: 2055, inicioCaptura: -20, finCaptura: -5, inicioRevision: -1 })
+    await crearMeta(base.bd, { cicloId: rev, gerencia: com, codigo: 'COM-T2' })
+    r = await pedir('enlace')
+    assert.equal(r.cuerpo.ciclo.fase, 'revision')
+    assert.deepEqual(codigos(r), ['COM-T2'])
+    await borrarCiclos()
+  })
+
+  test('sin pendientes: lista vacía con resumen en cero', async () => {
+    const c = await crearCiclo(base.bd, { ejercicio: 2054, inicioCaptura: -1, finCaptura: 5 })
+    await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-OK', estado: 'meta_enviada' })
+    const r = await pedir('enlace')
+    assert.deepEqual(r.cuerpo.metas, [])
+    assert.deepEqual(r.cuerpo.resumen, { total: 0, pendientes: 0, borradores: 0, vencidas: 0 })
+    await borrarCiclos()
+  })
+})
