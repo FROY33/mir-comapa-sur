@@ -23,9 +23,13 @@ GRANT USAGE ON SCHEMA public TO :"app";
 
 GRANT SELECT                         ON schema_migrations, gerencias, unidades TO :"app";
 GRANT SELECT, INSERT, UPDATE         ON indicadores      TO :"app";   -- catálogo del Admin (HU-R4-11); nunca DELETE (RN_2)
--- Los triggers de reportes leen la versión del indicador al generar un reporte (R3-01); los medios
--- se leen con el indicador. Escribir versiones solo lo hace el trigger de INDICADORES (dueño).
-GRANT SELECT                         ON indicador_versiones, medios_verificacion TO :"app";
+-- Los triggers de reportes leen la versión del indicador al generar un reporte (R3-01). Escribir
+-- versiones solo lo hace el trigger de INDICADORES (dueño); medios_verificacion va aparte abajo
+-- porque esa sí la escribe la app (mantenimiento del catálogo, S2-TEC-03).
+GRANT SELECT                         ON indicador_versiones TO :"app";
+-- Catálogo de medios de verificación (S2-TEC-03, ticket 4): alta, renombre y desactivación por el
+-- Administrador, con su propia bitácora; nunca DELETE (nada se borra, CA-3)
+GRANT SELECT, INSERT, UPDATE         ON medios_verificacion TO :"app";
 -- ciclos_planeacion, metas_planeacion y metas_periodo: sin permisos hasta que el código de R4 los use.
 GRANT SELECT, UPDATE                 ON frecuencias      TO :"app";   -- ventanas de captura (R3-01)
 GRANT SELECT, INSERT, UPDATE         ON usuarios         TO :"app";   -- gestión de usuarios (R7-07); nunca DELETE (RN_3)
