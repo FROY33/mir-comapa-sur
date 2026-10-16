@@ -94,6 +94,13 @@ describe('la app funciona con el rol de permisos mínimos', () => {
     const id = (await pedir('GET', '/api/admin/indicadores')).cuerpo.indicadores[0].id
     assert.equal((await pedir('POST', `/api/admin/indicadores/${id}/desactivar`)).status, 200)
     assert.equal((await pedir('POST', `/api/admin/indicadores/${id}/reactivar`)).status, 200)
+    // Catálogo de medios de verificación (S2-TEC-03): el rol escribe medios_verificacion directamente
+    const alta2 = await pedir('POST', '/api/admin/medios-verificacion', { nombre: 'Medio de prueba permisos' })
+    assert.equal(alta2.status, 201)
+    const medioId = alta2.cuerpo.medio_verificacion.id
+    assert.equal((await pedir('PUT', `/api/admin/medios-verificacion/${medioId}`, { nombre: 'Medio de prueba permisos editado' })).status, 200)
+    assert.equal((await pedir('POST', `/api/admin/medios-verificacion/${medioId}/desactivar`)).status, 200)
+    assert.equal((await pedir('POST', `/api/admin/medios-verificacion/${medioId}/reactivar`)).status, 200)
     assert.equal((await pedir('POST', '/api/auth/logout')).status, 200)
   })
 })
@@ -111,10 +118,9 @@ describe('con el modelo de versiones y metas', () => {
     await app.consultar('SELECT count(*) FROM medios_verificacion')
   })
 
-  test('no escribe versiones, medios ni metas directamente; las metas solo las lee (HU-R4-11 CA_4 y RN_3)', async () => {
+  test('no escribe versiones ni metas directamente; las metas solo las lee (HU-R4-11 CA_4 y RN_3)', async () => {
     const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
     await intentar(`UPDATE indicador_versiones SET definicion = '{}'`)
-    await intentar(`INSERT INTO medios_verificacion (nombre) VALUES ('x')`)
     await app.consultar('SELECT count(*) FROM metas_planeacion')
     await app.consultar('SELECT count(*) FROM metas_periodo')
     await app.consultar('SELECT count(*) FROM ciclos_planeacion')
@@ -133,6 +139,13 @@ describe('con el modelo de versiones y metas', () => {
       LEFT JOIN medios_verificacion m ON m.id = i.medio_verificacion_id WHERE i.codigo = 'IND-1'`)
     assert.equal(despues!.n, antes!.n + 1, 'la versión usada por el reporte quedó congelada y se creó otra')
     assert.equal(despues!.medio, 'Medio nuevo de permisos')
+  })
+
+  test('administra medios_verificacion directamente (alta, renombre, activo) pero nunca la borra (S2-TEC-03)', async () => {
+    const [m] = await app.consultar<{ id: string }>(
+      `INSERT INTO medios_verificacion (nombre) VALUES ('Medio de permisos directo') RETURNING id`)
+    await app.consultar(`UPDATE medios_verificacion SET nombre = 'Medio de permisos renombrado', activo = false WHERE id = $1`, [m!.id])
+    await assert.rejects(app.consultar(`DELETE FROM medios_verificacion WHERE id = $1`, [m!.id]), Error)
   })
 })
 

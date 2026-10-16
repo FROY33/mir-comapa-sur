@@ -11,6 +11,7 @@ import { cambiarPassword } from './cuenta.js'
 import * as indicadores from './indicadores.js'
 import * as indicadoresAdmin from './indicadoresAdmin.js'
 import * as indicadoresCambios from './indicadoresCambios.js'
+import * as mediosVerificacion from './mediosVerificacion.js'
 import * as pendientes from './pendientes.js'
 import type { Log } from './log.js'
 import type { Rol } from './rutas.js'
@@ -67,6 +68,13 @@ export function crearApp(
     'POST /api/admin/indicadores/:id/desactivar': protegida(['admin'], indicadoresAdmin.desactivar(bd)),
     'POST /api/admin/indicadores/:id/reactivar': protegida(['admin'], indicadoresAdmin.reactivar(bd)),
     'POST /api/admin/cambios-programados/:id/cancelar': protegida(['admin'], indicadoresCambios.cancelar(bd)),
+    // Catálogo de medios de verificación (S2-TEC-03, ticket 4)
+    'GET /api/admin/medios-verificacion': protegida(['admin'], mediosVerificacion.listar(bd)),
+    'GET /api/admin/medios-verificacion/:id': protegida(['admin'], mediosVerificacion.detalle(bd)),
+    'POST /api/admin/medios-verificacion': protegida(['admin'], mediosVerificacion.crear(bd)),
+    'PUT /api/admin/medios-verificacion/:id': protegida(['admin'], mediosVerificacion.editar(bd)),
+    'POST /api/admin/medios-verificacion/:id/desactivar': protegida(['admin'], mediosVerificacion.desactivar(bd)),
+    'POST /api/admin/medios-verificacion/:id/reactivar': protegida(['admin'], mediosVerificacion.reactivar(bd)),
     // Gestión de usuarios (HU-R7-07)
     'GET /api/admin/catalogo': protegida(['admin'], usuarios.catalogo(bd)),
     'GET /api/admin/usuarios': protegida(['admin'], usuarios.listar(bd)),

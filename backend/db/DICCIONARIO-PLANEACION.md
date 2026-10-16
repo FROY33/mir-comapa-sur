@@ -39,6 +39,13 @@ mientras el código y la carga inicial lo usen. El trigger `indicadores_medio` l
 escribir el texto crea o encuentra el medio y llena la FK, y deja el texto como lo escribe el catálogo;
 elegir la FK llena el texto. Texto vacío = sin medio. Una migración posterior quita la columna de texto.
 
+**Mantenimiento del catálogo (S2-TEC-03, ticket 4, migración 20261015000003).** El Administrador da de
+alta, renombra y desactiva medios desde su propia pantalla (`/api/admin/medios-verificacion`), no solo
+al editar un indicador. `medio_normalizado` se endureció para ignorar también la puntuación final
+(antes solo mayúsculas y espacios), porque el catálogo real trae casi-duplicados que solo difieren en
+un punto. El trigger `medios_verificacion_propagar` (AFTER UPDATE OF nombre) lleva un renombre del
+catálogo al texto heredado de los indicadores que ya usan ese medio.
+
 ## indicador_versiones
 
 Historia de la configuración de cada indicador (CA-3) y de su asignación (gerencia y unidad).
@@ -135,8 +142,9 @@ versión histórica.
 
 | Índice | Tabla | Para qué |
 |---|---|---|
-| `medios_verificacion_nombre` (único, normalizado) | medios_verificacion | Sin medios duplicados |
+| `medios_verificacion_nombre` (único, normalizado) | medios_verificacion | Sin medios duplicados (la normalización ignora mayúsculas, espacios y puntuación final) |
 | `indicadores_medio` | indicadores | Indicadores de un medio |
+| `medios_verificacion_propagar` (AFTER UPDATE OF nombre) | medios_verificacion | Renombrar un medio actualiza el texto heredado de quien ya lo usa (S2-TEC-03) |
 | `indicador_versiones_gerencia` | indicador_versiones | Asignación histórica por gerencia |
 | `reportes_indicador_version` | reportes | ¿Ya usa alguien esta versión? (trigger de versionado) |
 | `metas_planeacion_vigente` (único, parcial) | metas_planeacion | Una meta lógica por indicador y ejercicio |
@@ -144,8 +152,10 @@ versión histórica.
 
 ## Permisos del rol de la app
 
-`SELECT` en `indicador_versiones` y `medios_verificacion` (el trigger de reportes lee la versión al generar
-reportes en R3-01). `SELECT` en `ciclos_planeacion`, `metas_planeacion` y `metas_periodo` para el catálogo
-administrable (HU-R4-11: decidir la vigencia futura y calcular el cumplimiento); escribirlas llega con sus HU de R4.
-La app edita `indicadores` (HU-R4-11) sin escribir `indicador_versiones` ni `medios_verificacion`: los triggers
-`indicadores_versionar` e `indicadores_alinear_medio` corren como dueño (`SECURITY DEFINER`, 20261015000001).
+`SELECT` en `indicador_versiones` (el trigger de reportes lee la versión al generar reportes en R3-01).
+`SELECT` en `ciclos_planeacion`, `metas_planeacion` y `metas_periodo` para el catálogo administrable
+(HU-R4-11: decidir la vigencia futura y calcular el cumplimiento); escribirlas llega con sus HU de R4.
+La app edita `indicadores` (HU-R4-11) sin escribir `indicador_versiones`: el trigger `indicadores_versionar`
+corre como dueño (`SECURITY DEFINER`, 20261015000001). `medios_verificacion` es la excepción: desde
+S2-TEC-03 (ticket 4) la app sí la escribe directamente (`SELECT, INSERT, UPDATE`, nunca `DELETE`), porque
+el Administrador administra el catálogo desde su propia pantalla.

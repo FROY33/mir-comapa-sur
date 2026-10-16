@@ -28,9 +28,14 @@ BEGIN
    WHERE v.indicador_id <> r.indicador_id OR v.version <> 1;
   IF n > 0 THEN RAISE EXCEPTION '% reportes de S1 no apuntan a la versión 1 de su indicador', n; END IF;
 
-  SELECT count(*) INTO n FROM indicador_versiones v JOIN indicadores i ON i.id = v.indicador_id
-   WHERE v.definicion <> indicador_definicion(i);
-  IF n > 0 THEN RAISE EXCEPTION '% versiones no reflejan la configuración actual del indicador', n; END IF;
+  -- Solo la ÚLTIMA versión de cada indicador debe reflejar su configuración actual: una versión
+  -- congelada por un reporte diverge a propósito en cuanto el indicador cambia después (CA-3), y desde
+  -- S2-TEC-03 una fusión de medios casi-duplicados puede provocar justo eso sobre datos de la semilla.
+  SELECT count(*) INTO n FROM indicadores i JOIN LATERAL (
+           SELECT definicion FROM indicador_versiones v WHERE v.indicador_id = i.id ORDER BY v.version DESC LIMIT 1
+         ) ultima ON true
+   WHERE ultima.definicion <> indicador_definicion(i);
+  IF n > 0 THEN RAISE EXCEPTION '% indicadores cuya última versión no refleja su configuración actual', n; END IF;
 END;
 $$;
 
