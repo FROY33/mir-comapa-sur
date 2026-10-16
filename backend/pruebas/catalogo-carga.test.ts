@@ -228,11 +228,10 @@ describe('importador del CSV institucional', () => {
     assert.equal(huella(), primera)
   })
 
-  test('manifest.json y los CSV de datos coinciden en conteos y sha256', () => {
+  test('manifest.json y todos los CSV que lista coinciden en conteos y sha256', () => {
     const m = JSON.parse(readFileSync('db/semilla/manifest.json', 'utf8'))
     for (const a of m.archivos as { archivo: string; filas: number; sha256: string }[]) {
       const ruta = `db/semilla/${a.archivo}`
-      if (!['indicadores', 'gerencias', 'equivalencias_prototipo', 'fixtures_reportes'].some((n) => ruta.endsWith(`/${n}.csv`))) continue
       assert.equal(createHash('sha256').update(readFileSync(ruta)).digest('hex'), a.sha256, a.archivo)
       assert.equal(leerCsv(a.archivo.replace('datos/', '')).length, a.filas, a.archivo)
     }
