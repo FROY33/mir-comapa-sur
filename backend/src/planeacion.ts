@@ -9,6 +9,7 @@ import type { SolicitudConSesion } from './autorizacion.js'
 import type { BD } from './bd.js'
 import { abrirCicloPlaneacion, CicloExistente } from './datos/aperturaCicloPlaneacion.js'
 import { cicloVigente, FASES_ABIERTAS, historialCiclos, hoyEnBase } from './datos/cicloPlaneacion.js'
+import { marcarVencidas } from './datos/metaVencida.js'
 import { ESTADOS_META_PENDIENTE, listarMetasPendientes, NIVELES_MIR, resumirMetas } from './datos/metasPendientes.js'
 import type { Respuesta } from './http.js'
 
@@ -34,6 +35,8 @@ export const pendientes = (bd: BD) => async (s: SolicitudConSesion): Promise<Res
   const hoy = await hoyEnBase(bd)
   const c = await cicloVigente(bd, hoy)
   if (!c || !FASES_ABIERTAS.includes(c.fase)) return { status: 200, cuerpo: { ciclo: null, hoy, metas: [] } }
+  // No depende de que la tarea haya corrido: pasado el fin de captura, la marca se aplica antes de listar
+  if (c.fase !== 'captura') await bd.transaccion((tx) => marcarVencidas(tx, c.id))
   const q = s.url.searchParams
   const estado = q.get('estado') ?? '', nivel = q.get('nivel') ?? ''
   const metas = await listarMetasPendientes(bd, c.id, s.sesion.gerenciaId, {

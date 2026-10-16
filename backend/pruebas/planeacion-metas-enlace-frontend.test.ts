@@ -4,6 +4,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { describe, test } from 'node:test'
+import { DIAS_URGENCIA } from '../src/datos/pendientes.js'
 import { archivo, codigoSesion, ejecutarEnNavegador, RAIZ } from './apoyo-frontend.js'
 
 const esperar = async () => { for (let i = 0; i < 20; i++) await new Promise((ok) => setImmediate(ok)) }
@@ -122,6 +123,65 @@ describe('lista de metas del Enlace (HU-R4-02)', () => {
   })
 })
 
+describe('contador de días para el fin de captura (HU-R4-02 CA_3)', () => {
+  const sumar = (iso: string, dias: number) => new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10) + dias)).toISOString().slice(0, 10)
+  const HOY = '2026-11-10'
+  const conDias = (dias: number, fase = 'captura') => respuesta([meta()], {
+    ciclo: { ejercicio: 2027, fase, inicio_captura: '2026-11-01', fin_captura: sumar(HOY, dias), inicio_revision: '2026-11-30' }, hoy: HOY,
+  })
+  const dias = (p: Awaited<ReturnType<typeof cargar>>) => p.documento.getElementById('metasDias')!
+
+  test('el valor de urgencia del cliente es el mismo DIAS_URGENCIA del servidor', async () => {
+    const p = ejecutarEnNavegador(archivo('planeacion-metas-enlace.js'), ['DIAS_URGENCIA_META'])
+    assert.equal(p.api.DIAS_URGENCIA_META, DIAS_URGENCIA)
+  })
+
+  test('con DIAS_URGENCIA días queda en rojo y con texto de urgencia', async () => {
+    const e = dias(await cargar(conDias(DIAS_URGENCIA)))
+    assert.match(e.textContent, new RegExp(`${DIAS_URGENCIA} días`))
+    assert.match(e.textContent, /Urgente/)
+    assert.equal(e.dataset.urgente, 'true')
+  })
+
+  test('con DIAS_URGENCIA + 1 días se ve normal', async () => {
+    const e = dias(await cargar(conDias(DIAS_URGENCIA + 1)))
+    assert.match(e.textContent, new RegExp(`${DIAS_URGENCIA + 1} días`))
+    assert.doesNotMatch(e.textContent, /Urgente/)
+    assert.equal(e.dataset.urgente, 'false')
+  })
+
+  test('hoy es el último día y 1 día usan el singular', async () => {
+    assert.match(dias(await cargar(conDias(0))).textContent, /último día/i)
+    assert.match(dias(await cargar(conDias(1))).textContent, /1 día/)
+  })
+
+  test('pasado el fin de captura dice que el plazo terminó, en rojo, y la lista sigue', async () => {
+    const p = await cargar(conDias(-2, 'fuera_de_plazo'))
+    assert.match(dias(p).textContent, /plazo de captura terminó/i)
+    assert.equal(dias(p).dataset.urgente, 'true')
+    assert.match(texto(p, 'metasLista'), /COM-1/)
+  })
+
+  test('sin ciclo no hay contador', async () => {
+    assert.equal(dias(await cargar({ ciclo: null, hoy: HOY, metas: [] })).textContent, '')
+  })
+
+  test('se actualiza cada minuto con el día que dice el servidor', async () => {
+    const codigo = codigoSesion() + '\n;\n' + archivo('planeacion-metas-enlace.js')
+    const p = ejecutarEnNavegador(codigo, ['iniciarContadorDias'], {
+      respuestas: { '/api/planeacion/ciclo-vigente': { ciclo: { fase: 'captura', fin_captura: '2026-11-14' }, hoy: '2026-11-10' } },
+    })
+    ;(p.api.iniciarContadorDias as () => void)()
+    assert.equal(p.intervalos.length, 1)
+    assert.equal(p.intervalos[0]!.ms, 60000)
+    p.intervalos[0]!.fn()
+    await esperar()
+    const e = p.documento.getElementById('metasDias')!
+    assert.match(e.textContent, /4 días/)
+    assert.equal(e.dataset.urgente, 'false')
+  })
+})
+
 describe('la página', () => {
   const h = readFileSync(`${RAIZ}/planeacion-metas-enlace.html`, 'utf8')
   test('no carga los datos de prueba del prototipo', () => {
@@ -133,5 +193,7 @@ describe('la página', () => {
   test('carga su script y pide las metas', () => {
     assert.match(h, /<script src="planeacion-metas-enlace\.js"><\/script>/)
     assert.match(h, /cargarMetas\(\)/)
+    assert.match(h, /id="metasDias"/)
+    assert.match(h, /iniciarContadorDias\(\)/)
   })
 })

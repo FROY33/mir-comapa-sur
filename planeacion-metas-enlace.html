@@ -28,7 +28,9 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 .rp-badge.gray {background:var(--color-neutral-100);color:var(--color-text-secondary);}
 .filtros {display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .filtros select {font-family:inherit;font-size:12px;padding:7px 10px;border:1px solid var(--color-border);border-radius:8px;background:white;}
-.meta-ciclo {font-size:12px;color:var(--color-text-secondary);margin-bottom:16px;}
+.meta-ciclo {font-size:12px;color:var(--color-text-secondary);margin-bottom:4px;}
+.meta-dias {font-size:13px;font-weight:600;margin-bottom:16px;color:var(--color-text-secondary);}
+.meta-dias[data-urgente="true"] {color:var(--color-danger);}
 .meta-mensaje:not(:empty) {background:white;border:1px dashed var(--color-border);border-radius:12px;padding:24px;text-align:center;font-size:13px;color:var(--color-text-secondary);}
 .meta-fila {display:flex;align-items:center;gap:16px;background:white;border:1px solid var(--color-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;flex-wrap:wrap;}
 .meta-fila.meta-borrador {border-left:4px solid var(--color-observado);background:var(--color-observado-tint);}
@@ -121,6 +123,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     </div>
 
     <p class="meta-ciclo" id="metasCiclo"></p>
+    <p class="meta-dias" id="metasDias" aria-live="polite" data-urgente="false"></p>
 
     <div class="filtros">
       <select id="filtroEstado" onchange="cargarMetas()" aria-label="Filtrar por estado">
@@ -163,6 +166,7 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 })();
 pintarNavPlaneacion();
 cargarMetas();
+iniciarContadorDias();
 </script>
 </body>
 </html>

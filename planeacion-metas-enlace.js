@@ -7,6 +7,10 @@ var ESTADO_META = {
   meta_pendiente: { texto: 'Pendiente', clase: 'meta-pendiente' },
   borrador_meta: { texto: 'Borrador', clase: 'meta-borrador' }
 };
+// Días o menos para el fin de captura en que el contador se pone en rojo (HU-R4-02 CA_3); es el mismo
+// valor que DIAS_URGENCIA del servidor (backend/src/datos/pendientes.ts), y una prueba lo compara.
+var DIAS_URGENCIA_META = 3;
+var MS_ACTUALIZAR_CONTADOR = 60000;
 // Provisional: la captura del prototipo, hasta el ticket 10 (captura real de metas)
 var PAGINA_CAPTURA_META = 'planeacion-enlace.html';
 
@@ -22,6 +26,33 @@ function htmlEn(id, html) { var el = document.getElementById(id); if (el) el.inn
 function textoMetaAnterior(valor) {
   if (valor === null || valor === undefined) return 'Meta ejercicio anterior: Sin antecedente';
   return 'Meta ejercicio anterior: <strong>' + escaparHTML(valor) + '</strong>';
+}
+
+/** Texto y urgencia del contador a partir de { ciclo, hoy } (requiere diasEntre, de planeacion-ciclo.js). */
+function contadorDias(d) {
+  if (!d || !d.ciclo || !d.ciclo.fin_captura) return null;
+  var dias = diasEntre(d.hoy, d.ciclo.fin_captura);
+  if (dias < 0) return { texto: 'El plazo de captura terminó el ' + formatFecha(d.ciclo.fin_captura) + '. Las metas pendientes quedan como vencidas.', urgente: true };
+  var texto = dias === 0 ? 'Hoy es el último día de captura' : dias === 1 ? 'Queda 1 día para el fin de captura' : 'Quedan ' + dias + ' días para el fin de captura';
+  var urgente = dias <= DIAS_URGENCIA_META;
+  return { texto: urgente ? '¡Urgente! ' + texto : texto, urgente: urgente };
+}
+
+function pintarContadorDias(d) {
+  var el = document.getElementById('metasDias');
+  if (!el) return;
+  var c = contadorDias(d);
+  el.textContent = c ? c.texto : '';
+  el.dataset.urgente = c && c.urgente ? 'true' : 'false';
+}
+
+/** Vuelve a pedir el día al servidor y repinta solo el contador: no toca la lista ni los filtros. */
+function actualizarContadorDias() {
+  return cargarCicloVigente().then(pintarContadorDias);
+}
+
+function iniciarContadorDias() {
+  setInterval(actualizarContadorDias, MS_ACTUALIZAR_CONTADOR);
 }
 
 function filaMeta(m) {
@@ -47,6 +78,7 @@ function pintarMetas(d, hayFiltro) {
   htmlEn('metasMensaje', '');
   htmlEn('metasLista', '');
   htmlEn('metasCiclo', '');
+  pintarContadorDias(d);
   var r = d.resumen || { total: 0, pendientes: 0, borradores: 0, vencidas: 0 };
   textoEn('rpTotal', String(r.total));
   textoEn('rpPendiente', String(r.pendientes));
