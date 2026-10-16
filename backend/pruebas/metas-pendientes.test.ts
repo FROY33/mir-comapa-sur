@@ -65,6 +65,8 @@ describe('GET /api/planeacion/pendientes (HU-R4-02)', () => {
       await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-V', nivel: 'actividad', vencida: true })
       await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-ENV', estado: 'meta_enviada' })
       await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-VAL', estado: 'meta_validada' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-OBS', estado: 'meta_observada' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-COR', estado: 'meta_corregida', vencida: true })
       await crearMeta(base.bd, { cicloId: c, gerencia: otra, codigo: 'OTR-1' })
     })
     after(borrarCiclos)
@@ -81,6 +83,15 @@ describe('GET /api/planeacion/pendientes (HU-R4-02)', () => {
       const por = Object.fromEntries(r.cuerpo.metas.map((m: any) => [m.codigo, m.estado]))
       assert.equal(por['COM-D'], 'borrador_meta')
       assert.equal(por['COM-A'], 'meta_pendiente')
+    })
+
+    test('HU-R4-02 RN_1: meta_observada y meta_corregida nunca se listan ni entran en el resumen', async () => {
+      const r = await pedir('enlace')
+      assert.ok(!codigos(r).includes('COM-OBS') && !codigos(r).includes('COM-COR'), codigos(r).join())
+      assert.deepEqual(r.cuerpo.resumen, { total: 4, pendientes: 3, borradores: 1, vencidas: 1 })   // la corregida vencida no suma
+      for (const estado of ['meta_observada', 'meta_corregida']) {
+        assert.equal(codigos(await pedir('enlace', `?estado=${estado}`)).length, 4)   // no es un estado listable: se ignora
+      }
     })
 
     test('entrega ciclo con fase y fechas, hoy y los campos de cada meta', async () => {
@@ -180,5 +191,34 @@ describe('GET /api/planeacion/pendientes (HU-R4-02)', () => {
     assert.deepEqual(r.cuerpo.metas, [])
     assert.deepEqual(r.cuerpo.resumen, { total: 0, pendientes: 0, borradores: 0, vencidas: 0 })
     await borrarCiclos()
+  })
+})
+
+describe('GET /api/planeacion/pendientes tras reiniciar (HU-R4-02)', () => {
+  test('HU-R4-02 pruebas mínimas: persistencia tras reinicio, la lista del Enlace sale igual', async () => {
+    const base = await prepararBase('metas_pend_reinicio')
+    let app = await levantar({ url: base.url })
+    try {
+      const com = await crearGerencia(base.bd, 'COM')
+      const cookie = await entrar(base.bd, com, 'enlace', 'enlace')
+      const c = await crearCiclo(base.bd, { ejercicio: 2052, inicioCaptura: -3, finCaptura: 10 })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-A' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-D', estado: 'borrador_meta' })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-V', vencida: true })
+      const leer = async () => {
+        const r = await fetch(`${app.url}/api/planeacion/pendientes`, { headers: { cookie } })
+        assert.equal(r.status, 200)
+        return await r.json() as any
+      }
+      const antes = await leer()
+      assert.deepEqual(antes.metas.map((m: any) => [m.codigo, m.estado, m.vencida]),
+        [['COM-V', 'meta_pendiente', true], ['COM-A', 'meta_pendiente', false], ['COM-D', 'borrador_meta', false]])
+      await app.cerrar()
+      app = await levantar({ url: base.url })
+      const despues = await leer()   // la sesión también vive en la base: la misma cookie sirve
+      assert.deepEqual(despues.metas, antes.metas)
+      assert.deepEqual(despues.resumen, antes.resumen)
+      assert.deepEqual(despues.ciclo, antes.ciclo)
+    } finally { await app.cerrar(); await base.soltar() }
   })
 })

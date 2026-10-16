@@ -94,7 +94,7 @@ export interface OpcionesMeta {
   cicloId: string
   gerencia: Gerencia
   codigo: string
-  estado?: 'meta_pendiente' | 'borrador_meta' | 'meta_enviada' | 'meta_observada' | 'meta_validada'
+  estado?: 'meta_pendiente' | 'borrador_meta' | 'meta_enviada' | 'meta_observada' | 'meta_corregida' | 'meta_validada'
   nivel?: 'fin' | 'proposito' | 'componente' | 'actividad'
   vencida?: boolean
   metaAnual?: number
@@ -126,7 +126,7 @@ export async function crearMeta(bd: BD, o: OpcionesMeta): Promise<string> {
   const estado = o.estado ?? 'meta_pendiente'
   const indicadorId = o.mismoIndicador ? idDe(`indicador-${o.codigo}`)
     : await crearIndicador(bd, { gerencia: o.gerencia, codigo: o.codigo, nivel: o.nivel })
-  const completa = estado === 'meta_enviada' || estado === 'meta_observada' || estado === 'meta_validada'
+  const completa = estado === 'meta_enviada' || estado === 'meta_observada' || estado === 'meta_corregida' || estado === 'meta_validada'
   const id = idDe(`meta-${o.codigo}-${o.cicloId}`)
   await bd.consultar(
     `INSERT INTO metas_planeacion (id, indicador_id, ciclo_id, estado, vencida, vencida_at, meta_anual, linea_base, enviada_at, validada_at)
