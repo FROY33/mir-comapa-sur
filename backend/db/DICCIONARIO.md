@@ -435,6 +435,8 @@ indicador activo (MIR y gerencial; la versión del indicador la fija el trigger 
 `fin_captura`, `inicio_revision`, `metas_total`, `metas_por_gerencia` `[{gerencia, total}]` y `cambios_aplicados`).
 Un ejercicio con ciclo responde 409 `ciclo_existente`.
 
+**Indicadores tardíos** (ticket 8, issue 019). Con un ciclo no cerrado (programado, en captura, fuera de plazo o en revisión), el alta y la reactivación de un indicador desde el catálogo crean su `meta_pendiente` en la misma transacción (`metaPendienteDeIndicador`), con la versión y la gerencia vigentes; si ya tiene meta vigente en el ciclo no se crea otra. Deja `meta_pendiente_creada` (entidad `meta`, `entidad_id` = id de la meta, `indicador_id`; `detalle`: `ciclo_id`, `ejercicio`). Desactivar no toca la meta; sin ciclo o con el ciclo cerrado no se crea nada.
+
 ---
 
 ## Índices
