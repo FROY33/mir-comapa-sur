@@ -387,6 +387,20 @@ AUDIT_LOG del RQM. Solo inserción: un trigger rechaza UPDATE, DELETE y TRUNCATE
 | ip | inet | sí | | | |
 | created_at | timestamptz | no | `now()` | | |
 
+### Acción `acceso_bloqueado`
+
+Se registra cuando un usuario con sesión es rechazado por permisos (S2-TEC-01). Un 401 (sin sesión o vencida) no se registra.
+`entidad = 'acceso'`, `entidad_id` = id del usuario, `rol` y `ip` del solicitante. `detalle`:
+
+| Clave | Descripción |
+|---|---|
+| metodo | Método HTTP (`GET` para páginas) |
+| ruta | Ruta de API sin query, o página pedida (`configuracion.html`) |
+| motivo | `rol` (403 por rol o por página) u `otra_gerencia` (indicador existente de otra gerencia) |
+| gerencia_id | Gerencia de la sesión |
+
+No se guarda cuerpo, cookies, query ni datos del recurso.
+
 ## login_intentos
 
 Fallos consecutivos de inicio de sesión por correo y bloqueo temporal (HU-R7-06): 5 fallos bloquean 15 minutos.

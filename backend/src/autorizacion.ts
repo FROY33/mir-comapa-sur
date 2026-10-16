@@ -7,6 +7,7 @@
 
 import type { BD } from './bd.js'
 import { cookiesBorradas } from './auth.js'
+import { auditarBloqueo } from './datos/accesoBloqueado.js'
 import { COOKIE_SESION, consultarYRenovar, type SesionActiva } from './datos/sesiones.js'
 import type { Manejador, Respuesta, Solicitud } from './http.js'
 import { DASHBOARD, puedeAbrir, type Rol } from './rutas.js'
@@ -50,7 +51,10 @@ export function crearProtegida(bd: BD, produccion: boolean) {
       const sesion = await consultarYRenovar(bd, s.cookies[COOKIE_SESION])
       if (!sesion) return sinSesion(produccion)
       if (sesion.debeCambiarPassword) return cambioPendiente
-      if (!roles.includes(sesion.rol)) return prohibido(sesion.rol)
+      if (!roles.includes(sesion.rol)) {
+        await auditarBloqueo(bd, sesion, { metodo: s.req.method ?? 'GET', ruta: s.url.pathname, motivo: 'rol', ip: s.ip })
+        return prohibido(sesion.rol)
+      }
       return manejador({ ...s, sesion })
     }
 }
@@ -67,7 +71,10 @@ export function acceso(bd: BD, produccion: boolean) {
     if (!sesion) return sinSesion(produccion)
     const pagina = s.url.searchParams.get('pagina') ?? ''
     if (sesion.debeCambiarPassword && pagina !== PAGINA_CAMBIO_PASSWORD) return cambioPendiente
-    if (!puedeAbrir(sesion.rol, pagina)) return prohibido(sesion.rol)
+    if (!puedeAbrir(sesion.rol, pagina)) {
+      await auditarBloqueo(bd, sesion, { metodo: 'GET', ruta: pagina, motivo: 'rol', ip: s.ip })
+      return prohibido(sesion.rol)
+    }
     return { status: 200, cuerpo: { permitido: true } }
   }
 }
