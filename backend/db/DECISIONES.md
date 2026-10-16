@@ -53,6 +53,9 @@ Tomados para poder migrar; cambiarlos es barato.
 | Consulta MIR (CA_4): un reporte en `pendiente_carga` o `borrador` no cuenta como «reporte en el periodo»: N/A y su avance no se muestra. El % usa las reglas de HU-R4-11 RN_3 (acumulable, fracción), que extienden la fórmula simple de CA_4 | `src/datos/consultaMir.ts` | ¿El Revisor ve el avance de un borrador? (Recomendación: no, como las metas, HU-R4-03 RN_1) |
 | Consulta MIR solo lista MIR (`tipo = 'mir'`); los gerenciales no entran (el RQM no los menciona y el prototipo no los tenía ahí). Los desactivados sí, marcados (HU-R4-11 CA_5) | `src/datos/consultaMir.ts` | **PO:** el Revisor no tiene hoy ninguna pantalla donde ver los gerenciales de su gerencia; ¿dónde deben verse? |
 | Meta anual de la Consulta MIR: la de la meta `meta_validada` vigente del ejercicio del periodo mostrado; sin meta validada, «—» | `src/datos/consultaMir.ts` | — |
+| Ficha técnica (HU-R8-03 CA_5): la ficha de otra gerencia responde **404**, no 403 como dice la ficha, igual que `GET /api/indicadores/:id` (HU-R7-03): no confirma que el indicador exista. La usuaria: «no debería poder verlo» (15/10/2026) | `src/indicadores.ts` | Avisar a la PO de la desviación del texto |
+| Contrato del historial de la ficha (CA_2) mientras no exista el cierre (HU-R3-03): los últimos 3 reportes con periodo `cerrado`; % = `reportes.cumplimiento` congelado al cierre y, si está vacío, calculado con HU-R4-11 RN_3. Sin REPORTES_PERIODO | `src/datos/fichaTecnica.ts` | HU-R3-03 debe llenar `reportes.cumplimiento` al cerrar |
+| La ficha técnica también la consulta el Enlace, solo de su gerencia (HU-R4-11 CA_1: «Revisor y Enlace solo consultan»); la página ya estaba abierta a los tres roles | `src/app.ts` | — |
 
 ## Abiertas
 
