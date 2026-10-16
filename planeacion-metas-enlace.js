@@ -18,6 +18,12 @@ function valorFiltro(id) {
 function textoEn(id, texto) { var el = document.getElementById(id); if (el) el.textContent = texto; }
 function htmlEn(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
 
+/** Referencia de solo lectura (no un valor sugerido): la meta validada del ejercicio anterior. */
+function textoMetaAnterior(valor) {
+  if (valor === null || valor === undefined) return 'Meta ejercicio anterior: Sin antecedente';
+  return 'Meta ejercicio anterior: <strong>' + escaparHTML(valor) + '</strong>';
+}
+
 function filaMeta(m) {
   var est = ESTADO_META[m.estado] || { texto: m.estado, clase: '' };
   var nivel = m.tipo === 'gerencial' ? 'Gerencial' : (NIVEL_META[m.nivel] || m.nivel || '');
@@ -27,6 +33,7 @@ function filaMeta(m) {
       '<span class="meta-codigo">' + escaparHTML(m.codigo) + '</span>' +
       '<p class="meta-nombre">' + escaparHTML(m.nombre) + '</p>' +
       '<p class="meta-detalle">' + (m.tipo === 'gerencial' ? 'Gerencial' : 'MIR') + ' · ' + escaparHTML(nivel) + '</p>' +
+      '<p class="meta-anterior">' + textoMetaAnterior(m.meta_anterior) + '</p>' +
     '</div>' +
     '<div class="meta-estado">' +
       '<span class="meta-badge ' + escaparHTML(est.clase) + '">' + escaparHTML(est.texto) + '</span>' +

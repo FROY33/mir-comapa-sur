@@ -2,7 +2,7 @@
 // y metas creadas con la ayuda de pruebas, sin depender de la apertura.
 
 import assert from 'node:assert/strict'
-import { after, before, describe, test } from 'node:test'
+import { after, afterEach, before, describe, test } from 'node:test'
 import { levantar } from './apoyo.js'
 import { crearCiclo, crearGerencia, crearMeta, entrar, prepararBase, type BasePlaneacion, type Gerencia } from './apoyo-planeacion.js'
 
@@ -91,7 +91,7 @@ describe('GET /api/planeacion/pendientes (HU-R4-02)', () => {
       assert.match(r.cuerpo.hoy, /^\d{4}-\d{2}-\d{2}$/)
       const m = r.cuerpo.metas.find((x: any) => x.codigo === 'COM-A')
       assert.deepEqual(Object.keys(m).sort(),
-        ['codigo', 'estado', 'indicador_id', 'meta_id', 'nivel', 'nombre', 'tipo', 'vencida'])
+        ['codigo', 'estado', 'indicador_id', 'meta_anterior', 'meta_id', 'nivel', 'nombre', 'tipo', 'vencida'])
       assert.equal(m.nivel, 'actividad')
       assert.equal(m.tipo, 'mir')
     })
@@ -136,6 +136,41 @@ describe('GET /api/planeacion/pendientes (HU-R4-02)', () => {
     assert.equal(r.cuerpo.ciclo.fase, 'revision')
     assert.deepEqual(codigos(r), ['COM-T2'])
     await borrarCiclos()
+  })
+
+  describe('meta_anterior (HU-R4-02 CA_4)', () => {
+    const pasado = (ejercicio: number) => crearCiclo(base.bd, { ejercicio, inicioCaptura: -400, finCaptura: -390, cerrado: true })
+    const por = (r: { cuerpo: any }) => Object.fromEntries(r.cuerpo.metas.map((m: any) => [m.codigo, m.meta_anterior]))
+    afterEach(borrarCiclos)
+
+    test('es la meta_anual validada del mismo indicador en el ejercicio anterior', async () => {
+      const ant = await pasado(2059)
+      await crearMeta(base.bd, { cicloId: ant, gerencia: com, codigo: 'COM-H', estado: 'meta_validada', metaAnual: 87.5 })
+      await crearMeta(base.bd, { cicloId: ant, gerencia: com, codigo: 'COM-CERO', estado: 'meta_validada', metaAnual: 0 })
+      const c = await crearCiclo(base.bd, { ejercicio: 2060, inicioCaptura: -3, finCaptura: 10 })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-H', mismoIndicador: true })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-CERO', mismoIndicador: true })
+      assert.deepEqual(por(await pedir('enlace')), { 'COM-H': 87.5, 'COM-CERO': 0 })
+    })
+
+    test('sin antecedente, o con la anterior enviada, observada o en borrador: null', async () => {
+      const ant = await pasado(2059)
+      await crearMeta(base.bd, { cicloId: ant, gerencia: com, codigo: 'COM-XE', estado: 'meta_enviada', metaAnual: 50 })
+      await crearMeta(base.bd, { cicloId: ant, gerencia: com, codigo: 'COM-XB', estado: 'borrador_meta' })
+      await crearMeta(base.bd, { cicloId: ant, gerencia: com, codigo: 'COM-XO', estado: 'meta_observada', metaAnual: 30 })
+      const c = await crearCiclo(base.bd, { ejercicio: 2060, inicioCaptura: -3, finCaptura: 10 })
+      for (const codigo of ['COM-XE', 'COM-XB', 'COM-XO']) await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo, mismoIndicador: true })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-XN' })
+      assert.deepEqual(por(await pedir('enlace')), { 'COM-XE': null, 'COM-XB': null, 'COM-XO': null, 'COM-XN': null })
+    })
+
+    test('solo cuenta el ejercicio inmediato anterior, no uno más viejo', async () => {
+      const viejo = await pasado(2057)
+      await crearMeta(base.bd, { cicloId: viejo, gerencia: com, codigo: 'COM-XV', estado: 'meta_validada', metaAnual: 10 })
+      const c = await crearCiclo(base.bd, { ejercicio: 2060, inicioCaptura: -3, finCaptura: 10 })
+      await crearMeta(base.bd, { cicloId: c, gerencia: com, codigo: 'COM-XV', mismoIndicador: true })
+      assert.deepEqual(por(await pedir('enlace')), { 'COM-XV': null })
+    })
   })
 
   test('sin pendientes: lista vacía con resumen en cero', async () => {

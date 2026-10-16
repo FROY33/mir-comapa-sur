@@ -11,7 +11,7 @@ const MALO = '<img src=x onerror=alert(1)>'
 
 const meta = (m: Record<string, unknown> = {}) => ({
   meta_id: 'm1', indicador_id: 'i1', codigo: 'COM-1', nombre: 'Cobertura de agua', tipo: 'mir', nivel: 'actividad',
-  estado: 'meta_pendiente', vencida: false, ...m,
+  estado: 'meta_pendiente', vencida: false, meta_anterior: null, ...m,
 })
 const respuesta = (metas: unknown[], extra: Record<string, unknown> = {}) => ({
   ciclo: { ejercicio: 2027, fase: 'captura', inicio_captura: '2026-11-01', fin_captura: '2026-11-15', inicio_revision: '2026-11-20' },
@@ -53,6 +53,25 @@ describe('lista de metas del Enlace (HU-R4-02)', () => {
   test('la meta vencida lleva la marca', async () => {
     assert.match(texto(await cargar(respuesta([meta({ vencida: true })])), 'metasLista'), /Vencida/)
     assert.doesNotMatch(texto(await cargar(respuesta([meta()])), 'metasLista'), /Vencida/)
+  })
+
+  test('muestra la meta anterior validada como texto de referencia, sin campo ni botón para usarla', async () => {
+    const html = texto(await cargar(respuesta([meta({ meta_anterior: 87.5 })])), 'metasLista')
+    assert.match(html, /Meta ejercicio anterior:[^<]*<strong>87\.5<\/strong>/)
+    assert.doesNotMatch(html, /<input|<button|usar este valor/i)
+    assert.doesNotMatch(html, /Sin antecedente/)
+  })
+
+  test('una meta anterior de 0 se muestra como 0, no como «Sin antecedente»', async () => {
+    const html = texto(await cargar(respuesta([meta({ meta_anterior: 0 })])), 'metasLista')
+    assert.match(html, /<strong>0<\/strong>/)
+    assert.doesNotMatch(html, /Sin antecedente/)
+  })
+
+  test('sin meta anterior (null) muestra «Sin antecedente» y no calcula nada', async () => {
+    const html = texto(await cargar(respuesta([meta({ meta_anterior: null })])), 'metasLista')
+    assert.match(html, /Sin antecedente/)
+    assert.doesNotMatch(html, /NaN|undefined|null|Infinity/)
   })
 
   test('los nombres, códigos y niveles con HTML se escapan', async () => {

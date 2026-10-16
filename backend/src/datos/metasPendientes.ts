@@ -1,7 +1,8 @@
 // Metas pendientes del Enlace (PRD0_1, ticket 9; HU-R4-02): las metas vigentes del ciclo vigente que
 // aún piden acción de la gerencia (`meta_pendiente` y `borrador_meta`). La gerencia sale de la versión
 // del indicador a la que apunta la meta, no de `indicadores.gerencia_id`, para que una reasignación
-// posterior no la mueva antes de tiempo. Orden por defecto: vencidas primero, luego por código.
+// posterior no la mueva antes de tiempo. `meta_anterior` es la meta validada del ejercicio − 1 (HU-R4-02
+// CA_4); la reutilizan los tickets 10 y 12. Orden por defecto: vencidas primero, luego por código.
 
 import type { Ejecutor } from '../bd.js'
 
@@ -17,6 +18,8 @@ export interface MetaPendiente {
   nivel: string | null
   estado: 'meta_pendiente' | 'borrador_meta'
   vencida: boolean
+  /** Referencia de solo lectura (no un valor sugerido): `meta_anual` validada del ejercicio anterior, o null. */
+  meta_anterior: number | null
 }
 
 export interface FiltrosMetas { estado?: string; nivel?: string }
@@ -25,8 +28,14 @@ export interface ResumenMetas { total: number; pendientes: number; borradores: n
 
 export function listarMetasPendientes(bd: Ejecutor, cicloId: string, gerenciaId: string, f: FiltrosMetas = {}): Promise<MetaPendiente[]> {
   return bd.consultar<MetaPendiente>(
-    `SELECT m.id AS meta_id, i.id AS indicador_id, i.codigo, i.nombre, i.tipo, i.nivel, m.estado, m.vencida
+    `SELECT m.id AS meta_id, i.id AS indicador_id, i.codigo, i.nombre, i.tipo, i.nivel, m.estado, m.vencida,
+          (SELECT a.meta_anual::float8
+             FROM metas_planeacion a
+             JOIN ciclos_planeacion ca ON ca.id = a.ciclo_id
+            WHERE a.indicador_id = m.indicador_id AND a.vigente AND a.estado = 'meta_validada'
+              AND ca.ejercicio = c.ejercicio - 1) AS meta_anterior
        FROM metas_planeacion m
+       JOIN ciclos_planeacion c ON c.id = m.ciclo_id
        JOIN indicador_versiones v ON v.id = m.indicador_version_id
        JOIN indicadores i ON i.id = m.indicador_id
       WHERE m.ciclo_id = $1 AND m.vigente
