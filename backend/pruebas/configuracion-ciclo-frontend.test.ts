@@ -76,6 +76,44 @@ describe('sección «Ciclo de planeación» de Configuración', () => {
     assert.match(el(p, 'ciclo-status-detail').textContent, /Faltan 1 día\./)
   })
 
+  test('historial: un ciclo en cada fase, con quién lo abrió y las fechas, y el nombre escapado', async () => {
+    const f = (ejercicio: number, fase: string, abierto_por: string | null) => ({
+      ejercicio, fase, abierto_por, abierto_at: '2026-10-01T15:00:00.000Z',
+      inicio_captura: '2026-11-01', fin_captura: '2026-11-15', inicio_revision: '2026-11-20' })
+    const p = cargar({ 'GET /api/admin/planeacion/ciclos': { status: 200, cuerpo: { hoy: '2026-10-15', ciclos: [
+      f(2031, 'programado', 'Ana'), f(2030, 'captura', MALO), f(2029, 'fuera_de_plazo', 'Luis'),
+      f(2028, 'revision', 'Eva'), f(2027, 'cerrado', null)] } } })
+    await cicloCargar(p)
+    const html = el(p, 'ciclo-historial').innerHTML
+    for (const t of ['2031', '2030', '2029', '2028', '2027']) assert.ok(html.includes(t), t)
+    for (const t of ['Programado', 'Captura', 'Fuera de plazo', 'Revisión', 'Cerrado']) assert.ok(html.includes(t), t)
+    assert.ok(html.includes('Ana') && html.includes('Luis'))
+    assert.ok(html.includes(ESCAPADO) && !html.includes(MALO))
+    assert.match(html, /Carga inicial/)   // sin usuario que lo abriera
+    assert.equal(html.split('<tr><td>').length - 1, 5)
+  })
+
+  test('historial sin ciclos: mensaje vacío, sin error', async () => {
+    const p = cargar({ 'GET /api/admin/planeacion/ciclos': { status: 200, cuerpo: { hoy: '2026-10-15', ciclos: [] } } })
+    await cicloCargar(p)
+    assert.match(el(p, 'ciclo-historial').innerHTML, /Aún no se ha abierto ningún ciclo/)
+    assert.equal((p.ventana.toasts as string[]).length, 0)
+  })
+
+  test('si el historial falla, el formulario y el estado siguen funcionando', async () => {
+    const p = cargar({ 'GET /api/admin/planeacion/ciclos': { status: 500, cuerpo: {} } })
+    await cicloCargar(p)
+    assert.equal(el(p, 'ciclo-status-label').textContent, 'Sin ciclo abierto')
+    assert.match(el(p, 'ciclo-historial').innerHTML, /No se pudo cargar el historial/)
+  })
+
+  test('tras abrir un ciclo, el historial se recarga', async () => {
+    const p = cargar({ 'POST /api/admin/planeacion/ciclos': { status: 201, cuerpo: CREADO } })
+    llenar(p)
+    await abrir(p)
+    assert.equal(llamadas(p).filter((l) => l.ruta === '/api/admin/planeacion/ciclos' && l.metodo === 'GET').length, 1)
+  })
+
   test('pide confirmación antes de abrir y, si se rechaza, no llama a la API', async () => {
     const p = cargar()
     llenar(p)
@@ -152,7 +190,7 @@ describe('sección «Ciclo de planeación» de Configuración', () => {
     assert.match(html, /<script src="configuracion-ciclo\.js"><\/script>/)
     assert.match(html, /<script src="planeacion-ciclo\.js"><\/script>/)
     for (const id of ['ciclo-ejercicio', 'ciclo-inicio-captura', 'ciclo-fin-captura', 'ciclo-inicio-revision', 'ciclo-resumen', 'ciclo-abrir-btn',
-      'ciclo-error-ejercicio', 'ciclo-error-inicio_captura', 'ciclo-error-fin_captura', 'ciclo-error-inicio_revision']) {
+      'ciclo-historial', 'ciclo-error-ejercicio', 'ciclo-error-inicio_captura', 'ciclo-error-fin_captura', 'ciclo-error-inicio_revision']) {
       assert.ok(html.includes(`id="${id}"`), id)
     }
   })

@@ -2,12 +2,13 @@
 //   GET /api/planeacion/ciclo-vigente   los tres roles: el ciclo no cerrado más reciente y su fase.
 //   GET /api/planeacion/pendientes      solo Enlace: sus metas por configurar en el ciclo vigente (ticket 9).
 //   POST /api/admin/planeacion/ciclos   solo Administrador: abre el ciclo de un ejercicio (ticket 8).
+//   GET /api/admin/planeacion/ciclos    solo Administrador: historial de ciclos con fase y quién los abrió.
 //   Lo usan la navegación y el dashboard del Enlace, y la sección de Configuración.
 
 import type { SolicitudConSesion } from './autorizacion.js'
 import type { BD } from './bd.js'
 import { abrirCicloPlaneacion, CicloExistente } from './datos/aperturaCicloPlaneacion.js'
-import { cicloVigente, FASES_ABIERTAS, hoyEnBase } from './datos/cicloPlaneacion.js'
+import { cicloVigente, FASES_ABIERTAS, historialCiclos, hoyEnBase } from './datos/cicloPlaneacion.js'
 import { ESTADOS_META_PENDIENTE, listarMetasPendientes, NIVELES_MIR, resumirMetas } from './datos/metasPendientes.js'
 import type { Respuesta } from './http.js'
 
@@ -98,4 +99,11 @@ export const abrir = (bd: BD) => async (s: SolicitudConSesion): Promise<Respuest
     if (e instanceof CicloExistente) return error(409, 'ciclo_existente', `Ya existe un ciclo de planeación para el ejercicio ${e.ejercicio}`, 'ejercicio')
     throw e
   }
+}
+
+// ── Historial (HU-R4-01 CA_6): GET /api/admin/planeacion/ciclos, solo Administrador ───────────────
+
+export const listarCiclos = (bd: BD) => async (): Promise<Respuesta> => {
+  const hoy = await hoyEnBase(bd)
+  return { status: 200, cuerpo: { ciclos: await historialCiclos(bd, hoy), hoy } }
 }

@@ -1,6 +1,6 @@
 // configuracion-ciclo.js — Sección «Ciclo de planeación» de configuracion.html (PRD0_1, ticket 8).
 // Lee GET /api/planeacion/ciclo-vigente y abre el ciclo con POST /api/admin/planeacion/ciclos; ya no
-// guarda nada en localStorage. Requiere session.js (pedir, escaparHTML), vistas-mir.js (formatFecha),
+// guarda nada en localStorage. El historial viene de GET /api/admin/planeacion/ciclos. Requiere session.js (pedir, escaparHTML), vistas-mir.js (formatFecha),
 // planeacion-ciclo.js (cargarCicloVigente, diasEntre) y showToast de la página.
 
 (function () {
@@ -89,10 +89,41 @@
     el('ciclo-resumen').style.display = '';
   }
 
+  var ETIQUETA_FASE_CORTA = { programado: 'Programado', captura: 'Captura', fuera_de_plazo: 'Fuera de plazo', revision: 'Revisión', cerrado: 'Cerrado' };
+
+  /** Día y hora en que se abrió el ciclo, en la hora de la base. */
+  function fechaApertura(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('es-MX', { timeZone: 'America/Monterrey', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  /** Historial: del ejercicio más reciente al más antiguo, con fase, fechas y quién lo abrió (HU-R4-01 CA_6). */
+  function pintarHistorial(ciclos) {
+    var caja = el('ciclo-historial');
+    if (!caja) return;
+    if (!ciclos) { caja.innerHTML = '<p class="config-card-subtitle">No se pudo cargar el historial.</p>'; return; }
+    if (!ciclos.length) { caja.innerHTML = '<p class="config-card-subtitle">Aún no se ha abierto ningún ciclo.</p>'; return; }
+    caja.innerHTML = '<table class="config-table"><thead><tr><th>Ejercicio</th><th>Fase</th><th>Captura</th><th>Revisión desde</th><th>Abierto por</th><th>Abierto el</th></tr></thead><tbody>' +
+      ciclos.map(function (c) {
+        return '<tr><td>' + escaparHTML(String(c.ejercicio)) + '</td><td>' + escaparHTML(ETIQUETA_FASE_CORTA[c.fase] || c.fase) + '</td><td>' +
+          escaparHTML(formatFecha(c.inicio_captura)) + ' – ' + escaparHTML(formatFecha(c.fin_captura)) + '</td><td>' +
+          escaparHTML(formatFecha(c.inicio_revision)) + '</td><td>' + escaparHTML(c.abierto_por || 'Carga inicial') + '</td><td>' +
+          escaparHTML(fechaApertura(c.abierto_at)) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function cargarHistorial() {
+    return pedir('/api/admin/planeacion/ciclos')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { pintarHistorial(d && d.ciclos); }, function () { pintarHistorial(null); });
+  }
+
   window.cicloCargar = function () {
     return cargarCicloVigente().then(function (d) {
       if (d) pintarEjercicios(d.hoy);
       pintarEstado(d);
+      return cargarHistorial();
     });
   };
 
