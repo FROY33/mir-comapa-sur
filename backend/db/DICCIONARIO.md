@@ -423,10 +423,17 @@ valores nuevos y se aplican al abrir el siguiente periodo. Los reportes y las me
 **Quién escribe y cuándo aplica.** La API de edición del catálogo (`PUT /api/admin/indicadores/:id`) inserta;
 `POST /api/admin/cambios-programados/:id/cancelar` cancela. `aplicarCambiosProgramados` (`src/datos/cambiosProgramados.ts`)
 aplica los pendientes con `vigente_desde <= hoy` dentro de la transacción de `abrirCiclos` (periodo de reporte de
-su frecuencia), antes de generar los reportes. Abrir un ciclo de planeación debe llamarla igual (ticket 8, pendiente).
+su frecuencia), antes de generar los reportes. Abrir un ciclo de planeación la llama igual, sin filtro y antes de generar las metas (`abrirCicloPlaneacion`, `src/datos/aperturaCicloPlaneacion.ts`).
 Un indicador tiene a lo sumo un cambio pendiente: uno nuevo cancela y reemplaza al anterior (conserva sus valores).
 Cada paso queda en la bitácora: `cambio_programado`, `cambio_programado_cancelado` y `cambio_programado_aplicado`
 (con `antes`, `despues` y `vigente_desde`).
+
+**Apertura del ciclo de planeación** (`POST /api/admin/planeacion/ciclos`, ticket 8). En una transacción: aplica los cambios
+programados vencidos, inserta el ciclo (`abierto_por`, `abierto_at`) y una `metas_planeacion` en `meta_pendiente` por cada
+indicador activo (MIR y gerencial; la versión del indicador la fija el trigger de la meta). Deja en la bitácora
+`ciclo_planeacion_abierto` (entidad `ciclo_planeacion`, `entidad_id` = id del ciclo; `detalle`: `ejercicio`, `inicio_captura`,
+`fin_captura`, `inicio_revision`, `metas_total`, `metas_por_gerencia` `[{gerencia, total}]` y `cambios_aplicados`).
+Un ejercicio con ciclo responde 409 `ciclo_existente`.
 
 ---
 

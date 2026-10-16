@@ -100,18 +100,34 @@ export interface OpcionesMeta {
   metaAnual?: number
 }
 
+export interface OpcionesIndicador {
+  gerencia: Gerencia
+  codigo: string
+  nivel?: 'fin' | 'proposito' | 'componente' | 'actividad'
+  tipo?: 'mir' | 'gerencial'
+  activo?: boolean
+}
+
+/** Un indicador de la gerencia (activo por omisión; MIR o gerencial). Devuelve su id reconocible. */
+export async function crearIndicador(bd: BD, o: OpcionesIndicador): Promise<string> {
+  const gerencial = o.tipo === 'gerencial'
+  const [i] = await bd.consultar<{ id: string }>(
+    `INSERT INTO indicadores (id, gerencia_id, unidad_id, codigo, tipo, nivel, nombre, unidad_medida, frecuencia, activo)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'Porcentaje', 'mensual', $8) RETURNING id`,
+    [idDe(`indicador-${o.codigo}`), o.gerencia.id, o.gerencia.unidadId, o.codigo, o.tipo ?? 'mir',
+     gerencial ? null : (o.nivel ?? 'actividad'), `Indicador ${o.codigo}`, o.activo !== false])
+  return i!.id
+}
+
 /** Un indicador activo de la gerencia y su meta vigente en el estado dado. Devuelve el id de la meta. */
 export async function crearMeta(bd: BD, o: OpcionesMeta): Promise<string> {
   const estado = o.estado ?? 'meta_pendiente'
-  const [i] = await bd.consultar<{ id: string }>(
-    `INSERT INTO indicadores (id, gerencia_id, unidad_id, codigo, nivel, nombre, unidad_medida, frecuencia)
-     VALUES ($1, $2, $3, $4, $5, $6, 'Porcentaje', 'mensual') RETURNING id`,
-    [idDe(`indicador-${o.codigo}`), o.gerencia.id, o.gerencia.unidadId, o.codigo, o.nivel ?? 'actividad', `Indicador ${o.codigo}`])
+  const indicadorId = await crearIndicador(bd, { gerencia: o.gerencia, codigo: o.codigo, nivel: o.nivel })
   const completa = estado === 'meta_enviada' || estado === 'meta_validada'
   const id = idDe(`meta-${o.codigo}`)
   await bd.consultar(
     `INSERT INTO metas_planeacion (id, indicador_id, ciclo_id, estado, vencida, vencida_at, meta_anual, linea_base, enviada_at, validada_at)
      VALUES ($1, $2, $3, $4, $5, ${o.vencida ? 'now()' : 'NULL'}, $6, $7, ${completa ? 'now()' : 'NULL'}, ${estado === 'meta_validada' ? 'now()' : 'NULL'})`,
-    [id, i!.id, o.cicloId, estado, o.vencida === true, completa ? (o.metaAnual ?? 100) : null, completa ? 0 : null])
+    [id, indicadorId, o.cicloId, estado, o.vencida === true, completa ? (o.metaAnual ?? 100) : null, completa ? 0 : null])
   return id
 }

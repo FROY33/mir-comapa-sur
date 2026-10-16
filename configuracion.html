@@ -205,6 +205,7 @@ td {padding:12px 16px;vertical-align:middle;}
 .ciclo-status-label {font-size:13px;font-weight:700;color:var(--color-text-primary);}
 .ciclo-status-detail {font-size:12px;color:var(--color-text-secondary);margin-top:3px;line-height:1.5;}
 .ciclo-actions {display:flex;gap:10px;margin-top:4px;}
+.ciclo-error {font-size:12px;color:var(--color-danger);}
 .btn-save {background:var(--color-primary);color:white;border:none;border-radius:var(--radius-btn);padding:10px 22px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;}
 .btn-save:hover {background:var(--color-accent-dark);}
 .btn-ciclo-close {background:white;color:var(--color-danger);border:1.5px solid transparent;border-radius:var(--radius-btn);padding:10px 18px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .15s;}
@@ -502,128 +503,54 @@ td {padding:12px 16px;vertical-align:middle;}
       <div class="page-header">
         <div>
           <h1 class="page-title">Ciclo de planeación</h1>
-          <p class="page-subtitle">Define el período de captura y revisión de metas para el ejercicio fiscal</p>
+          <p class="page-subtitle">Abre la planeación de metas de un ejercicio: elige las fechas y el sistema genera una meta pendiente por cada indicador activo</p>
         </div>
       </div>
 
-      <!-- Estado actual del ciclo -->
+      <!-- Estado del ciclo vigente (configuracion-ciclo.js) -->
       <div id="ciclo-status-card" class="ciclo-status-card inactivo">
         <div class="ciclo-estado-dot"></div>
         <div class="ciclo-status-info">
-          <div class="ciclo-status-label" id="ciclo-status-label">Sin ciclo configurado</div>
-          <div class="ciclo-status-detail" id="ciclo-status-detail">Define las fechas del ciclo y guarda la configuración para activarlo automáticamente.</div>
+          <div class="ciclo-status-label" id="ciclo-status-label">Sin ciclo abierto</div>
+          <div class="ciclo-status-detail" id="ciclo-status-detail">Elige el ejercicio y las fechas, y abre el ciclo para que las gerencias empiecen a definir sus metas.</div>
         </div>
-        <button class="btn-ciclo-close" id="ciclo-close-btn" style="display:none" onclick="closeCicloManual()">Cerrar ciclo</button>
       </div>
 
-      <!-- Fase 1: Captura -->
       <div class="config-card">
-        <div class="config-card-title">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>
-          Fase 1 — Captura de metas
-          <span id="ciclo-c-phase-badge" style="display:none"></span>
-        </div>
-        <p class="config-card-subtitle">Período durante el cual los usuarios enlace pueden configurar y enviar las metas de sus indicadores asignados.</p>
+        <div class="config-card-title">Abrir un ciclo</div>
+        <p class="config-card-subtitle">Un ejercicio tiene un solo ciclo. Con la captura en el futuro, el ciclo queda programado y las gerencias lo ven hasta el día de inicio. Abrir el ciclo no se deshace.</p>
         <div class="config-form-row">
           <div class="config-form-field">
-            <label class="config-form-label">Fecha de apertura</label>
-            <div class="cp-datepicker">
-              <div class="cp-dp-trigger" id="dp-trg-ciclo-c-inicio" onclick="cpToggle('ciclo-c-inicio')">
-                <span class="cp-dp-text placeholder" id="dp-text-ciclo-c-inicio">Seleccionar fecha</span>
-                <svg class="cp-dp-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-              </div>
-              <div class="cp-dp-dropdown" id="dp-drop-ciclo-c-inicio" style="display:none">
-                <div class="cp-dp-header">
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-c-inicio',-1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></button>
-                  <span class="cp-dp-month-label" id="dp-hdr-ciclo-c-inicio"></span>
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-c-inicio',1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
-                </div>
-                <div class="cp-dp-weekdays"><div class="cp-dp-wd">Lun</div><div class="cp-dp-wd">Mar</div><div class="cp-dp-wd">Mié</div><div class="cp-dp-wd">Jue</div><div class="cp-dp-wd">Vie</div><div class="cp-dp-wd">Sáb</div><div class="cp-dp-wd">Dom</div></div>
-                <div class="cp-dp-grid" id="dp-grid-ciclo-c-inicio"></div>
-              </div>
-            </div>
+            <label class="config-form-label" for="ciclo-ejercicio">Ejercicio</label>
+            <select class="config-form-input" id="ciclo-ejercicio"></select>
+            <span class="ciclo-error" id="ciclo-error-ejercicio" style="display:none"></span>
+          </div>
+        </div>
+        <div class="config-form-row" style="margin-top:12px">
+          <div class="config-form-field">
+            <label class="config-form-label" for="ciclo-inicio-captura">Inicio de captura</label>
+            <input class="config-form-input" type="date" id="ciclo-inicio-captura">
+            <span class="ciclo-error" id="ciclo-error-inicio_captura" style="display:none"></span>
           </div>
           <div class="config-form-field">
-            <label class="config-form-label">Fecha de cierre</label>
-            <div class="cp-datepicker">
-              <div class="cp-dp-trigger" id="dp-trg-ciclo-c-fin" onclick="cpToggle('ciclo-c-fin')">
-                <span class="cp-dp-text placeholder" id="dp-text-ciclo-c-fin">Seleccionar fecha</span>
-                <svg class="cp-dp-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-              </div>
-              <div class="cp-dp-dropdown" id="dp-drop-ciclo-c-fin" style="display:none">
-                <div class="cp-dp-header">
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-c-fin',-1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></button>
-                  <span class="cp-dp-month-label" id="dp-hdr-ciclo-c-fin"></span>
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-c-fin',1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
-                </div>
-                <div class="cp-dp-weekdays"><div class="cp-dp-wd">Lun</div><div class="cp-dp-wd">Mar</div><div class="cp-dp-wd">Mié</div><div class="cp-dp-wd">Jue</div><div class="cp-dp-wd">Vie</div><div class="cp-dp-wd">Sáb</div><div class="cp-dp-wd">Dom</div></div>
-                <div class="cp-dp-grid" id="dp-grid-ciclo-c-fin"></div>
-              </div>
-            </div>
+            <label class="config-form-label" for="ciclo-fin-captura">Fin de captura</label>
+            <input class="config-form-input" type="date" id="ciclo-fin-captura">
+            <span class="ciclo-error" id="ciclo-error-fin_captura" style="display:none"></span>
           </div>
           <div class="config-form-field">
-            <label class="config-form-label">Duración</label>
-            <div class="config-dur-badge" id="ciclo-c-dur">— días</div>
+            <label class="config-form-label" for="ciclo-inicio-revision">Inicio de revisión</label>
+            <input class="config-form-input" type="date" id="ciclo-inicio-revision">
+            <span class="ciclo-error" id="ciclo-error-inicio_revision" style="display:none"></span>
           </div>
         </div>
       </div>
 
-      <!-- Fase 2: Revisión -->
-      <div class="config-card">
-        <div class="config-card-title">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.746 3.746 0 0 1-3.296 1.043 3.745 3.745 0 0 1-3.068 1.593 3.745 3.745 0 0 1-3.068-1.593 3.746 3.746 0 0 1-3.296-1.043 3.746 3.746 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 0 1 1.043-3.296 3.745 3.745 0 0 1 3.296-1.043A3.745 3.745 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
-          Fase 2 — Revisión de metas
-          <span id="ciclo-r-phase-badge" style="display:none"></span>
-        </div>
-        <p class="config-card-subtitle">Período durante el cual los usuarios revisor pueden validar y aprobar las metas enviadas por los enlaces.</p>
-        <div class="config-form-row">
-          <div class="config-form-field">
-            <label class="config-form-label">Fecha de apertura</label>
-            <div class="cp-datepicker">
-              <div class="cp-dp-trigger" id="dp-trg-ciclo-r-inicio" onclick="cpToggle('ciclo-r-inicio')">
-                <span class="cp-dp-text placeholder" id="dp-text-ciclo-r-inicio">Seleccionar fecha</span>
-                <svg class="cp-dp-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-              </div>
-              <div class="cp-dp-dropdown" id="dp-drop-ciclo-r-inicio" style="display:none">
-                <div class="cp-dp-header">
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-r-inicio',-1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></button>
-                  <span class="cp-dp-month-label" id="dp-hdr-ciclo-r-inicio"></span>
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-r-inicio',1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
-                </div>
-                <div class="cp-dp-weekdays"><div class="cp-dp-wd">Lun</div><div class="cp-dp-wd">Mar</div><div class="cp-dp-wd">Mié</div><div class="cp-dp-wd">Jue</div><div class="cp-dp-wd">Vie</div><div class="cp-dp-wd">Sáb</div><div class="cp-dp-wd">Dom</div></div>
-                <div class="cp-dp-grid" id="dp-grid-ciclo-r-inicio"></div>
-              </div>
-            </div>
-          </div>
-          <div class="config-form-field">
-            <label class="config-form-label">Fecha de cierre</label>
-            <div class="cp-datepicker">
-              <div class="cp-dp-trigger" id="dp-trg-ciclo-r-fin" onclick="cpToggle('ciclo-r-fin')">
-                <span class="cp-dp-text placeholder" id="dp-text-ciclo-r-fin">Seleccionar fecha</span>
-                <svg class="cp-dp-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-              </div>
-              <div class="cp-dp-dropdown" id="dp-drop-ciclo-r-fin" style="display:none">
-                <div class="cp-dp-header">
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-r-fin',-1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></button>
-                  <span class="cp-dp-month-label" id="dp-hdr-ciclo-r-fin"></span>
-                  <button class="cp-dp-nav" onclick="cpNav('ciclo-r-fin',1)" type="button"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg></button>
-                </div>
-                <div class="cp-dp-weekdays"><div class="cp-dp-wd">Lun</div><div class="cp-dp-wd">Mar</div><div class="cp-dp-wd">Mié</div><div class="cp-dp-wd">Jue</div><div class="cp-dp-wd">Vie</div><div class="cp-dp-wd">Sáb</div><div class="cp-dp-wd">Dom</div></div>
-                <div class="cp-dp-grid" id="dp-grid-ciclo-r-fin"></div>
-              </div>
-            </div>
-          </div>
-          <div class="config-form-field">
-            <label class="config-form-label">Duración</label>
-            <div class="config-dur-badge" id="ciclo-r-dur">— días</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Acciones -->
       <div class="ciclo-actions">
-        <button class="btn-save" onclick="saveCiclo()">Guardar configuración</button>
+        <button class="btn-save" id="ciclo-abrir-btn" type="button" onclick="abrirCiclo()">Abrir ciclo</button>
       </div>
+
+      <!-- Resumen tras abrir: metas por gerencia y cambios aplicados -->
+      <div id="ciclo-resumen" style="display:none;margin-top:16px"></div>
     </div>
 
     <!-- ─── SECCIÓN: VENTANA DE CAPTURA ────────────────────────────── -->
@@ -1162,7 +1089,7 @@ function switchSection(name){
     var nav=document.getElementById('cnav-'+s);
     if(nav) nav.classList.toggle('active', s===name);
   });
-  if (name === 'ciclo') { cicloPopulateForm(); cicloRenderStatus(); }
+  if (name === 'ciclo') cicloCargar();
 }
 
 function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
@@ -1967,293 +1894,14 @@ function confirmarEliminarMedio(id) {
 }
 
 renderMedios();
-
-// ════════════════════════════════════════
-// CICLO DE PLANEACIÓN
-// ════════════════════════════════════════
-// Demo: clear cycle state on every page load
-try { localStorage.removeItem('comapa-ciclo'); } catch(e) {}
-
-var CICLO_KEY = 'comapa-ciclo';
-
-function cicloParseDate(s) {
-  if (!s) return null;
-  var p = s.split('-');
-  var d = new Date(+p[0], +p[1]-1, +p[2]);
-  d.setHours(0,0,0,0);
-  return d;
-}
-
-function cicloGetEstado(ciclo) {
-  if (!ciclo || !ciclo.faseCaptura || !ciclo.faseRevision) return 'inactivo';
-  if (ciclo.cerradoManualmente) return 'cerrado';
-  var hoy = new Date(); hoy.setHours(0,0,0,0);
-  var c0 = cicloParseDate(ciclo.faseCaptura.inicio);
-  var c1 = cicloParseDate(ciclo.faseCaptura.fin);
-  var r0 = cicloParseDate(ciclo.faseRevision.inicio);
-  var r1 = cicloParseDate(ciclo.faseRevision.fin);
-  if (!c0||!c1||!r0||!r1) return 'inactivo';
-  if (hoy < c0) return 'pendiente';
-  if (hoy >= c0 && hoy <= c1) return 'captura';
-  if (hoy > c1 && hoy < r0) return 'entre_fases';
-  if (hoy >= r0 && hoy <= r1) return 'revision';
-  return 'cerrado';
-}
-
-function cicloLoad() {
-  try { return JSON.parse(localStorage.getItem(CICLO_KEY)); } catch(e) { return null; }
-}
-
-function cicloFmtDate(s) {
-  if (!s) return '';
-  var p = s.split('-');
-  var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  return +p[2]+' '+meses[+p[1]-1]+'. '+p[0];
-}
-
-function cicloDias(ini, fin) {
-  var a = cicloParseDate(ini), b = cicloParseDate(fin);
-  if (!a||!b||b<a) return null;
-  return Math.round((b-a)/(1000*60*60*24))+1;
-}
-
-function cicloUpdateDurs() {
-  var cI = cpGetValue('ciclo-c-inicio');
-  var cF = cpGetValue('ciclo-c-fin');
-  var rI = cpGetValue('ciclo-r-inicio');
-  var rF = cpGetValue('ciclo-r-fin');
-  var cd = cicloDias(cI,cF), rd = cicloDias(rI,rF);
-  document.getElementById('ciclo-c-dur').textContent = cd ? cd+' día'+(cd===1?'':'s') : '— días';
-  document.getElementById('ciclo-r-dur').textContent = rd ? rd+' día'+(rd===1?'':'s') : '— días';
-}
-
-function cicloRenderStatus() {
-  var ciclo = cicloLoad();
-  var est = cicloGetEstado(ciclo);
-  var card = document.getElementById('ciclo-status-card');
-  if (!card) return;
-  card.className = 'ciclo-status-card '+est;
-  var labelEl = document.getElementById('ciclo-status-label');
-  var detailEl = document.getElementById('ciclo-status-detail');
-  var closeBtn = document.getElementById('ciclo-close-btn');
-  var labels = {
-    inactivo: 'Sin ciclo configurado',
-    pendiente: 'Ciclo configurado — Pendiente de inicio',
-    captura: 'Ciclo activo · Fase 1: Captura de metas',
-    entre_fases: 'Entre fases · Esperando inicio de revisión',
-    revision: 'Ciclo activo · Fase 2: Revisión de metas',
-    cerrado: 'Ciclo cerrado'
-  };
-  labelEl.textContent = labels[est] || est;
-  if (!ciclo || !ciclo.faseCaptura) {
-    detailEl.textContent = 'Define las fechas del ciclo y guarda la configuración para activarlo automáticamente.';
-    if (closeBtn) closeBtn.style.display = 'none';
-    cicloUpdatePhaseBadges(null, est);
-    return;
-  }
-  var hoy = new Date(); hoy.setHours(0,0,0,0);
-  var c0 = cicloParseDate(ciclo.faseCaptura.inicio);
-  var c1 = cicloParseDate(ciclo.faseCaptura.fin);
-  var r0 = cicloParseDate(ciclo.faseRevision.inicio);
-  var r1 = cicloParseDate(ciclo.faseRevision.fin);
-  function diasRest(d) {
-    if (!d) return 0;
-    return Math.max(0, Math.round((d-hoy)/(1000*60*60*24)));
-  }
-  var details = {
-    pendiente: 'El ciclo abrirá para captura el '+cicloFmtDate(ciclo.faseCaptura.inicio)+'. Faltan '+diasRest(c0)+' día'+(diasRest(c0)===1?'':'s')+'.',
-    captura: 'Los usuarios enlace pueden configurar metas hasta el '+cicloFmtDate(ciclo.faseCaptura.fin)+'. Quedan '+diasRest(c1)+' día'+(diasRest(c1)===1?'':'s')+'.',
-    entre_fases: 'La fase de captura cerró. La revisión de metas abrirá el '+cicloFmtDate(ciclo.faseRevision.inicio)+'.',
-    revision: 'Los usuarios revisor pueden validar metas hasta el '+cicloFmtDate(ciclo.faseRevision.fin)+'. Quedan '+diasRest(r1)+' día'+(diasRest(r1)===1?'':'s')+'.',
-    cerrado: ciclo.cerradoManualmente ? 'Cerrado manualmente por el administrador.' : 'El ciclo finalizó el '+cicloFmtDate(ciclo.faseRevision.fin)+'.'
-  };
-  detailEl.textContent = details[est] || '';
-  var showClose = (est==='pendiente'||est==='captura'||est==='entre_fases'||est==='revision');
-  if (closeBtn) closeBtn.style.display = showClose ? '' : 'none';
-  cicloUpdatePhaseBadges(ciclo, est);
-}
-
-function cicloUpdatePhaseBadges(ciclo, est) {
-  var cb = document.getElementById('ciclo-c-phase-badge');
-  var rb = document.getElementById('ciclo-r-phase-badge');
-  if (!cb||!rb) return;
-  cb.style.display = 'none'; rb.style.display = 'none';
-  if (!ciclo) return;
-  var map = {
-    pendiente:    ['pendiente-p','Pendiente',   'pendiente-p','Pendiente'],
-    captura:      ['activa',     'Activa ahora','pendiente-p','Pendiente'],
-    entre_fases:  ['cerrada',    'Cerrada',     'pendiente-p','Pendiente'],
-    revision:     ['cerrada',    'Cerrada',     'activa',     'Activa ahora'],
-    cerrado:      ['cerrada',    'Cerrada',     'cerrada',    'Cerrada']
-  };
-  var v = map[est]; if (!v) return;
-  cb.className='phase-badge '+v[0]; cb.textContent=v[1]; cb.style.display='';
-  rb.className='phase-badge '+v[2]; rb.textContent=v[3]; rb.style.display='';
-}
-
-function cicloPopulateForm() {
-  var ids = ['ciclo-c-inicio','ciclo-c-fin','ciclo-r-inicio','ciclo-r-fin'];
-  ids.forEach(function(id) { if (!_cpState[id]) cpInit(id, cicloUpdateDurs); });
-  var ciclo = cicloLoad();
-  if (!ciclo) return;
-  if (ciclo.faseCaptura) {
-    cpSetValue('ciclo-c-inicio', ciclo.faseCaptura.inicio);
-    cpSetValue('ciclo-c-fin',    ciclo.faseCaptura.fin);
-  }
-  if (ciclo.faseRevision) {
-    cpSetValue('ciclo-r-inicio', ciclo.faseRevision.inicio);
-    cpSetValue('ciclo-r-fin',    ciclo.faseRevision.fin);
-  }
-  cicloUpdateDurs();
-}
-
-window.saveCiclo = function() {
-  var cI = cpGetValue('ciclo-c-inicio');
-  var cF = cpGetValue('ciclo-c-fin');
-  var rI = cpGetValue('ciclo-r-inicio');
-  var rF = cpGetValue('ciclo-r-fin');
-  if (!cI||!cF||!rI||!rF) { showToast('Completa todas las fechas antes de guardar.','error'); return; }
-  if (cF < cI) { showToast('El cierre de captura debe ser posterior a la apertura.','error'); return; }
-  if (rF < rI) { showToast('El cierre de revisión debe ser posterior a la apertura.','error'); return; }
-  if (rI <= cF) { showToast('La revisión debe iniciar después del cierre de captura.','error'); return; }
-  var ciclo = { faseCaptura:{inicio:cI,fin:cF}, faseRevision:{inicio:rI,fin:rF}, cerradoManualmente:false };
-  try { localStorage.setItem(CICLO_KEY, JSON.stringify(ciclo)); } catch(e) {}
-  cicloRenderStatus();
-  showToast('Ciclo guardado correctamente.','success');
-};
-
-window.closeCicloManual = function() {
-  if (!confirm('¿Cerrar el ciclo anticipadamente? Los usuarios enlace y revisor perderán acceso inmediatamente.')) return;
-  var ciclo = cicloLoad();
-  if (!ciclo) return;
-  ciclo.cerradoManualmente = true;
-  try { localStorage.setItem(CICLO_KEY, JSON.stringify(ciclo)); } catch(e) {}
-  cicloRenderStatus();
-  showToast('Ciclo cerrado.','success');
-};
-
-// ── Custom Date Picker ──────────────────────────────────────────
-var _cpState = {};
-var _CP_MESES_LONG = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-var _CP_MESES_SHORT = ['ene.','feb.','mar.','abr.','may.','jun.','jul.','ago.','sep.','oct.','nov.','dic.'];
-
-function cpInit(id, onChange) {
-  var today = new Date();
-  _cpState[id] = { value: null, year: today.getFullYear(), month: today.getMonth(), onChange: onChange || null };
-  cpRender(id);
-}
-
-window.cpToggle = function(id) {
-  var drop = document.getElementById('dp-drop-'+id);
-  var trg  = document.getElementById('dp-trg-'+id);
-  if (!drop) return;
-  var isOpen = drop.style.display !== 'none';
-  Object.keys(_cpState).forEach(function(k) {
-    var d = document.getElementById('dp-drop-'+k);
-    var t = document.getElementById('dp-trg-'+k);
-    if (d) d.style.display = 'none';
-    if (t) t.classList.remove('open');
-  });
-  if (!isOpen) {
-    drop.style.display = '';
-    if (trg) trg.classList.add('open');
-  }
-};
-
-window.cpNav = function(id, delta) {
-  var st = _cpState[id]; if (!st) return;
-  st.month += delta;
-  if (st.month > 11) { st.month = 0; st.year++; }
-  if (st.month < 0)  { st.month = 11; st.year--; }
-  cpRender(id);
-};
-
-window.cpSelect = function(id, y, m, d) {
-  var st = _cpState[id]; if (!st) return;
-  st.value = new Date(y, m, d);
-  st.year = y; st.month = m;
-  var drop = document.getElementById('dp-drop-'+id);
-  var trg  = document.getElementById('dp-trg-'+id);
-  if (drop) drop.style.display = 'none';
-  if (trg) trg.classList.remove('open');
-  cpUpdateText(id);
-  cpRender(id);
-  if (st.onChange) st.onChange();
-};
-
-function cpGetValue(id) {
-  var st = _cpState[id];
-  if (!st||!st.value) return '';
-  var d = st.value;
-  var mm = ('0'+(d.getMonth()+1)).slice(-2);
-  var dd = ('0'+d.getDate()).slice(-2);
-  return d.getFullYear()+'-'+mm+'-'+dd;
-}
-
-function cpSetValue(id, valStr) {
-  if (!valStr) return;
-  var p = valStr.split('-');
-  var st = _cpState[id]; if (!st) return;
-  st.value = new Date(+p[0], +p[1]-1, +p[2]);
-  st.year = +p[0]; st.month = +p[1]-1;
-  cpUpdateText(id);
-  cpRender(id);
-}
-
-function cpUpdateText(id) {
-  var el = document.getElementById('dp-text-'+id);
-  if (!el) return;
-  var st = _cpState[id];
-  if (!st||!st.value) {
-    el.textContent = 'Seleccionar fecha';
-    el.classList.add('placeholder');
-  } else {
-    var d = st.value;
-    el.textContent = d.getDate()+' '+_CP_MESES_SHORT[d.getMonth()]+' '+d.getFullYear();
-    el.classList.remove('placeholder');
-  }
-}
-
-function cpRender(id) {
-  var grid = document.getElementById('dp-grid-'+id);
-  var hdr  = document.getElementById('dp-hdr-'+id);
-  if (!grid||!hdr) return;
-  var st = _cpState[id];
-  hdr.textContent = _CP_MESES_LONG[st.month]+' '+st.year;
-  var today = new Date(); today.setHours(0,0,0,0);
-  var firstDay = new Date(st.year, st.month, 1);
-  var lastDay  = new Date(st.year, st.month+1, 0);
-  var startDow = (firstDay.getDay()+6)%7; // Mon=0
-  var lastDow  = (lastDay.getDay()+6)%7;
-  var html = '';
-  for (var i = 0; i < startDow; i++) html += '<div class="cp-dp-day other-month"></div>';
-  for (var d = 1; d <= lastDay.getDate(); d++) {
-    var dDate = new Date(st.year, st.month, d); dDate.setHours(0,0,0,0);
-    var isToday = dDate.getTime()===today.getTime();
-    var isSel   = st.value && new Date(st.value.getFullYear(), st.value.getMonth(), st.value.getDate()).getTime()===dDate.getTime();
-    var cls = 'cp-dp-day'+(isToday?' today':'')+(isSel?' selected':'');
-    html += '<button class="'+cls+'" onclick="cpSelect(\''+id+'\','+st.year+','+st.month+','+d+')" type="button">'+d+'</button>';
-  }
-  var trailing = lastDow < 6 ? 6-lastDow : 0;
-  for (var n = 0; n < trailing; n++) html += '<div class="cp-dp-day other-month"></div>';
-  grid.innerHTML = html;
-}
-
-document.addEventListener('click', function(e) {
-  if (!e.target.closest || !e.target.closest('.cp-datepicker')) {
-    Object.keys(_cpState).forEach(function(k) {
-      var d = document.getElementById('dp-drop-'+k);
-      var t = document.getElementById('dp-trg-'+k);
-      if (d) d.style.display = 'none';
-      if (t) t.classList.remove('open');
-    });
-  }
-});
 </script>
 <!-- Gestión de usuarios contra la API (HU-R7-07); sustituye los datos simulados de arriba -->
 <script src="usuarios-admin.js"></script>
 <!-- Ventanas de captura contra la API (HU-R3-01) -->
 <script src="ventanas-admin.js"></script>
+<!-- Apertura del ciclo de planeación contra la API (PRD0_1, ticket 8) -->
+<script src="planeacion-ciclo.js"></script>
+<script src="configuracion-ciclo.js"></script>
 <script src="dev-toolbar.js"></script>
 </body>
 </html>

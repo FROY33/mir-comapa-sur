@@ -57,6 +57,7 @@ export function crearApp(
     'GET /api/planeacion/ciclo-vigente': protegida(TODOS, planeacion.vigente(bd)),
 
     // Solo Administrador: todo lo que cuelga de /api/admin/ (HU-R7-03 CA_3, CA_6)
+    'POST /api/admin/planeacion/ciclos': protegida(['admin'], planeacion.abrir(bd)),   // apertura del ciclo de planeación (PRD0_1)
     'GET /api/admin/configuracion': protegida(['admin'], async () => ({
       status: 200, cuerpo: { frecuencias: await listarFrecuencias(bd) },
     })),
