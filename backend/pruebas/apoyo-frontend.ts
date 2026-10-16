@@ -9,7 +9,7 @@ export const RAIZ = path.resolve(import.meta.dirname, '../..')
 export const archivo = (nombre: string) => readFileSync(path.join(RAIZ, nombre), 'utf8')
 
 /** Los scripts de sesión en el orden en que los carga cada página, como un solo código. */
-export const codigoSesion = () => ['session.js', 'guardia.js', 'vistas-mir.js'].map(archivo).join('\n;\n')
+export const codigoSesion = () => ['session.js', 'guardia.js', 'vistas-mir.js', 'planeacion-ciclo.js'].map(archivo).join('\n;\n')
 
 /** El <script> en línea de `pagina` que contiene `marca` (las vistas tienen su código en el HTML). */
 export function scriptDePagina(pagina: string, marca: string): string {

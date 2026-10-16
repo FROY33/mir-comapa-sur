@@ -13,6 +13,7 @@ import * as indicadoresAdmin from './indicadoresAdmin.js'
 import * as indicadoresCambios from './indicadoresCambios.js'
 import * as mediosVerificacion from './mediosVerificacion.js'
 import * as pendientes from './pendientes.js'
+import * as planeacion from './planeacion.js'
 import type { Log } from './log.js'
 import type { Rol } from './rutas.js'
 import * as usuarios from './usuarios.js'
@@ -51,6 +52,9 @@ export function crearApp(
 
     // Reportes del periodo abierto de la gerencia, con los pendientes del Enlace (HU-R1-01)
     'GET /api/pendientes': protegida(TODOS, pendientes.listar(bd)),
+
+    // Ciclo de planeación de metas vigente y su fase, para navegación y dashboards (PRD0_1)
+    'GET /api/planeacion/ciclo-vigente': protegida(TODOS, planeacion.vigente(bd)),
 
     // Solo Administrador: todo lo que cuelga de /api/admin/ (HU-R7-03 CA_3, CA_6)
     'GET /api/admin/configuracion': protegida(['admin'], async () => ({

@@ -9,6 +9,7 @@
   <script src="session.js"></script>
   <script src="guardia.js"></script>
   <script src="vistas-mir.js"></script>
+  <script src="planeacion-ciclo.js"></script>
   <script src="mock-notifications.js"></script>
   <script src="mir-actividades-data.js"></script>
   <script src="demo-data.js"></script>
@@ -207,9 +208,9 @@
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
       <span class="nav-label">Notificaciones</span>
     </div>
-    <a class="nav-item" href="planeacion-enlace.html" title="Planeación">
+    <a id="navPlaneacionMetas" class="nav-item" href="planeacion-metas-enlace.html" title="Planeación de metas" style="display:none">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-      <span class="nav-label">Planeación</span>
+      <span class="nav-label">Planeación de metas</span>
     </a>
   </div>
   <div class="sidebar-bottom">
@@ -418,75 +419,12 @@ function pintarDashboardEnlace() {
 pintarDashboardEnlace();
 cargarPendientesEnlace().then(function (d) { if (d) pintarDashboardEnlace(); });
 
-// ── Banner ciclo de planeación ────────────────────────────────────────
-(function() {
-  var CICLO_KEY = 'comapa-ciclo';
-  function cpParseDate(s) {
-    if (!s) return null;
-    var p = s.split('-');
-    var d = new Date(+p[0], +p[1]-1, +p[2]); d.setHours(0,0,0,0); return d;
-  }
-  function cpGetEstado(c) {
-    if (!c||!c.faseCaptura||!c.faseRevision) return 'inactivo';
-    if (c.cerradoManualmente) return 'cerrado';
-    var h = new Date(); h.setHours(0,0,0,0);
-    var c0=cpParseDate(c.faseCaptura.inicio), c1=cpParseDate(c.faseCaptura.fin);
-    var r0=cpParseDate(c.faseRevision.inicio), r1=cpParseDate(c.faseRevision.fin);
-    if (!c0||!c1||!r0||!r1) return 'inactivo';
-    if (h<c0) return 'pendiente';
-    if (h>=c0&&h<=c1) return 'captura';
-    if (h>c1&&h<r0) return 'entre_fases';
-    if (h>=r0&&h<=r1) return 'revision';
-    return 'cerrado';
-  }
-  function cpFmt(s) {
-    if (!s) return '';
-    var p=s.split('-'), ms=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-    return +p[2]+' '+ms[+p[1]-1]+'. '+p[0];
-  }
-  function cpDias(d) {
-    var h=new Date(); h.setHours(0,0,0,0);
-    return Math.max(0,Math.round((d-h)/(1000*60*60*24)));
-  }
-  try {
-    var ciclo = JSON.parse(localStorage.getItem(CICLO_KEY));
-    var est = cpGetEstado(ciclo);
-    var banner = null;
-    if (est==='captura') {
-      var c1 = cpParseDate(ciclo.faseCaptura.fin);
-      var dias = cpDias(c1);
-      banner = {
-        bg:'#ECFDF5', border:'#BBF7D0', dot:'#10B981',
-        title: 'Ciclo de planeación abierto — Configura tus metas',
-        detail: 'Tienes hasta el '+cpFmt(ciclo.faseCaptura.fin)+' para configurar y enviar las metas de tus indicadores. '+
-                (dias===0?'Vence hoy.': dias===1?'Queda 1 día.':'Quedan '+dias+' días.'),
-        href: 'planeacion-metas-enlace.html', btn: 'Ir a mis metas'
-      };
-    } else if (est==='pendiente') {
-      banner = {
-        bg:'#FFF7ED', border:'#FED7AA', dot:'#F97316',
-        title: 'Ciclo de planeación próximo',
-        detail: 'El período de captura de metas abrirá el '+cpFmt(ciclo.faseCaptura.inicio)+'. Se avisará cuando esté disponible.',
-        href: null, btn: null
-      };
-    }
-    if (!banner) return;
-    var el = document.createElement('div');
-    el.className = 'cp-banner';
-    el.style.cssText = 'background:'+banner.bg+';border-color:'+banner.border+';';
-    el.innerHTML = '<div class="cp-banner-dot" style="background:'+banner.dot+(est==='captura'?';animation:cp-pulse-g 2s infinite':'')+';"></div>'
-      +'<div class="cp-banner-info"><div class="cp-banner-title">'+escaparHTML(banner.title)+'</div><div class="cp-banner-detail">'+escaparHTML(banner.detail)+'</div></div>'
-      +(banner.btn?'<button class="cp-banner-btn" onclick="location.href=\''+banner.href+'\'">'+banner.btn+'</button>':'');
-    var ks = document.createElement('style');
-    ks.textContent = '@keyframes cp-pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4);}50%{box-shadow:0 0 0 5px rgba(16,185,129,0);}}';
-    document.head.appendChild(ks);
-    var hero = document.querySelector('.dash-hero');
-    if (hero) hero.parentNode.insertBefore(el, hero);
-  } catch(e) {}
-})();
+// ── Aviso del ciclo de planeación: de la API, no de localStorage ──────
+pintarAvisoCiclo();
 </script>
 <!-- Periodo abierto y fecha límite (HU-R3-01 CA_6) -->
 <script>pintarPeriodosAbiertos();</script>
 <script src="dev-toolbar.js"></script>
+<script>pintarNavPlaneacion();</script>
 </body>
 </html>

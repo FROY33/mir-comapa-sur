@@ -13,7 +13,7 @@
 | METAS_PLANEACION y METAS_PERIODO | `db/migrations/20261014000004_metas_planeacion.sql` |
 | Diccionario | `db/DICCIONARIO-PLANEACION.md`; referencias en `DICCIONARIO.md`, `EXTENSION.md`, `DECISIONES.md`, `README.md` |
 | Pruebas SQL | `db/pruebas/modelo-metas.sql` (35); comprobaciones de actualización `db/pruebas/actualizacion.sql` |
-| Permisos del rol de la app | `db/permisos.sql` (SELECT en versiones y medios) y 2 pruebas en `pruebas/permisos.test.ts` |
+| Permisos del rol de la app | `db/permisos.sql` (SELECT en versiones y medios; INSERT de ciclos e INSERT/UPDATE de metas) y pruebas en `pruebas/permisos.test.ts` |
 
 ## Decisiones aprobadas (14/10/2026)
 
@@ -59,4 +59,4 @@ db/probar.sh            → 5 pasos en orden (35 + 58 pruebas SQL)
   una migración posterior, después de cambiar ese código.
 - **Versión 1 de los reportes de S1:** se armó con la configuración del indicador al migrar; la historia
   previa no existía. La foto de S1 de esos reportes sigue intacta.
-- **Ciclos y metas sin código:** las HU R4 los llenarán; hasta entonces el rol de la app no tiene permisos sobre ellos.
+- **Ciclos y metas:** el rol de la app lee ambos, abre ciclos (`INSERT`) y genera y actualiza metas (`INSERT`/`UPDATE`), sin `DELETE` (PRD0_1, base compartida). Una meta histórica sigue sin poder modificarse por el trigger.
