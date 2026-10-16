@@ -1,4 +1,4 @@
-// Recorrido de la planeación de metas de punta a punta (PRD0_1, issue 023, primer criterio).
+// Recorrido de la planeación de metas de punta a punta (tickets 8 y 9: HU-R4-01, HU-R4-02).
 // Levanta el backend y el sitio reales sobre una base propia (el «ciclo vigente» es global y un ciclo
 // abierto en la base compartida cambiaría el catálogo en otras pruebas) y recorre, con cookies y por
 // el origen del sitio como un navegador: el Administrador abre el ciclo (HU-R4-01) y cada Enlace ve

@@ -127,7 +127,7 @@ describe('con el modelo de versiones y metas', () => {
     await intentar('DELETE FROM metas_periodo')
   })
 
-  test('abre ciclos y genera y actualiza metas, pero nunca las borra; una meta histórica no se modifica (PRD0_1)', async () => {
+  test('abre ciclos y genera y actualiza metas, pero nunca las borra; una meta histórica no se modifica (tickets 8 y 9)', async () => {
     const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
     const [c] = await app.consultar<{ id: string }>(
       `INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision)

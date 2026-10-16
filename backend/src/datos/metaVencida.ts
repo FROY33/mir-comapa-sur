@@ -1,4 +1,4 @@
-// Marca vencida de las metas (PRD0_1, ticket 9; HU-R4-02 CA_5, RN_2): pasado el fin de captura, las
+// Marca vencida de las metas (ticket 9, HU-R4-02 CA_5, RN_2): pasado el fin de captura, las
 // metas que siguen en `meta_pendiente` o `borrador_meta` quedan con `vencida = true`. Es una marca, no
 // un estado, y nada la quita: ningún código escribe `vencida = false`. Cada meta marcada deja
 // `meta_vencida` en la bitácora, y correrla otra vez no duplica nada (solo toca las no marcadas).

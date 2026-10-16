@@ -1,4 +1,4 @@
-// PRD0_1, ticket 9, en el navegador (HU-R4-02): planeacion-metas-enlace.js pinta la lista de
+// Ticket 9, en el navegador (HU-R4-02): planeacion-metas-enlace.js pinta la lista de
 // GET /api/planeacion/pendientes. Se ejecuta el código real con un DOM mínimo.
 
 import assert from 'node:assert/strict'

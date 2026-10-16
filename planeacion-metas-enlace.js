@@ -1,4 +1,4 @@
-// planeacion-metas-enlace.js — Lista de metas por configurar del Enlace (PRD0_1, ticket 9; HU-R4-02).
+// planeacion-metas-enlace.js — Lista de metas por configurar del Enlace (ticket 9, HU-R4-02).
 // Todo viene de GET /api/planeacion/pendientes: la gerencia la decide el servidor por la sesión.
 // Requiere session.js (pedir, escaparHTML) y vistas-mir.js (formatFecha).
 

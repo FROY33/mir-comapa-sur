@@ -59,4 +59,4 @@ db/probar.sh            → 5 pasos en orden (35 + 58 pruebas SQL)
   una migración posterior, después de cambiar ese código.
 - **Versión 1 de los reportes de S1:** se armó con la configuración del indicador al migrar; la historia
   previa no existía. La foto de S1 de esos reportes sigue intacta.
-- **Ciclos y metas:** el rol de la app lee ambos, abre ciclos (`INSERT`) y genera y actualiza metas (`INSERT`/`UPDATE`), sin `DELETE` (PRD0_1, base compartida). Una meta histórica sigue sin poder modificarse por el trigger.
+- **Ciclos y metas:** el rol de la app lee ambos, abre ciclos (`INSERT`) y genera y actualiza metas (`INSERT`/`UPDATE`), sin `DELETE` (tickets 8 y 9). Una meta histórica sigue sin poder modificarse por el trigger.

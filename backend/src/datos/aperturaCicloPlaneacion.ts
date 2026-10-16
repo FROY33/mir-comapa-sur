@@ -1,4 +1,4 @@
-// Apertura del ciclo de planeación de metas (PRD0_1, ticket 8; HU-R4-01).
+// Apertura del ciclo de planeación de metas (ticket 8, HU-R4-01).
 //
 // En la transacción `tx` de quien abre: aplica los cambios programados vencidos (sin filtro, antes de
 // generar las metas, para que cada meta nazca con la gerencia y la versión ya vigentes), crea el ciclo,

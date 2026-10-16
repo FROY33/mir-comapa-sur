@@ -1,4 +1,4 @@
-// PRD0_1, ticket 9 (HU-R4-02 CA_5, RN_2): `marcarVencidas` y su uso al listar y en la tarea automática.
+// Ticket 9 (HU-R4-02 CA_5, RN_2): `marcarVencidas` y su uso al listar y en la tarea automática.
 // Base propia: el ciclo vigente es global.
 
 import assert from 'node:assert/strict'

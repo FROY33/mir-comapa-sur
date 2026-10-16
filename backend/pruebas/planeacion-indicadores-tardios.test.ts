@@ -1,4 +1,4 @@
-// PRD0_1, ticket 8 (issue 019): un indicador dado de alta o reactivado con un ciclo abierto recibe su
+// Ticket 8 (HU-R4-01 CA_2): un indicador dado de alta o reactivado con un ciclo abierto recibe su
 // meta pendiente en la misma transacción. El ciclo vigente es global: base propia, ciclos limpiados entre pruebas.
 
 import assert from 'node:assert/strict'

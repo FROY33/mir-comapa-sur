@@ -1,4 +1,4 @@
-// PRD0_1, ticket 8, en el navegador: configuracion-ciclo.js (sección «Ciclo de planeación» de
+// Ticket 8 (HU-R4-01), en el navegador: configuracion-ciclo.js (sección «Ciclo de planeación» de
 // configuracion.html) abre el ciclo por la API, muestra los errores junto al campo, pide confirmación
 // antes de abrir y pinta el resumen. DOM mínimo; el servidor se simula en window.respuestas.
 

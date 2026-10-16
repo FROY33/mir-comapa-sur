@@ -1,4 +1,4 @@
-// Metas pendientes del Enlace (PRD0_1, ticket 9; HU-R4-02): las metas vigentes del ciclo vigente que
+// Metas pendientes del Enlace (ticket 9, HU-R4-02): las metas vigentes del ciclo vigente que
 // aún piden acción de la gerencia (`meta_pendiente` y `borrador_meta`). La gerencia sale de la versión
 // del indicador a la que apunta la meta, no de `indicadores.gerencia_id`, para que una reasignación
 // posterior no la mueva antes de tiempo. `meta_anterior` es la meta validada del ejercicio − 1 (HU-R4-02

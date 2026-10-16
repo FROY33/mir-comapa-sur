@@ -1,4 +1,4 @@
-// PRD0_1, ticket 8 (HU-R4-01 CA_6, issue 018): historial de ciclos del Administrador.
+// Ticket 8 (HU-R4-01 CA_6): historial de ciclos del Administrador.
 // GET /api/admin/planeacion/ciclos. El ciclo vigente es global, así que corre en una base propia.
 
 import assert from 'node:assert/strict'
@@ -8,7 +8,7 @@ import { crearCiclo, crearGerencia, crearIndicador, entrar, prepararBase, type B
 
 const RUTA = '/api/admin/planeacion/ciclos'
 
-describe('historial de ciclos de planeación (issue 018)', () => {
+describe('historial de ciclos de planeación (HU-R4-01 CA_6)', () => {
   let base: BasePlaneacion
   let app: Awaited<ReturnType<typeof levantar>>
   let g: Gerencia

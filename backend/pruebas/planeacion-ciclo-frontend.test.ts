@@ -1,4 +1,4 @@
-// PRD0_1, base compartida, en el navegador: planeacion-ciclo.js decide, según GET
+// Tickets 8 y 9, base compartida, en el navegador: planeacion-ciclo.js decide, según GET
 // /api/planeacion/ciclo-vigente, si el Enlace ve «Planeación de metas» y el aviso del dashboard.
 // Nada sale de localStorage: lo que se muestra viene del servidor.
 

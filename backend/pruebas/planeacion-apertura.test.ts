@@ -1,4 +1,4 @@
-// PRD0_1, ticket 8 (HU-R4-01, issue 017): el Administrador abre el ciclo de planeación.
+// Ticket 8 (HU-R4-01): el Administrador abre el ciclo de planeación.
 // POST /api/admin/planeacion/ciclos. El ciclo vigente es global y el ejercicio solo puede ser el actual
 // o el siguiente, así que corre en una base propia y limpia los ciclos entre pruebas.
 

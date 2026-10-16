@@ -1,4 +1,4 @@
-// configuracion-ciclo.js — Sección «Ciclo de planeación» de configuracion.html (PRD0_1, ticket 8).
+// configuracion-ciclo.js — Sección «Ciclo de planeación» de configuracion.html (ticket 8, HU-R4-01).
 // Lee GET /api/planeacion/ciclo-vigente y abre el ciclo con POST /api/admin/planeacion/ciclos; ya no
 // guarda nada en localStorage. El historial viene de GET /api/admin/planeacion/ciclos. Requiere session.js (pedir, escaparHTML), vistas-mir.js (formatFecha),
 // planeacion-ciclo.js (cargarCicloVigente, diasEntre) y showToast de la página.

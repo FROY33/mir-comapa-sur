@@ -1,4 +1,4 @@
-// PRD0_1, ticket 9: GET /api/planeacion/pendientes (HU-R4-02). Base propia (el ciclo vigente es global)
+// Ticket 9: GET /api/planeacion/pendientes (HU-R4-02). Base propia (el ciclo vigente es global)
 // y metas creadas con la ayuda de pruebas, sin depender de la apertura.
 
 import assert from 'node:assert/strict'

@@ -1,4 +1,4 @@
-// planeacion-ciclo.js — Ciclo de planeación de metas vigente (PRD0_1). Lo que se muestra viene de
+// planeacion-ciclo.js — Ciclo de planeación de metas vigente (tickets 8 y 9). Lo que se muestra viene de
 // GET /api/planeacion/ciclo-vigente, no de localStorage. Requiere session.js (pedir, escaparHTML) y
 // vistas-mir.js (formatFecha).
 

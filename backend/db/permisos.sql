@@ -39,7 +39,7 @@ GRANT SELECT, INSERT                 ON reportes         TO :"app";   -- generac
 GRANT SELECT, INSERT                 ON bitacora         TO :"app";   -- solo inserción (TEC-05 CA-5)
 -- Catálogo administrable (HU-R4-11): lee metas para decidir la vigencia futura (CA_4) y calcular el cumplimiento (RN_3)
 GRANT SELECT                         ON ciclos_planeacion, metas_planeacion, metas_periodo TO :"app";
--- Planeación de metas (PRD0_1, R4-01 y R4-02): la app abre el ciclo (INSERT) y genera y avanza las metas
+-- Planeación de metas (tickets 8 y 9: HU-R4-01 y HU-R4-02): la app abre el ciclo (INSERT) y genera y avanza las metas
 -- (INSERT/UPDATE; la marca vencida, el borrador). Nunca DELETE: las metas se versionan, no se borran, y
 -- una versión histórica no se modifica (trigger). Cerrar un ciclo (UPDATE) y escribir metas_periodo
 -- se agregan con R4-04/R4-05, junto con su prueba.

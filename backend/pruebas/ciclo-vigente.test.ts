@@ -1,4 +1,4 @@
-// PRD0_1, base compartida: fase del ciclo de planeación (función pura) y GET /api/planeacion/ciclo-vigente.
+// Tickets 8 y 9 (HU-R4-01, HU-R4-02), base compartida: fase del ciclo de planeación (función pura) y GET /api/planeacion/ciclo-vigente.
 // El ciclo vigente es global, así que la API se prueba en una base propia.
 
 import assert from 'node:assert/strict'
@@ -11,7 +11,7 @@ const ciclo = (c: Partial<CicloPlaneacion> = {}): CicloPlaneacion => ({
   inicio_captura: '2026-11-01', fin_captura: '2026-11-15', inicio_revision: '2026-11-20', cerrado_manual: false, ...c,
 })
 
-describe('fase del ciclo (PRD0_1, «Fase del ciclo»)', () => {
+describe('fase del ciclo (HU-R4-01, HU-R4-02)', () => {
   test('programado antes de la captura', () => {
     assert.equal(faseCiclo(ciclo(), '2026-10-31'), 'programado')
   })

@@ -1,4 +1,4 @@
-// Ciclo de planeación de metas (PRD0_1, «Fase del ciclo»). La fase no se guarda: se calcula de las
+// Ciclo de planeación de metas (HU-R4-01, HU-R4-02). La fase no se guarda: se calcula de las
 // fechas del ciclo y de `cerrado_manual` para un día dado. Las fechas son días calendario en la zona
 // de la base, como en el resto del sistema.
 

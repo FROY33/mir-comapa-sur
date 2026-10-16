@@ -1,4 +1,4 @@
-// Indicadores tardíos (PRD0_1, ticket 8; HU-R4-01 CA_2). Con un ciclo de planeación abierto (no cerrado),
+// Indicadores tardíos (ticket 8, HU-R4-01 CA_2). Con un ciclo de planeación abierto (no cerrado),
 // el indicador que se da de alta o se reactiva recibe su meta pendiente en la misma transacción del catálogo.
 // Si la creación falla, la transacción de quien llama se revierte completa.
 

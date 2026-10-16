@@ -1,4 +1,4 @@
-// Planeación de metas (PRD0_1).
+// Planeación de metas (tickets 8 y 9: HU-R4-01, HU-R4-02).
 //   GET /api/planeacion/ciclo-vigente   los tres roles: el ciclo no cerrado más reciente y su fase.
 //   GET /api/planeacion/pendientes      solo Enlace: sus metas por configurar en el ciclo vigente (ticket 9).
 //   POST /api/admin/planeacion/ciclos   solo Administrador: abre el ciclo de un ejercicio (ticket 8).
@@ -66,7 +66,7 @@ const invalido = (campo: string, mensaje: string) => error(422, 'datos_invalidos
 const fechaReal = (v: unknown): v is string =>
   typeof v === 'string' && FECHA.test(v) && new Date(`${v}T00:00:00Z`).toISOString().slice(0, 10) === v
 
-/** Valida el cuerpo; devuelve los datos limpios o el primer error con su campo (PRD0_1, «Validación»). */
+/** Valida el cuerpo; devuelve los datos limpios o el primer error con su campo (HU-R4-01 CA_3). */
 function validarApertura(c: Record<string, unknown>, hoy: string): { ejercicio: number; inicio: string; fin: string; revision: string } | Respuesta {
   const anio = Number(hoy.slice(0, 4))
   if (c.ejercicio === undefined || c.ejercicio === null || c.ejercicio === '') return invalido('ejercicio', 'Falta el ejercicio')

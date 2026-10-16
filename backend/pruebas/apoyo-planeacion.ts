@@ -1,4 +1,4 @@
-// Ayuda de pruebas del ciclo de planeación (PRD0_1, base compartida de los tickets 8 y 9): una base
+// Ayuda de pruebas del ciclo de planeación (base compartida de los tickets 8 y 9): una base
 // propia (el «ciclo vigente» es global y en la compartida lo ensuciarían otras pruebas), y ciclos y
 // metas con identificadores reconocibles para probar el ticket 9 sin depender de la apertura.
 
