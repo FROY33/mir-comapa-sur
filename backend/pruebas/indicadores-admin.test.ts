@@ -8,6 +8,7 @@
 
 import assert from 'node:assert/strict'
 import { before, describe, test } from 'node:test'
+import { abrirCicloPlaneacion } from '../src/datos/aperturaCicloPlaneacion.js'
 import { abrirCiclos } from '../src/datos/ciclos.js'
 import { listarEventos } from '../src/datos/bitacora.js'
 import {
@@ -186,7 +187,20 @@ describe('HU-R4-11 CA_5: desactivar no borra ni afecta el historial', () => {
   })
 
   test.todo('HU-R4-11 CA_5 (diferido al ticket 5): el desactivado debe seguir en Consulta MIR — GET /api/indicadores filtra «WHERE i.activo» y lo oculta del listado')
-  test.todo('HU-R4-11 CA_5 (diferido al ticket 8): el desactivado no entra en ciclos de planeación nuevos — la generación de metas pendientes por indicador activo es del ticket 8')
+
+  test('HU-R4-11 CA_5: el desactivado no entra en ciclos de planeación nuevos (ticket 8)', async () => {
+    const activo = await altaApi()
+    const apagado = await altaApi()
+    await admin('POST', `/api/admin/indicadores/${apagado.id}/desactivar`, {})
+    const metas = await sinPersistir(async (tx) => {
+      await abrirCicloPlaneacion(tx, {
+        ejercicio: 2091, inicioCaptura: '2091-01-01', finCaptura: '2091-01-31', inicioRevision: '2091-02-05',
+        autor: usuarios.admin!.id, hoy: '2090-12-01',
+      })
+      return tx.consultar<{ indicador_id: string }>('SELECT indicador_id FROM metas_planeacion WHERE indicador_id = ANY($1)', [[activo.id, apagado.id]])
+    })
+    assert.deepEqual(metas.map((m) => m.indicador_id), [activo.id])
+  })
 })
 
 describe('HU-R4-11 RN_2: un indicador no se elimina', () => {

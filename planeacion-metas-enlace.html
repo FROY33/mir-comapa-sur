@@ -9,10 +9,8 @@
   <script src="session.js"></script>
   <script src="guardia.js"></script>
   <script src="vistas-mir.js"></script>
-  <script src="mir-gerencias-data.js"></script>
-  <script src="mir-actividades-data.js"></script>
-  <script src="demo-data.js"></script>
-  <script src="planeacion-data.js"></script>
+  <script src="planeacion-ciclo.js"></script>
+  <script src="planeacion-metas-enlace.js"></script>
   <style>
 *,*::before,*::after {margin:0;padding:0;box-sizing:border-box;}
 body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface);color:var(--color-text-primary);display:flex;min-height:100vh;}
@@ -28,112 +26,28 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
 .rp-badge.orange {background:var(--color-observado-tint);color:var(--color-observado);}
 .rp-badge.blue {background:var(--color-info-tint);color:var(--color-info);}
 .rp-badge.gray {background:var(--color-neutral-100);color:var(--color-text-secondary);}
-.alert-box {background:var(--color-observado-tint);border:1px solid var(--color-observado-tint);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--color-warning-text);}
-.alert-box svg {width:16px;height:16px;flex-shrink:0;margin-top:1px;color:var(--color-observado);}
-.filter-chips {display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
-.chip-count {font-size:10px;font-weight:700;background:rgba(0,0,0,.1);padding:1px 6px;border-radius:var(--radius-btn);}
-.cards-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
-.ind-card {background:white;border-radius:var(--radius-card);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--color-border);transition:border-color .15s,box-shadow .15s;cursor:pointer;}
-.ind-card:hover {border-color:var(--color-neutral-300);box-shadow:0 2px 8px rgba(0,0,0,.1);}
-.ind-card.observado {border-color:var(--color-observado-tint);}
-.ind-card.bloqueado {opacity:.8;}
-.card-top {display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
-.card-clave {font-family:monospace;font-size:11px;font-weight:700;color:var(--color-text-secondary);}
-.card-nombre {font-size:13px;font-weight:600;color:var(--color-text-primary);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.card-meta-row {display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
-.freq-pill {font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--radius-btn);background:var(--color-neutral-100);color:var(--color-text-primary);}
-.nivel-pill {font-size:10px;font-weight:800;width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;}
-.nivel-pill.F {background:var(--color-text-primary);color:white;}
-.nivel-pill.P {background:var(--color-text-primary);color:white;}
-.nivel-pill.C {background:var(--color-text-secondary);color:white;}
-.nivel-pill.A {background:var(--color-border);color:var(--color-text-primary);}
-.card-footer {display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid var(--color-border);}
-.btn-card {font-size:12px;font-weight:600;font-family:inherit;padding:6px 14px;border-radius:var(--radius-btn);border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;}
-.btn-card.primary {background:var(--color-primary);color:white;}
-.btn-card.primary:hover {background:var(--color-accent-dark);}
-.btn-card.secondary {background:var(--color-surface);color:var(--color-text-primary);}
-.btn-card.secondary:hover {background:var(--color-border);}
-.btn-card.info {background:var(--color-info-tint);color:var(--color-info);}
-.btn-card.warn {background:var(--color-observado-tint);color:var(--color-observado);border:1px solid var(--color-observado-tint);}
-.btn-card:disabled {opacity:.5;cursor:not-allowed;}
-.lock-icon {font-size:12px;}
-.modal-header-top {display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
-.modal-subtitle {font-size:11px;color:var(--color-text-secondary);}
-.modal-meta {display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.modal-body {flex:1;overflow-y:auto;padding:20px 24px;}
-.footer-right {display:flex;gap:8px;}
-.obs-callout {background:var(--color-observado-tint);border:1px solid var(--color-observado-tint);border-radius:12px;padding:14px 16px;margin-bottom:20px;}
-.obs-callout-title {font-size:12px;font-weight:700;color:#B45309;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
-.obs-callout-body {font-size:12px;color:var(--color-warning-text);line-height:1.6;}
-.readonly-notice {background:var(--color-success-tint);border:1px solid #BBF7D0;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--color-success-dark);display:flex;align-items:center;gap:8px;}
-.period-section-title {font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--color-border);}
-.period-grid {display:grid;gap:8px;margin-bottom:20px;}
-.period-grid.cols-2 {grid-template-columns:1fr 1fr;}
-.period-grid.cols-3 {grid-template-columns:1fr 1fr 1fr;}
-.period-grid.cols-4 {grid-template-columns:1fr 1fr 1fr 1fr;}
-.period-item {display:flex;flex-direction:column;gap:4px;}
-.period-label {font-size:11px;font-weight:600;color:var(--color-text-secondary);}
-.period-input {padding:7px 10px;font-size:13px;font-family:inherit;border:1px solid var(--color-border);border-radius:8px;background:white;outline:none;transition:border-color .15s;width:100%;}
-.period-input:focus {border-color:var(--color-primary);box-shadow:0 0 0 2px rgba(139,29,58,.08);}
-.period-input:read-only {background:var(--color-neutral-50);color:var(--color-text-secondary);cursor:not-allowed;}
-.period-input.filled {background:var(--color-success-tint);border-color:#BBF7D0;}
-.acum-total {background:var(--color-success-tint);border:1px solid #BBF7D0;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.acum-total-label {font-size:12px;font-weight:600;color:var(--color-success-strong);}
-.acum-total-val {font-size:16px;font-weight:700;color:var(--color-success-strong);}
-.comment-label {font-size:12px;font-weight:600;color:var(--color-text-primary);margin-bottom:5px;display:block;}
-.comment-textarea {width:100%;padding:10px 12px;font-size:12px;font-family:inherit;border:1px solid var(--color-border);border-radius:10px;resize:vertical;min-height:72px;outline:none;line-height:1.5;transition:border-color .15s;}
-.comment-textarea:focus {border-color:var(--color-primary);}
-.comment-textarea:read-only {background:var(--color-neutral-50);color:var(--color-text-secondary);}
-.btn-draft {background:var(--color-warning-tint);color:var(--color-warning-text);border:none;border-radius:var(--radius-btn);padding:8px 16px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;}
-.btn-draft:hover {background:#FDE68A;}
-.toast {position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--color-text-primary);color:white;font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius-btn);opacity:0;transition:all .25s;z-index:2000;pointer-events:none;white-space:nowrap;}
-.toast.show {opacity:1;transform:translateX(-50%) translateY(0);}
-.toast.success {background:var(--color-success-strong);}
-.toast.info {background:var(--color-info);}
-/* View toggle */
-    .view-toggle {display:inline-flex;background:var(--color-neutral-100);border-radius:var(--radius-btn);padding:3px;gap:2px;flex-shrink:0;}
-.vtab {font-size:11px;font-weight:600;font-family:inherit;padding:5px 14px;border-radius:var(--radius-btn);border:none;background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all .15s;}
-.vtab.active {background:white;color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,.1);}
-/* Impact callout */
-    .impact-callout {background:var(--color-info-tint);border:1px solid var(--color-info-tint);border-radius:10px;padding:11px 14px;margin-bottom:16px;font-size:12px;color:var(--color-info);line-height:1.6;display:flex;align-items:flex-start;gap:8px;}
-.impact-callout svg {flex-shrink:0;margin-top:1px;}
-/* Meta change form — in-modal */
-    .change-form-header {display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--color-border);}
-.change-form-back {background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:12px;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:4px;padding:0;}
-.change-form-back:hover {color:var(--color-text-primary);}
-/* Meta comparison table */
-    .meta-compare-grid {display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--color-border);border-radius:10px;overflow:hidden;margin-bottom:14px;}
-.meta-compare-col {padding:10px 12px;}
-.meta-compare-col:first-child {border-right:1px solid var(--color-border);}
-.meta-compare-head {font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
-.meta-compare-head.original {color:var(--color-text-secondary);}
-.meta-compare-head.nueva {color:var(--color-corregido);}
-.meta-compare-row {display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--color-neutral-100);}
-.meta-compare-row:last-child {border-bottom:none;}
-.meta-compare-val {font-weight:600;}
-.meta-compare-val.changed {color:var(--color-corregido);}
-/* Cambio en revisión status */
-    .cambio-status-box {background:var(--color-corregido-tint);border:1px solid #DDD6FE;border-radius:12px;padding:14px 16px;margin-bottom:16px;}
-.cambio-status-title {font-size:11px;font-weight:700;color:var(--color-corregido);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.cambio-motivo {font-size:11px;color:var(--color-corregido);margin-bottom:12px;background:var(--color-corregido-tint);border-radius:8px;padding:6px 10px;line-height:1.5;}
-/* Demo label on cards */
-    .demo-label {font-size:10px;font-weight:600;color:var(--color-text-secondary);background:var(--color-surface);border-radius:4px;padding:2px 6px;border:1px solid var(--color-border);}
-/* Solicitud cambio de meta — LEGACY (kept for sol-step CSS) */
-    .sol-status-box {background:var(--color-info-tint);border:1px solid #BAE6FD;border-radius:12px;padding:14px 16px;margin-bottom:16px;}
-.sol-status-title {font-size:11px;font-weight:700;color:#0369A1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.sol-timeline {display:flex;flex-direction:column;gap:0;}
-.sol-step {position:relative;display:flex;align-items:flex-start;gap:10px;}
-.sol-step:not(:last-child)::before {content:'';position:absolute;left:7px;top:18px;bottom:0;width:2px;background:var(--color-border);}
-.sol-step-dot {width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
-.sol-step-dot.done {background:var(--color-success);}
-.sol-step-dot.active {background:var(--color-primary);}
-.sol-step-dot.pending {background:var(--color-border);}
-.sol-step-dot.rejected {background:var(--color-danger);}
-.sol-step-text {padding-bottom:10px;}
-.sol-step-label {font-size:12px;font-weight:600;color:var(--color-text-primary);}
-.sol-step-label.dim {color:var(--color-text-secondary);font-weight:500;}
-.sol-step-sub {font-size:11px;color:var(--color-text-secondary);margin-top:1px;line-height:1.4;}
-.sol-motivo-chip {font-size:11px;color:#0369A1;margin-bottom:12px;background:var(--color-info-tint);border-radius:8px;padding:6px 10px;line-height:1.5;}
+.filtros {display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.filtros select {font-family:inherit;font-size:12px;padding:7px 10px;border:1px solid var(--color-border);border-radius:8px;background:white;}
+.meta-ciclo {font-size:12px;color:var(--color-text-secondary);margin-bottom:4px;}
+.meta-dias {font-size:13px;font-weight:600;margin-bottom:16px;color:var(--color-text-secondary);}
+.meta-dias[data-urgente="true"] {color:var(--color-danger);}
+.meta-mensaje:not(:empty) {background:white;border:1px dashed var(--color-border);border-radius:12px;padding:24px;text-align:center;font-size:13px;color:var(--color-text-secondary);}
+.meta-fila {display:flex;align-items:center;gap:16px;background:white;border:1px solid var(--color-border);border-radius:12px;padding:14px 16px;margin-bottom:10px;flex-wrap:wrap;}
+.meta-fila.meta-borrador {border-left:4px solid var(--color-observado);background:var(--color-observado-tint);}
+.meta-fila.meta-pendiente {border-left:4px solid var(--color-neutral-300);}
+.meta-fila.meta-vencida {border-color:var(--color-danger);}
+.meta-info {flex:1;min-width:200px;}
+.meta-codigo {font-family:monospace;font-size:11px;font-weight:700;color:var(--color-text-secondary);}
+.meta-nombre {font-size:13px;font-weight:600;line-height:1.4;margin-top:2px;}
+.meta-detalle {font-size:11px;color:var(--color-text-secondary);margin-top:2px;}
+.meta-anterior {font-size:11px;color:var(--color-text-secondary);margin-top:2px;}
+.meta-anterior strong {color:var(--color-text-primary);font-weight:500;}
+.meta-estado {display:flex;gap:6px;flex-wrap:wrap;}
+.meta-badge {font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--radius-btn);background:var(--color-neutral-100);color:var(--color-text-secondary);}
+.meta-badge.meta-borrador {background:var(--color-observado-tint);color:var(--color-observado);}
+.meta-badge-vencida {background:var(--color-danger);color:white;}
+.meta-enlace {font-size:12px;font-weight:600;padding:6px 14px;border-radius:var(--radius-btn);background:var(--color-primary);color:white;text-decoration:none;}
+.meta-enlace:hover {background:var(--color-accent-dark);}
 </style>
 </head>
 <body class="has-topnav">
@@ -157,10 +71,10 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
     </button>
     <span class="topnav-chip">ENLACE</span>
     <div class="topnav-user">
-      <div class="topnav-avatar">AT</div>
+      <div class="topnav-avatar" id="topnavAvatar"></div>
       <div>
-        <p class="topnav-name">Ana Torres</p>
-        <p class="topnav-role" id="topnavRole">Gerencia Comercial</p>
+        <p class="topnav-name" id="topnavName"></p>
+        <p class="topnav-role" id="topnavRole"></p>
       </div>
     </div>
     <button class="topnav-exit" title="Cerrar sesión" onclick="cerrarSesion()">
@@ -190,575 +104,69 @@ body {font-family:'Plus Jakarta Sans',sans-serif;background:var(--color-surface)
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/></svg>
       <span class="nav-label">Notificaciones</span>
     </div>
-    <a class="nav-item active" href="planeacion-enlace.html" title="Planeación">
+    <a id="navPlaneacionMetas" class="nav-item active" href="planeacion-metas-enlace.html" title="Planeación de metas" style="display:none">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-      <span class="nav-label">Planeación</span>
+      <span class="nav-label">Planeación de metas</span>
     </a>
   </div>
   <div class="sidebar-bottom">
-    <div class="avatar-xs">AT</div>
+    <div class="avatar-xs" id="avatarEl"></div>
   </div>
 </nav>
-
-
 
 <div class="app-wrapper">
   <main class="main-content">
 
     <div class="page-header">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-        <div>
-          <h1 class="page-title">Planeación MIR</h1>
-          <p class="page-subtitle" id="pageSubtitle">Configuración de metas — Ejercicio 2026</p>
-        </div>
-        <div class="view-toggle" style="margin-top:4px;">
-          <button class="vtab active" id="vtabReal" onclick="switchView('real')">Ejercicio 2026</button>
-          <button class="vtab" id="vtabDemo" onclick="switchView('demo')">Demo de estados</button>
-        </div>
-      </div>
+      <h1 class="page-title">Planeación MIR</h1>
+      <p class="page-subtitle">Metas por configurar de tu gerencia</p>
     </div>
 
-    <div class="alert-box" id="alertBox" style="display:none">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
-      <span id="alertText"></span>
+    <p class="meta-ciclo" id="metasCiclo"></p>
+    <p class="meta-dias" id="metasDias" aria-live="polite" data-urgente="false"></p>
+
+    <div class="filtros">
+      <select id="filtroEstado" onchange="cargarMetas()" aria-label="Filtrar por estado">
+        <option value="">Todos los estados</option>
+        <option value="meta_pendiente">Pendiente</option>
+        <option value="borrador_meta">Borrador</option>
+      </select>
+      <select id="filtroNivel" onchange="cargarMetas()" aria-label="Filtrar por nivel">
+        <option value="">Todos los niveles</option>
+        <option value="fin">Fin</option>
+        <option value="proposito">Propósito</option>
+        <option value="componente">Componente</option>
+        <option value="actividad">Actividad</option>
+      </select>
     </div>
 
-    <div class="filter-chips" id="filterChips"></div>
-    <div class="cards-grid" id="cardsGrid"></div>
+    <div class="meta-mensaje" id="metasMensaje"></div>
+    <div id="metasLista"></div>
 
   </main>
 
   <aside class="right-panel">
-    <div class="rp-user">
-      <div class="rp-avatar" id="rpAvatar">AT</div>
-      <div>
-        <p class="rp-name" id="rpName">Ana Torres</p>
-        <p class="rp-role" id="rpRole">Enlace · Comercial</p>
-      </div>
-    </div>
-    <div class="rp-divider"></div>
-    <p class="rp-section-title">Mis indicadores</p>
-    <div class="rp-stat-row"><span class="rp-stat-label">Total asignados</span><span class="rp-stat-val" id="rpTotal">—</span></div>
-    <div class="rp-divider"></div>
-    <p class="rp-section-title">Estado de metas</p>
-    <div class="rp-stat-row"><span class="rp-stat-label">Sin capturar</span><span class="rp-badge gray" id="rpPendiente">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Borrador</span><span class="rp-badge orange" id="rpBorrador">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Enviados</span><span class="rp-badge blue" id="rpEnviado">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Con obs.</span><span class="rp-badge orange" id="rpObservado">—</span></div>
-    <div class="rp-stat-row"><span class="rp-stat-label">Aprobados</span><span class="rp-badge green" id="rpAprobado">—</span></div>
-    <div class="rp-divider"></div>
-    <p class="rp-section-title">Progreso</p>
-    <div id="rpProgressBar" style="height:6px;background:var(--color-border);border-radius:3px;overflow:hidden;margin-bottom:4px;"><div id="rpProgressFill" style="height:100%;background:var(--color-success);width:0%;transition:width .4s;"></div></div>
-    <p style="font-size:11px;color:var(--color-text-secondary);" id="rpProgressLabel">0% enviados o aprobados</p>
+    <p class="rp-section-title">Metas por configurar</p>
+    <div class="rp-stat-row"><span class="rp-stat-label">Total</span><span class="rp-stat-val" id="rpTotal">—</span></div>
+    <div class="rp-stat-row"><span class="rp-stat-label">Pendientes</span><span class="rp-badge gray" id="rpPendiente">—</span></div>
+    <div class="rp-stat-row"><span class="rp-stat-label">Borradores</span><span class="rp-badge orange" id="rpBorrador">—</span></div>
+    <div class="rp-stat-row"><span class="rp-stat-label">Vencidas</span><span class="rp-badge orange" id="rpVencida">—</span></div>
   </aside>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="overlayClick(event)">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div class="modal-header-top">
-        <div>
-          <p class="modal-title" id="modalTitle">Indicador</p>
-          <p class="modal-subtitle" id="modalSubtitle"></p>
-        </div>
-        <button class="modal-close" onclick="closeModal()">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="modal-meta" id="modalMeta"></div>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>
-      <div class="footer-right" id="modalFooterBtns"></div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-var CURRENT_FILTER = 'todos';
-var CURRENT_VIEW = 'real';
-var INDICATORS = [];
-var EDITING_ID = null;
-var IS_READONLY = false;
-
-var PERIODOS_REPORTADOS = { Mensual:6, Bimestral:3, Trimestral:2, Semestral:1, Anual:0 };
-
-// Indicadores de demo — uno por cada estado
-var DEMO_INDICATORS = [
-  { id:'DEMO-1', nombre:'Porcentaje de cobertura en agua potable', nivel:'F', frecuencia:'Anual', unidad:'%', acumulable:false, metaAnual:null,
-    plan:{ estado:'pendiente', metas:[], comentariosEnlace:'', obsRevisor:'', obsAdmin:'', fechaEnvio:null } },
-  { id:'DEMO-2', nombre:'Porcentaje de eficiencia comercial del servicio', nivel:'P', frecuencia:'Trimestral', unidad:'%', acumulable:false, metaAnual:85,
-    plan:{ estado:'borrador', metas:[82,84,null,null], comentariosEnlace:'Meta progresiva en proceso.', obsRevisor:'', fechaEnvio:null } },
-  { id:'DEMO-3', nombre:'Porcentaje de avance del programa operativo anual', nivel:'C', frecuencia:'Trimestral', unidad:'%', acumulable:false, metaAnual:90,
-    plan:{ estado:'enviado', metas:[80,85,88,92], comentariosEnlace:'Metas enviadas al revisor.', obsRevisor:'', fechaEnvio:'2026-03-10' } },
-  { id:'DEMO-4', nombre:'Porcentaje de anomalías atendidas oportunamente', nivel:'A', frecuencia:'Mensual', unidad:'%', acumulable:false, metaAnual:95,
-    plan:{ estado:'observado', metas:[88,88,89,89,90,90,91,91,92,92,93,93], comentariosEnlace:'Metas escalonadas.', obsRevisor:'Ene-Feb parecen conservadoras vs. el histórico actual de 92%. Justifica o corrige.', fechaEnvio:'2026-04-05', fechaRevision:'2026-04-10' } },
-  { id:'DEMO-5', nombre:'Porcentaje de metas ejecutadas por gerencia', nivel:'A', frecuencia:'Trimestral', unidad:'%', acumulable:false, metaAnual:87,
-    plan:{ estado:'aprobado', metas:[82,85,87,90], comentariosEnlace:'Metas alineadas al POA.', obsRevisor:'Metas razonables. Aprobado con seguimiento trimestral.', fechaEnvio:'2026-03-12', fechaRevision:'2026-03-18' } },
-  { id:'DEMO-6', nombre:'Porcentaje de movimientos autorizados en padrón de usuarios', nivel:'C', frecuencia:'Trimestral', unidad:'%', acumulable:false, metaAnual:88,
-    plan:{ estado:'bloqueado', metas:[78,82,85,88], comentariosEnlace:'Meta validada y aprobada en Marzo 2026.', obsRevisor:'Metas validadas. Aprobado.', obsAdmin:'Aprobado definitivamente. Leticia Solís — 20 Mar 2026.', fechaEnvio:'2026-03-10', fechaRevision:'2026-03-15', fechaAprobacion:'2026-03-20' } },
-  { id:'DEMO-7', nombre:'Porcentaje de cobertura de saneamiento sanitario', nivel:'A', frecuencia:'Mensual', unidad:'%', acumulable:false, metaAnual:90,
-    plan:{ estado:'cambio_en_revision', metas:[88,88,89,89,90,90,91,91,92,92,93,93], cambioMeta:{ motivo:'Reducción de capacidad operativa en Q3-Q4 por renovación de flota vehicular.', nuevasMetas:[85,85,86,86,87,87,88,88,89,89,90,90], metasOriginales:[88,88,89,89,90,90,91,91,92,92,93,93], fecha:'2026-07-20' }, comentariosEnlace:'', obsRevisor:'', fechaEnvio:'2026-03-08', fechaAprobacion:'2026-03-20' } },
-];
-
-var ESTADO_CFG = {
-  pendiente:          { label:'Sin capturar',        color:'#6B7280', bg:'#F3F4F6' },
-  borrador:           { label:'Borrador',             color:'#92400E', bg:'#FEF3C7' },
-  enviado:            { label:'Enviado a revisor',    color:'#1D4ED8', bg:'#EFF6FF' },
-  observado:          { label:'Con observaciones',    color:'#EA580C', bg:'#FFF7ED' },
-  aprobado:           { label:'Aprobado por revisor', color:'#059669', bg:'#D1FAE5' },
-  bloqueado:          { label:'Meta fijada',          color:'#16A34A', bg:'#F0FDF4' },
-  cambio_en_revision: { label:'Cambio en revisión',   color:'#7C3AED', bg:'#F5F3FF' },
-};
-
-// ── Auth ─────────────────────────────────────────────────────────────────────
-var CURRENT_USER = null;
-(function checkAuth() {
-  CURRENT_USER = Session.requireAuth();
-  if (!CURRENT_USER) return;
-  document.getElementById('avatarEl').textContent = CURRENT_USER.iniciales||'AT';
-  document.getElementById('rpAvatar').textContent = CURRENT_USER.iniciales||'AT';
-  document.getElementById('rpName').textContent   = CURRENT_USER.nombre||'Ana Torres';
-  var _g = (typeof getNombreCortoGerenciaEnlace==='function') ? getNombreCortoGerenciaEnlace() : (CURRENT_USER.gerencia||'Comercial').replace('Gerencia ','');
-  document.getElementById('rpRole').textContent   = 'Enlace · '+_g;
-})();
-
-// ── Build indicator list ──────────────────────────────────────────────────────
-function buildIndicatorList() {
-  var list = [];
-  var src = (typeof getActividadesEnlace==='function') ? getActividadesEnlace() : (typeof ACTIVIDADES_ENLACE!=='undefined' ? ACTIVIDADES_ENLACE : []);
-  src.forEach(function(act) {
-    var plan = getPlan(act.id);
-    list.push({
-      id:act.id, nombre:act.nombreIndicador, nivel:act.nivel||'A',
-      frecuencia:act.frecuenciaMedicion||'Mensual', unidad:act.unidadMedida||'%',
-      acumulable:!!act.acumulable, metaAnual:act.metaAnual,
-      plan: plan || { id:act.id, gerencia:'comercial', frecuencia:act.frecuenciaMedicion||'Mensual',
-        metas:[], comentariosEnlace:'', estado:'pendiente',
-        obsRevisor:'', obsAdmin:'', fechaEnvio:null, fechaRevision:null, fechaAprobacion:null },
-    });
-  });
-  return list;
-}
-
-function findItem(id) {
-  if (id.indexOf('DEMO-')===0) return DEMO_INDICATORS.find(function(i){ return i.id===id; })||null;
-  return INDICATORS.find(function(i){ return i.id===id; })||null;
-}
-
-// ── View switching ────────────────────────────────────────────────────────────
-function switchView(mode) {
-  CURRENT_VIEW = mode;
-  document.getElementById('vtabReal').classList.toggle('active', mode==='real');
-  document.getElementById('vtabDemo').classList.toggle('active', mode==='demo');
-  document.getElementById('pageSubtitle').textContent = mode==='real'
-    ? 'Configuración de metas — Ejercicio 2026'
-    : 'Vista de demostración — todos los estados disponibles';
-  document.getElementById('filterChips').style.display = mode==='real' ? '' : 'none';
-  renderCards();
-}
-
-// ── Chips ─────────────────────────────────────────────────────────────────────
-function buildChips() {
-  if (CURRENT_VIEW!=='real') return;
-  var counts = { todos:0, pendiente:0, borrador:0, enviado:0, observado:0, aprobado:0, bloqueado:0, cambio_en_revision:0 };
-  INDICATORS.forEach(function(i){ counts.todos++; if(counts[i.plan.estado]!==undefined) counts[i.plan.estado]++; });
-  var defs = [
-    {key:'todos',              label:'Todos'},
-    {key:'pendiente',          label:'Sin capturar'},
-    {key:'borrador',           label:'Borrador'},
-    {key:'enviado',            label:'Enviado'},
-    {key:'observado',          label:'Con observaciones'},
-    {key:'aprobado',           label:'Aprobados'},
-    {key:'bloqueado',          label:'Meta fijada'},
-    {key:'cambio_en_revision', label:'Cambio en revisión'},
-  ];
-  document.getElementById('filterChips').innerHTML = defs.map(function(d){
-    var n = counts[d.key];
-    if (n===0 && d.key!=='todos') return '';
-    return '<button class="chip'+(CURRENT_FILTER===d.key?' active':'')+'" onclick="setFilter(\''+d.key+'\')">'+d.label+' <span class="chip-count">'+n+'</span></button>';
-  }).join('');
-}
-
-function setFilter(key) { CURRENT_FILTER=key; buildChips(); renderCards(); }
-
-// ── Cards — real view ─────────────────────────────────────────────────────────
-function renderCards() {
-  if (CURRENT_VIEW==='demo') { renderDemoCards(); return; }
-  var filtered = CURRENT_FILTER==='todos' ? INDICATORS : INDICATORS.filter(function(i){ return i.plan.estado===CURRENT_FILTER; });
-  var emptyHtml = '<div class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"/></svg><p>No hay indicadores en este estado</p></div>';
-  if (!filtered.length) { document.getElementById('cardsGrid').innerHTML = emptyHtml; return; }
-  document.getElementById('cardsGrid').innerHTML = filtered.map(buildCardHtml).join('');
-}
-
-// ── Cards — demo view ─────────────────────────────────────────────────────────
-function renderDemoCards() {
-  var header = '<div style="grid-column:1/-1;margin-bottom:4px;">'+
-    '<p style="font-size:11px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Demo de estados</p>'+
-    '<p style="font-size:12px;color:var(--color-text-secondary);">Un indicador por cada estado disponible en el flujo de planeación</p></div>';
-  document.getElementById('cardsGrid').innerHTML = header + DEMO_INDICATORS.map(buildCardHtml).join('');
-}
-
-function buildCardHtml(i) {
-  var est = i.plan.estado;
-  var ec  = ESTADO_CFG[est]||ESTADO_CFG.pendiente;
-  var btn = getBtnForEstado(est);
-  var isDemo = i.id.indexOf('DEMO-')===0;
-  return '<div class="ind-card '+escaparHTML(est)+'" data-id="'+escaparHTML(i.id)+'" onclick="openModal(this.dataset.id)">'+
-    '<div class="card-top">'+
-      '<span class="card-clave'+(isDemo?' demo-label':'')+'">'+escaparHTML(i.id)+'</span>'+
-      '<span class="estado-badge" style="background:'+ec.bg+';color:'+ec.color+'">'+ec.label+'</span>'+
-    '</div>'+
-    '<p class="card-nombre">'+escaparHTML(i.nombre)+'</p>'+
-    '<div class="card-meta-row">'+
-      '<span class="nivel-pill '+escaparHTML(i.nivel)+'">'+escaparHTML(i.nivel)+'</span>'+
-      '<span class="freq-pill">'+escaparHTML(i.frecuencia)+'</span>'+
-      (i.acumulable?'<span class="freq-pill" style="background:var(--color-success-tint);color:var(--color-success-strong)">Acumulable</span>':'')+
-    '</div>'+
-    '<div class="card-footer">'+
-      (i.plan.fechaEnvio?'<span style="font-size:10px;color:var(--color-text-muted)">Enviado '+escaparHTML(i.plan.fechaEnvio)+'</span>':'<span style="font-size:10px;color:var(--color-text-muted)">'+(est==='pendiente'?'Sin iniciar':'')+'</span>')+
-      '<button class="btn-card '+btn.cls+'" data-id="'+escaparHTML(i.id)+'" onclick="event.stopPropagation();openModal(this.dataset.id)">'+btn.label+'</button>'+
-    '</div>'+
-  '</div>';
-}
-
-function getBtnForEstado(est) {
-  var map = {
-    pendiente:{cls:'primary',label:'Configurar metas'},
-    borrador:{cls:'secondary',label:'Continuar'},
-    enviado:{cls:'info',label:'Ver enviado'},
-    observado:{cls:'warn',label:'Ver observaciones'},
-    aprobado:{cls:'secondary',label:'Ver aprobado'},
-    bloqueado:{cls:'secondary',label:'Ver meta'},
-    cambio_en_revision:{cls:'info',label:'Ver solicitud'},
-  };
-  return map[est]||{cls:'secondary',label:'Ver'};
-}
-
-// ── Right panel ───────────────────────────────────────────────────────────────
-function updatePanel() {
-  var c={pendiente:0,borrador:0,enviado:0,observado:0,aprobado:0,bloqueado:0,cambio_en_revision:0};
-  INDICATORS.forEach(function(i){ if(c[i.plan.estado]!==undefined) c[i.plan.estado]++; });
-  document.getElementById('rpTotal').textContent     = INDICATORS.length;
-  document.getElementById('rpPendiente').textContent = c.pendiente;
-  document.getElementById('rpBorrador').textContent  = c.borrador;
-  document.getElementById('rpEnviado').textContent   = c.enviado;
-  document.getElementById('rpObservado').textContent = c.observado;
-  document.getElementById('rpAprobado').textContent  = c.aprobado+c.bloqueado+c.cambio_en_revision;
-  var done = c.enviado+c.observado+c.aprobado+c.bloqueado+c.cambio_en_revision;
-  var pct  = INDICATORS.length>0 ? Math.round(done/INDICATORS.length*100) : 0;
-  document.getElementById('rpProgressFill').style.width = pct+'%';
-  document.getElementById('rpProgressLabel').textContent = pct+'% enviados o aprobados';
-  if (c.observado>0) {
-    document.getElementById('alertBox').style.display='flex';
-    document.getElementById('alertText').textContent = c.observado+' indicador'+(c.observado>1?'es tienen':'tiene')+' observaciones del revisor.';
-  }
-}
-
-// ── Impact message ────────────────────────────────────────────────────────────
-function getImpactMessage(frecuencia) {
-  var reported = PERIODOS_REPORTADOS[frecuencia]||0;
-  var labels   = PERIODOS_LABELS[frecuencia]||[];
-  var total    = labels.length;
-  if (reported===0) return 'No hay períodos reportados aún. Puedes actualizar todas las metas sin afectar reportes existentes.';
-  var repNames = labels.slice(0, reported).join(', ');
-  var pending  = total - reported;
-  var penNames = pending>0 ? labels.slice(reported).join(', ') : '';
-  return '<strong>'+reported+' período'+(reported>1?'s':'')+' ya reportado'+(reported>1?'s':'')+': </strong>'+escaparHTML(repNames)+'. Cambiar estas metas recalculará el cumplimiento retroactivamente.'+
-    (penNames?' <strong>'+pending+' pendiente'+(pending>1?'s':'')+':</strong> '+escaparHTML(penNames)+'.':'');
-}
-
-// ── Cambio en revisión — timeline ─────────────────────────────────────────────
-function renderCambioTimeline(cambio) {
-  var chk = '<svg fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="white" width="10" height="10"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
-  var steps = [
-    {label:'Solicitud enviada',       sub:'Enviada el '+escaparHTML(cambio.fecha||'2026-07-28'), st:'done'},
-    {label:'Revisión por Revisor',    sub:'Esperando revisión del revisor',           st:'active'},
-    {label:'Aprobación Administrador',sub:'Pendiente',                                st:'pending'},
-    {label:'Meta actualizada',        sub:'Pendiente',                                st:'pending'},
-  ];
-  var stepsHtml = steps.map(function(s){
-    var bg = s.st==='done'?'background:#22C55E':s.st==='active'?'background:#7C3AED':'background:#E5E7EB';
-    return '<div class="sol-step"><div class="sol-step-dot '+s.st+'" style="'+bg+'">'+
-      (s.st==='done'?chk:'')+'</div><div class="sol-step-text">'+
-      '<p class="sol-step-label'+(s.st==='pending'?' dim':'')+'">'+s.label+'</p>'+
-      (s.st!=='pending'?'<p class="sol-step-sub">'+s.sub+'</p>':'')+
-      '</div></div>';
-  }).join('');
-  return '<div class="cambio-status-box">'+
-    '<p class="cambio-status-title">↩ Solicitud de cambio en revisión</p>'+
-    (cambio.motivo?'<div class="cambio-motivo">"'+escaparHTML(cambio.motivo)+'"</div>':'')+
-    '<div class="sol-timeline">'+stepsHtml+'</div></div>';
-}
-
-// ── Meta comparison grid ──────────────────────────────────────────────────────
-function buildMetaComparison(item, cambio) {
-  var labels   = PERIODOS_LABELS[item.frecuencia]||[];
-  var original = cambio.metasOriginales||item.plan.metas||[];
-  var nueva    = cambio.nuevasMetas||[];
-  function row(lbl, val, changed) {
-    return '<div class="meta-compare-row"><span style="color:var(--color-text-secondary);font-size:11px">'+escaparHTML(lbl)+'</span>'+
-      '<span class="meta-compare-val'+(changed?' changed':'')+'">'+escaparHTML(val)+'</span></div>';
-  }
-  var origRows = labels.map(function(lbl,i){ return row(lbl, original[i]!=null?original[i]:'—', false); }).join('');
-  var newRows  = labels.map(function(lbl,i){
-    var nv = nueva[i]!=null?nueva[i]:'—';
-    return row(lbl, nv, original[i]!==nueva[i]);
-  }).join('');
-  return '<div class="meta-compare-grid">'+
-    '<div class="meta-compare-col"><p class="meta-compare-head original">Meta original</p>'+origRows+'</div>'+
-    '<div class="meta-compare-col"><p class="meta-compare-head nueva">Meta propuesta</p>'+newRows+'</div>'+
-    '</div>';
-}
-
-// ── Modal ─────────────────────────────────────────────────────────────────────
-function openModal(id) {
-  var item = findItem(id);
-  if (!item) return;
-  EDITING_ID = id;
-  var est = item.plan.estado;
-  IS_READONLY = (est==='enviado'||est==='aprobado'||est==='bloqueado'||est==='cambio_en_revision');
-
-  document.getElementById('modalTitle').textContent    = item.nombre;
-  document.getElementById('modalSubtitle').textContent = item.id+' · '+item.frecuencia+(item.acumulable?' · Acumulable':'');
-  var ec = ESTADO_CFG[est]||ESTADO_CFG.pendiente;
-  document.getElementById('modalMeta').innerHTML =
-    '<span class="nivel-pill '+escaparHTML(item.nivel)+'" style="font-size:10px;font-weight:800;width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;">'+escaparHTML(item.nivel)+'</span>'+
-    '<span class="freq-pill">'+escaparHTML(item.frecuencia)+'</span>'+
-    '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:'+ec.bg+';color:'+ec.color+'">'+ec.label+'</span>'+
-    (item.unidad?'<span class="freq-pill">Unidad: '+escaparHTML(item.unidad)+'</span>':'')+
-    (item.metaAnual!=null?'<span class="freq-pill">Meta anual: '+escaparHTML(item.metaAnual)+'</span>':'');
-
-  var html = '';
-
-  if (est==='cambio_en_revision') {
-    html += renderCambioTimeline(item.plan.cambioMeta||{});
-    html += buildMetaComparison(item, item.plan.cambioMeta||{});
-
-  } else if (est==='bloqueado') {
-    html += '<div class="readonly-notice"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>Metas aprobadas y fijadas. Puedes solicitar un cambio si necesitas ajustar los valores.</div>';
-    html += '<div class="impact-callout"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg><span>'+getImpactMessage(item.frecuencia)+'</span></div>';
-
-  } else if (est==='observado') {
-    if (item.plan.obsRevisor) html += '<div class="obs-callout"><p class="obs-callout-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg> Observaciones del revisor</p><p class="obs-callout-body">'+escaparHTML(item.plan.obsRevisor)+'</p></div>';
-
-  } else if (est==='aprobado') {
-    html += '<div class="readonly-notice" style="background:var(--color-success-tint);border-color:var(--color-success-tint);color:var(--color-success-strong);"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Metas aprobadas por el revisor, pendientes de aprobación final del administrador.</div>';
-    if (item.plan.obsRevisor) html += '<div class="readonly-notice" style="background:var(--color-success-tint);border-color:var(--color-success-tint);color:var(--color-success-strong);margin-top:8px;"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>Revisor: '+escaparHTML(item.plan.obsRevisor)+'</div>';
-
-  } else if (est==='enviado') {
-    html += '<div class="readonly-notice"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>Metas enviadas al revisor. No se pueden editar mientras están en revisión.</div>';
-  }
-
-  if (est!=='cambio_en_revision') {
-    var periods = PERIODOS_LABELS[item.frecuencia]||[];
-    var n = periods.length;
-    var cols = n>=10?'cols-4':n>=6?'cols-3':n>=3?'cols-2':'';
-    html += '<p class="period-section-title">Metas por período · '+escaparHTML(item.frecuencia)+'</p>';
-    html += '<div class="period-grid '+cols+'">';
-    periods.forEach(function(p,i){
-      var val = item.plan.metas[i]!=null ? item.plan.metas[i] : '';
-      html += '<div class="period-item"><span class="period-label">'+escaparHTML(p)+'</span>'+
-        '<input class="period-input'+(val!==''?' filled':'')+'" type="number" min="0" step="any" id="pg_'+i+'" value="'+escaparHTML(val)+'" placeholder="0"'+(IS_READONLY?' readonly':'')+' oninput="onMetaInput('+i+')"></div>';
-    });
-    html += '</div>';
-    if (item.acumulable) {
-      var tot = (item.plan.metas||[]).reduce(function(s,v){ return s+(parseFloat(v)||0); }, 0);
-      html += '<div class="acum-total"><span class="acum-total-label">Total acumulado</span><span class="acum-total-val" id="acumTotal">'+tot.toLocaleString('es-MX')+(item.unidad?' '+escaparHTML(item.unidad):'')+'</span></div>';
-    }
-    html += '<label class="comment-label" style="margin-top:4px;">Comentarios de justificación</label>'+
-      '<textarea class="comment-textarea" id="commentTA" placeholder="Justifica tus metas proyectadas: base histórica, factores externos, supuestos…"'+(IS_READONLY?' readonly':'')+'>'+escaparHTML(item.plan.comentariosEnlace||'')+'</textarea>';
-  }
-
-  document.getElementById('modalBody').innerHTML = html;
-
-  var footer = '';
-  if (est==='bloqueado') {
-    footer = '<button class="btn-card warn" style="font-size:13px;font-family:inherit;padding:9px 18px;" onclick="showMetaChangeForm()">'+
-      '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>'+
-      'Solicitar cambio en la meta</button>';
-  } else if (est==='cambio_en_revision') {
-    footer = '<span style="font-size:12px;color:var(--color-corregido);font-weight:600;">Solicitud enviada el '+
-      escaparHTML((item.plan.cambioMeta&&item.plan.cambioMeta.fecha)||'2026-07-28')+'</span>';
-  } else if (!IS_READONLY) {
-    footer = '<button class="btn-draft" onclick="saveDraft()">Guardar borrador</button>'+
-      '<button class="btn btn-primary" onclick="submitPlan()">'+
-      '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>'+
-      'Enviar para revisión</button>';
-  }
-  document.getElementById('modalFooterBtns').innerHTML = footer;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-// ── Meta change inline form ───────────────────────────────────────────────────
-function showMetaChangeForm() {
-  var item = findItem(EDITING_ID);
-  if (!item) return;
-  var periods  = PERIODOS_LABELS[item.frecuencia]||[];
-  var n        = periods.length;
-  var cols     = n>=10?'cols-4':n>=6?'cols-3':n>=3?'cols-2':'';
-  var reported = PERIODOS_REPORTADOS[item.frecuencia]||0;
-
-  var html = '<div class="change-form-header">'+
-    '<button class="change-form-back" onclick="openModal(EDITING_ID)">'+
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg> Volver</button>'+
-    '<span style="font-size:13px;font-weight:700;">Solicitar cambio en la meta</span></div>';
-
-  html += '<div class="impact-callout"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg><span>'+getImpactMessage(item.frecuencia)+'</span></div>';
-
-  html += '<p class="period-section-title">Nuevas metas por período</p>';
-  html += '<div class="period-grid '+cols+'">';
-  periods.forEach(function(p,i){
-    var val = item.plan.metas[i]!=null ? item.plan.metas[i] : '';
-    var dot = i<reported ? ' <span style="color:var(--color-observado);font-size:9px;vertical-align:middle;">●</span>' : '';
-    html += '<div class="period-item"><span class="period-label">'+escaparHTML(p)+dot+'</span>'+
-      '<input class="period-input'+(val!==''?' filled':'')+'" type="number" min="0" step="any" id="pg_'+i+'" value="'+escaparHTML(val)+'" placeholder="0"></div>';
-  });
-  html += '</div>';
-  if (reported>0) html += '<p style="font-size:11px;color:var(--color-observado);margin-bottom:14px;"><span style="font-weight:700;">●</span> Los períodos marcados ya tienen reportes. Cambiar estas metas afecta el cálculo de cumplimiento retroactivamente.</p>';
-
-  html += '<label class="comment-label">Motivo del cambio <span style="color:var(--color-danger)">*</span></label>'+
-    '<textarea class="comment-textarea" id="cambioMotivoTA" placeholder="Describe el motivo del cambio: ajuste operativo, cambio de metodología, factores externos…" style="min-height:80px;"></textarea>';
-
-  document.getElementById('modalBody').innerHTML = html;
-  document.getElementById('modalFooterBtns').innerHTML =
-    '<button class="btn btn-primary" onclick="submitMetaChange()">'+
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>'+
-    'Enviar solicitud de cambio</button>';
-}
-
-// ── Submit meta change ────────────────────────────────────────────────────────
-function submitMetaChange() {
-  var item = findItem(EDITING_ID);
-  if (!item) return;
-  var motivo = document.getElementById('cambioMotivoTA').value.trim();
-  if (!motivo) { showToast('Describe el motivo del cambio'); return; }
-  var periods = PERIODOS_LABELS[item.frecuencia]||[];
-  var nuevasMetas = periods.map(function(_,i){
-    var el = document.getElementById('pg_'+i);
-    return el && el.value!=='' ? parseFloat(el.value) : null;
-  });
-  var cambio = { motivo:motivo, nuevasMetas:nuevasMetas, metasOriginales:(item.plan.metas||[]).slice(), fecha:'2026-07-28' };
-  var plan = Object.assign({}, item.plan, { estado:'cambio_en_revision', cambioMeta:cambio });
-  upsertPlan(plan);
-  var realItem = INDICATORS.find(function(i){ return i.id===EDITING_ID; });
-  if (realItem) realItem.plan = plan;
-  showToast('Solicitud de cambio enviada al revisor ✓', true);
-  closeModal();
-  refresh();
-}
-
-function closeModal()    { document.getElementById('modalOverlay').classList.remove('open'); }
-function overlayClick(e) { if (e.target===document.getElementById('modalOverlay')) closeModal(); }
-
-function onMetaInput(idx) {
-  var item = findItem(EDITING_ID);
-  if (!item||!item.acumulable) return;
-  var periods = PERIODOS_LABELS[item.frecuencia]||[];
-  var total = 0;
-  periods.forEach(function(_,i){ var el=document.getElementById('pg_'+i); if(el) total+=parseFloat(el.value)||0; });
-  var te = document.getElementById('acumTotal');
-  if (te) te.textContent = total.toLocaleString('es-MX')+(item.unidad?' '+item.unidad:'');
-}
-
-function collectMetas() {
-  var item = findItem(EDITING_ID);
-  if (!item) return [];
-  var periods = PERIODOS_LABELS[item.frecuencia]||[];
-  return periods.map(function(_,i){ var el=document.getElementById('pg_'+i); return el?(el.value!==''?parseFloat(el.value):null):null; });
-}
-
-function saveDraft() {
-  var item = findItem(EDITING_ID);
-  if (!item) return;
-  var plan = Object.assign({}, item.plan, {
-    metas:collectMetas(), comentariosEnlace:document.getElementById('commentTA').value.trim(),
-    estado:'borrador', id:item.id, gerencia:'comercial', frecuencia:item.frecuencia,
-  });
-  upsertPlan(plan); item.plan = plan;
-  showToast('Borrador guardado', true); closeModal(); refresh();
-}
-
-function submitPlan() {
-  var item = findItem(EDITING_ID);
-  if (!item) return;
-  var metas = collectMetas();
-  if (metas.every(function(v){ return v===null||v===undefined; })) { showToast('Ingresa al menos una meta antes de enviar'); return; }
-  var plan = Object.assign({}, item.plan, {
-    metas:metas, comentariosEnlace:document.getElementById('commentTA').value.trim(),
-    estado:'enviado', id:item.id, gerencia:'comercial', frecuencia:item.frecuencia, fechaEnvio:'2026-07-28',
-  });
-  upsertPlan(plan); item.plan = plan;
-  showToast('Plan enviado al revisor ✓', true); closeModal(); refresh();
-}
-
-function refresh() { buildChips(); renderCards(); updatePanel(); }
-
-function showToast(msg, ok) {
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(ok?' success':'');
-  t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },2800);
-}
-
-// ── Ciclo de planeación gate ──────────────────────────────────────────────────
-function cicloEnlaceGate() {
-  function cpParseDate(s) {
-    if (!s) return null;
-    var p=s.split('-'), d=new Date(+p[0],+p[1]-1,+p[2]); d.setHours(0,0,0,0); return d;
-  }
-  function cpGetEstado(c) {
-    if (!c||!c.faseCaptura||!c.faseRevision) return 'inactivo';
-    if (c.cerradoManualmente) return 'cerrado';
-    var h=new Date(); h.setHours(0,0,0,0);
-    var c0=cpParseDate(c.faseCaptura.inicio), c1=cpParseDate(c.faseCaptura.fin);
-    var r0=cpParseDate(c.faseRevision.inicio), r1=cpParseDate(c.faseRevision.fin);
-    if (!c0||!c1||!r0||!r1) return 'inactivo';
-    if (h<c0) return 'pendiente';
-    if (h>=c0&&h<=c1) return 'captura';
-    if (h>c1&&h<r0) return 'entre_fases';
-    if (h>=r0&&h<=r1) return 'revision';
-    return 'cerrado';
-  }
-  function cpFmt(s) {
-    if (!s) return '';
-    var p=s.split('-'), ms=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-    return +p[2]+' '+ms[+p[1]-1]+'. '+p[0];
-  }
-  var ciclo = null;
-  try { ciclo = JSON.parse(localStorage.getItem('comapa-ciclo')); } catch(e) {}
-  var est = cpGetEstado(ciclo);
-  if (est === 'captura') return; // access granted
-
-  // Build gate overlay
-  var map = {
-    inactivo:     { icon:'🔒', title:'Captura de metas no disponible',        body:'El administrador aún no ha abierto el ciclo de planeación. Regresa cuando el período de captura esté activo.' },
-    pendiente:    { icon:'🕐', title:'Captura de metas aún no ha iniciado',    body:'El ciclo de planeación comenzará el '+(ciclo?cpFmt(ciclo.faseCaptura.inicio):'pronto')+'. Regresa en esa fecha para configurar tus metas.' },
-    entre_fases:  { icon:'🔒', title:'Período de captura cerrado',             body:'El tiempo para configurar metas finalizó. La fase de revisión abrirá el '+(ciclo?cpFmt(ciclo.faseRevision.inicio):'pronto')+'.' },
-    revision:     { icon:'🔍', title:'Período de captura cerrado',             body:'Tus metas están en revisión hasta el '+(ciclo?cpFmt(ciclo.faseRevision.fin):'pronto')+'. Ya no puedes hacer cambios.' },
-    cerrado:      { icon:'🔒', title:'Ciclo de planeación cerrado',            body:'El ciclo de planeación ha concluido. El administrador abrirá un nuevo ciclo cuando corresponda.' }
-  };
-  var info = map[est] || map.inactivo;
-  document.getElementById('filterChips').style.display='none';
-  document.getElementById('cardsGrid').innerHTML = '<div style="text-align:center;padding:64px 24px 48px;">'
-    +'<div style="font-size:40px;margin-bottom:16px;">'+info.icon+'</div>'
-    +'<h2 style="font-size:18px;font-weight:700;color:var(--color-text-primary);margin-bottom:8px;">'+info.title+'</h2>'
-    +'<p style="font-size:13px;color:var(--color-text-secondary);max-width:420px;margin:0 auto;line-height:1.6;">'+escaparHTML(info.body)+'</p>'
-    +'</div>';
-  // Disable modal interactions
-  window.openModal = function() {};
-}
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-(function init() {
-  INDICATORS = buildIndicatorList();
-  buildChips(); renderCards(); updatePanel();
-  cicloEnlaceGate();
-})();
-</script>
 <script src="dev-toolbar.js"></script>
+<script>
+(function () {
+  var u = Session.getUser();
+  if (!u) return;
+  document.getElementById('topnavAvatar').textContent = u.iniciales;
+  document.getElementById('avatarEl').textContent = u.iniciales;
+  document.getElementById('topnavName').textContent = u.nombre;
+  document.getElementById('topnavRole').textContent = u.gerencia;
+})();
+pintarNavPlaneacion();
+cargarMetas();
+iniciarContadorDias();
+</script>
 </body>
 </html>

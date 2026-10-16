@@ -30,7 +30,6 @@ GRANT SELECT                         ON indicador_versiones TO :"app";
 -- Catálogo de medios de verificación (S2-TEC-03, ticket 4): alta, renombre y desactivación por el
 -- Administrador, con su propia bitácora; nunca DELETE (nada se borra, CA-3)
 GRANT SELECT, INSERT, UPDATE         ON medios_verificacion TO :"app";
--- ciclos_planeacion, metas_planeacion y metas_periodo: sin permisos hasta que el código de R4 los use.
 GRANT SELECT, UPDATE                 ON frecuencias      TO :"app";   -- ventanas de captura (R3-01)
 GRANT SELECT, INSERT, UPDATE         ON usuarios         TO :"app";   -- gestión de usuarios (R7-07); nunca DELETE (RN_3)
 GRANT SELECT, INSERT, UPDATE         ON sesiones         TO :"app";   -- se revocan, no se borran
@@ -40,5 +39,11 @@ GRANT SELECT, INSERT                 ON reportes         TO :"app";   -- generac
 GRANT SELECT, INSERT                 ON bitacora         TO :"app";   -- solo inserción (TEC-05 CA-5)
 -- Catálogo administrable (HU-R4-11): lee metas para decidir la vigencia futura (CA_4) y calcular el cumplimiento (RN_3)
 GRANT SELECT                         ON ciclos_planeacion, metas_planeacion, metas_periodo TO :"app";
+-- Planeación de metas (tickets 8 y 9: HU-R4-01 y HU-R4-02): la app abre el ciclo (INSERT) y genera y avanza las metas
+-- (INSERT/UPDATE; la marca vencida, el borrador). Nunca DELETE: las metas se versionan, no se borran, y
+-- una versión histórica no se modifica (trigger). Cerrar un ciclo (UPDATE) y escribir metas_periodo
+-- se agregan con R4-04/R4-05, junto con su prueba.
+GRANT INSERT                         ON ciclos_planeacion TO :"app";
+GRANT INSERT, UPDATE                 ON metas_planeacion  TO :"app";
 -- Cambios del indicador con vigencia futura (HU-R4-11 CA_4): se programan, se aplican o cancelan (UPDATE); nunca DELETE
 GRANT SELECT, INSERT, UPDATE         ON indicador_cambios_programados TO :"app";

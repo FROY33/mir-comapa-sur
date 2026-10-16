@@ -118,15 +118,28 @@ describe('con el modelo de versiones y metas', () => {
     await app.consultar('SELECT count(*) FROM medios_verificacion')
   })
 
-  test('no escribe versiones ni metas directamente; las metas solo las lee (HU-R4-11 CA_4 y RN_3)', async () => {
+  test('no escribe versiones; lee metas y ciclos (HU-R4-11 CA_4 y RN_3)', async () => {
     const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
     await intentar(`UPDATE indicador_versiones SET definicion = '{}'`)
     await app.consultar('SELECT count(*) FROM metas_planeacion')
     await app.consultar('SELECT count(*) FROM metas_periodo')
     await app.consultar('SELECT count(*) FROM ciclos_planeacion')
-    await intentar(`INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision)
-                    VALUES (2099, '2098-11-01', '2098-11-20', '2098-11-25')`)
+    await intentar('DELETE FROM metas_periodo')
+  })
+
+  test('abre ciclos y genera y actualiza metas, pero nunca las borra; una meta histórica no se modifica (tickets 8 y 9)', async () => {
+    const intentar = (sql: string) => assert.rejects(app.consultar(sql), Error, `el rol pudo: ${sql}`)
+    const [c] = await app.consultar<{ id: string }>(
+      `INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision)
+       VALUES (2099, '2098-11-01', '2098-11-20', '2098-11-25') RETURNING id`)
+    const [m] = await app.consultar<{ id: string }>(
+      `INSERT INTO metas_planeacion (indicador_id, ciclo_id) SELECT id, $1 FROM indicadores WHERE codigo = 'IND-1' RETURNING id`, [c!.id])
+    await app.consultar(`UPDATE metas_planeacion SET vencida = true, vencida_at = now() WHERE id = $1`, [m!.id])
     await intentar('DELETE FROM metas_planeacion')
+    await intentar('DELETE FROM ciclos_planeacion')
+    await intentar(`UPDATE ciclos_planeacion SET ejercicio = 2098`)
+    await comoDueño(`UPDATE metas_planeacion SET vigente = false WHERE id = '${m!.id}'`, base)
+    await intentar(`UPDATE metas_planeacion SET estado = 'borrador_meta' WHERE id = '${m!.id}'`)
   })
 
   test('al editar un indicador, los triggers versionan y dan de alta el medio aunque la app no escriba esas tablas (HU-R4-11 CA_1)', async () => {

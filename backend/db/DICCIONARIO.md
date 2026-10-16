@@ -387,6 +387,20 @@ AUDIT_LOG del RQM. Solo inserción: un trigger rechaza UPDATE, DELETE y TRUNCATE
 | ip | inet | sí | | | |
 | created_at | timestamptz | no | `now()` | | |
 
+### Acción `acceso_bloqueado`
+
+Se registra cuando un usuario con sesión es rechazado por permisos (S2-TEC-01). Un 401 (sin sesión o vencida) no se registra.
+`entidad = 'acceso'`, `entidad_id` = id del usuario, `rol` y `ip` del solicitante. `detalle`:
+
+| Clave | Descripción |
+|---|---|
+| metodo | Método HTTP (`GET` para páginas) |
+| ruta | Ruta de API sin query, o página pedida (`configuracion.html`) |
+| motivo | `rol` (403 por rol o por página) u `otra_gerencia` (indicador existente de otra gerencia) |
+| gerencia_id | Gerencia de la sesión |
+
+No se guarda cuerpo, cookies, query ni datos del recurso.
+
 ## login_intentos
 
 Fallos consecutivos de inicio de sesión por correo y bloqueo temporal (HU-R7-06): 5 fallos bloquean 15 minutos.
@@ -423,10 +437,19 @@ valores nuevos y se aplican al abrir el siguiente periodo. Los reportes y las me
 **Quién escribe y cuándo aplica.** La API de edición del catálogo (`PUT /api/admin/indicadores/:id`) inserta;
 `POST /api/admin/cambios-programados/:id/cancelar` cancela. `aplicarCambiosProgramados` (`src/datos/cambiosProgramados.ts`)
 aplica los pendientes con `vigente_desde <= hoy` dentro de la transacción de `abrirCiclos` (periodo de reporte de
-su frecuencia), antes de generar los reportes. Abrir un ciclo de planeación debe llamarla igual (ticket 8, pendiente).
+su frecuencia), antes de generar los reportes. Abrir un ciclo de planeación la llama igual, sin filtro y antes de generar las metas (`abrirCicloPlaneacion`, `src/datos/aperturaCicloPlaneacion.ts`).
 Un indicador tiene a lo sumo un cambio pendiente: uno nuevo cancela y reemplaza al anterior (conserva sus valores).
 Cada paso queda en la bitácora: `cambio_programado`, `cambio_programado_cancelado` y `cambio_programado_aplicado`
 (con `antes`, `despues` y `vigente_desde`).
+
+**Apertura del ciclo de planeación** (`POST /api/admin/planeacion/ciclos`, ticket 8). En una transacción: aplica los cambios
+programados vencidos, inserta el ciclo (`abierto_por`, `abierto_at`) y una `metas_planeacion` en `meta_pendiente` por cada
+indicador activo (MIR y gerencial; la versión del indicador la fija el trigger de la meta). Deja en la bitácora
+`ciclo_planeacion_abierto` (entidad `ciclo_planeacion`, `entidad_id` = id del ciclo; `detalle`: `ejercicio`, `inicio_captura`,
+`fin_captura`, `inicio_revision`, `metas_total`, `metas_por_gerencia` `[{gerencia, total}]` y `cambios_aplicados`).
+Un ejercicio con ciclo responde 409 `ciclo_existente`.
+
+**Indicadores tardíos** (ticket 8, HU-R4-01 CA_2). Con un ciclo no cerrado (programado, en captura, fuera de plazo o en revisión), el alta y la reactivación de un indicador desde el catálogo crean su `meta_pendiente` en la misma transacción (`metaPendienteDeIndicador`), con la versión y la gerencia vigentes; si ya tiene meta vigente en el ciclo no se crea otra. Deja `meta_pendiente_creada` (entidad `meta`, `entidad_id` = id de la meta, `indicador_id`; `detalle`: `ciclo_id`, `ejercicio`). Desactivar no toca la meta; sin ciclo o con el ciclo cerrado no se crea nada.
 
 ---
 

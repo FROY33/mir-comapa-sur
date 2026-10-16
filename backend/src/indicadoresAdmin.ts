@@ -5,6 +5,7 @@
 import type { SolicitudConSesion } from './autorizacion.js'
 import type { BD, Ejecutor } from './bd.js'
 import { registrarEvento } from './datos/bitacora.js'
+import { metaPendienteDeIndicador } from './datos/metaTardia.js'
 import {
   actualizarIndicador, cambiarActivoIndicador, catalogoIndicadores, codigoExiste,
   crearIndicador, frecuenciaExiste, gerenciaExiste, listarIndicadoresAdmin,
@@ -177,6 +178,7 @@ export const crear = (bd: BD) => async (s: SolicitudConSesion): Promise<Respuest
 
   const id = await bd.transaccion(async (tx) => {
     const id = await crearIndicador(tx, d)
+    await metaPendienteDeIndicador(tx, id, { usuarioId: s.sesion.usuarioId, ip: s.ip })
     const despues = await obtenerIndicadorCompleto(tx, id)
     await auditar(tx, s, 'indicador_creado', id, { despues: foto(despues!) })
     return id
@@ -227,6 +229,7 @@ export const reactivar = (bd: BD) => async (s: SolicitudConSesion): Promise<Resp
 
   await bd.transaccion(async (tx) => {
     await cambiarActivoIndicador(tx, id, true)
+    await metaPendienteDeIndicador(tx, id, { usuarioId: s.sesion.usuarioId, ip: s.ip })
     const despues = await obtenerIndicadorCompleto(tx, id)
     await auditar(tx, s, 'indicador_reactivado', id, { antes: foto(ind), despues: foto(despues!) })
   })

@@ -56,8 +56,8 @@ async function reporte(indicadorId: string, periodoId: string, estado: string, a
 
 async function meta(indicadorId: string, anual: number, porPeriodo: number[], estado = 'meta_validada') {
   const [c] = await bd.consultar<{ id: string }>(
-    `INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision)
-     VALUES ($1, '2000-01-01', '2000-01-31', '2000-02-15')
+    `INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision, cerrado_manual, cerrado_at)
+     VALUES ($1, '2000-01-01', '2000-01-31', '2000-02-15', true, now())
      ON CONFLICT (ejercicio) DO UPDATE SET ejercicio = EXCLUDED.ejercicio RETURNING id`, [ejercicio])
   const [m] = await bd.consultar<{ id: string }>(
     `INSERT INTO metas_planeacion (indicador_id, ciclo_id, estado, meta_anual, linea_base, enviada_at, validada_at)

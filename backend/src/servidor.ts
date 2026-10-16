@@ -3,6 +3,7 @@
 import { createServer } from 'node:http'
 import { crearApp } from './app.js'
 import { correrApertura } from './ciclos.js'
+import { marcarVencidasDeCiclos } from './datos/metaVencida.js'
 import { crearBD } from './bd.js'
 import { cargarConfig, type Config } from './config.js'
 import { registrarEvento } from './datos/bitacora.js'
@@ -47,6 +48,12 @@ async function aperturaAutomatica(): Promise<void> {
     if (nuevas.length > 0) log.info('Ciclos abiertos', { aperturas: nuevas })
   } catch (err) {
     log.aviso('No se pudo correr la apertura de ciclos', detalleError(err))
+  }
+  try {
+    const vencidas = await bd.transaccion((tx) => marcarVencidasDeCiclos(tx))
+    if (vencidas > 0) log.info('Metas marcadas como vencidas', { vencidas })
+  } catch (err) {
+    log.aviso('No se pudo marcar las metas vencidas', detalleError(err))
   }
 }
 if (config.ciclosAutomaticos) {

@@ -13,6 +13,7 @@ import * as indicadoresAdmin from './indicadoresAdmin.js'
 import * as indicadoresCambios from './indicadoresCambios.js'
 import * as mediosVerificacion from './mediosVerificacion.js'
 import * as pendientes from './pendientes.js'
+import * as planeacion from './planeacion.js'
 import type { Log } from './log.js'
 import type { Rol } from './rutas.js'
 import * as usuarios from './usuarios.js'
@@ -52,7 +53,13 @@ export function crearApp(
     // Reportes del periodo abierto de la gerencia, con los pendientes del Enlace (HU-R1-01)
     'GET /api/pendientes': protegida(TODOS, pendientes.listar(bd)),
 
+    // Ciclo de planeación de metas vigente y su fase, para navegación y dashboards (tickets 8 y 9)
+    'GET /api/planeacion/ciclo-vigente': protegida(TODOS, planeacion.vigente(bd)),
+    'GET /api/planeacion/pendientes': protegida(['enlace'], planeacion.pendientes(bd)),   // metas por configurar (ticket 9, HU-R4-02)
+
     // Solo Administrador: todo lo que cuelga de /api/admin/ (HU-R7-03 CA_3, CA_6)
+    'POST /api/admin/planeacion/ciclos': protegida(['admin'], planeacion.abrir(bd)),   // apertura del ciclo de planeación (ticket 8, HU-R4-01)
+    'GET /api/admin/planeacion/ciclos': protegida(['admin'], planeacion.listarCiclos(bd)),   // historial de ciclos (HU-R4-01 CA_6)
     'GET /api/admin/configuracion': protegida(['admin'], async () => ({
       status: 200, cuerpo: { frecuencias: await listarFrecuencias(bd) },
     })),

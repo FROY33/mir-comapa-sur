@@ -59,8 +59,8 @@ before(async () => {
   medio = mv!.id
   ejercicio = 2030 + Math.floor(Math.random() * 60)
   const [c] = await bd.consultar<{ id: string }>(
-    `INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision)
-     VALUES ($1, '2000-01-01', '2000-01-31', '2000-02-15')
+    `INSERT INTO ciclos_planeacion (ejercicio, inicio_captura, fin_captura, inicio_revision, cerrado_manual, cerrado_at)
+     VALUES ($1, '2000-01-01', '2000-01-31', '2000-02-15', true, now())
      ON CONFLICT (ejercicio) DO UPDATE SET ejercicio = EXCLUDED.ejercicio RETURNING id`, [ejercicio])
   cicloId = c!.id
 })

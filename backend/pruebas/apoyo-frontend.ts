@@ -9,7 +9,7 @@ export const RAIZ = path.resolve(import.meta.dirname, '../..')
 export const archivo = (nombre: string) => readFileSync(path.join(RAIZ, nombre), 'utf8')
 
 /** Los scripts de sesión en el orden en que los carga cada página, como un solo código. */
-export const codigoSesion = () => ['session.js', 'guardia.js', 'vistas-mir.js'].map(archivo).join('\n;\n')
+export const codigoSesion = () => ['session.js', 'guardia.js', 'vistas-mir.js', 'planeacion-ciclo.js'].map(archivo).join('\n;\n')
 
 /** El <script> en línea de `pagina` que contiene `marca` (las vistas tienen su código en el HTML). */
 export function scriptDePagina(pagina: string, marca: string): string {
@@ -64,6 +64,8 @@ export function ejecutarEnNavegador(codigo: string, exportar: string[], opciones
     location: { pathname: `/${opciones.pagina ?? 'pagina.html'}`, search: '', href: '', replace() {} },
     addEventListener() {},
   }
+  /** Los `setInterval` que pidió el código: la prueba los dispara a mano, sin esperar al reloj. */
+  const intervalos: { fn: () => void; ms: number }[] = []
   const respuestas = opciones.respuestas ?? {}
   const fetchFalso = (ruta: string) => {
     const cuerpo = Object.entries(respuestas).find(([prefijo]) => ruta.startsWith(prefijo))?.[1]
@@ -71,14 +73,15 @@ export function ejecutarEnNavegador(codigo: string, exportar: string[], opciones
     return Promise.resolve({ ok, status: ok ? 200 : 404, json: () => Promise.resolve(cuerpo ?? {}) })
   }
   const almacen = { getItem: () => null, setItem() {}, removeItem() {} }
-  const api = new Function('window', 'document', 'fetch', 'localStorage', 'sessionStorage', 'navigator', 'setTimeout',
+  const api = new Function('window', 'document', 'fetch', 'localStorage', 'sessionStorage', 'navigator', 'setTimeout', 'setInterval',
     `${codigo}\n;return { ${exportar.join(', ')} }`)(
-    ventana, documento, fetchFalso, almacen, almacen, {}, () => 0) as Record<string, (...a: unknown[]) => unknown>
+    ventana, documento, fetchFalso, almacen, almacen, {}, () => 0,
+    (fn: () => void, ms: number) => { intervalos.push({ fn, ms }); return intervalos.length }) as Record<string, (...a: unknown[]) => unknown>
 
   /** Todo el HTML que el código asignó, de cualquier elemento. */
   const htmlPintado = () => creados.map((e) => e.innerHTML).join('\n')
   /** Todo el texto asignado con textContent. */
   const textoPintado = () => creados.map((e) => e.textContent).join('\n')
   const disparar = (ev: string) => oyentes[ev]?.()
-  return { api, ventana: ventana as typeof ventana & Record<string, unknown>, documento, htmlPintado, textoPintado, disparar }
+  return { api, intervalos, ventana: ventana as typeof ventana & Record<string, unknown>, documento, htmlPintado, textoPintado, disparar }
 }

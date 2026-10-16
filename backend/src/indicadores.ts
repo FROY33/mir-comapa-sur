@@ -7,6 +7,7 @@
 
 import type { BD } from './bd.js'
 import type { SolicitudConSesion } from './autorizacion.js'
+import { auditarBloqueo, esDeOtraGerencia } from './datos/accesoBloqueado.js'
 import { fichaTecnica } from './datos/fichaTecnica.js'
 import { listarIndicadores, obtenerIndicador } from './datos/indicadores.js'
 import type { Respuesta } from './http.js'
@@ -38,13 +39,21 @@ export const buscar = (bd: BD) => async (s: SolicitudConSesion): Promise<Respues
   return { status: 200, cuerpo: await listarIndicadores(bd, gerencia, texto) }
 }
 
+/** Un 404 por indicador ajeno es un bloqueo (S2-TEC-01); uno por indicador inexistente no. La respuesta es la misma. */
+async function noEncontrado(bd: BD, s: SolicitudConSesion, id: string): Promise<Respuesta> {
+  if (s.sesion.rol !== 'admin' && await esDeOtraGerencia(bd, id, s.sesion.gerenciaId)) {
+    await auditarBloqueo(bd, s.sesion, { metodo: 'GET', ruta: s.url.pathname, motivo: 'otra_gerencia', ip: s.ip })
+  }
+  return NO_ENCONTRADO
+}
+
 /** GET /api/indicadores/:id — 404 si no existe o es de otra gerencia. */
 export const detalle = (bd: BD) => async (s: SolicitudConSesion): Promise<Respuesta> => {
   const id = s.params.id ?? ''
   if (!UUID.test(id)) return NO_ENCONTRADO
   const gerencia = s.sesion.rol === 'admin' ? null : s.sesion.gerenciaId
   const indicador = await obtenerIndicador(bd, id, gerencia)
-  return indicador ? { status: 200, cuerpo: indicador } : NO_ENCONTRADO
+  return indicador ? { status: 200, cuerpo: indicador } : noEncontrado(bd, s, id)
 }
 
 /** GET /api/indicadores/:id/ficha — ficha técnica (HU-R8-03). Otra gerencia: 404, como el detalle (CA_5). */
@@ -52,5 +61,5 @@ export const ficha = (bd: BD) => async (s: SolicitudConSesion): Promise<Respuest
   const id = s.params.id ?? ''
   if (!UUID.test(id)) return NO_ENCONTRADO
   const f = await fichaTecnica(bd, id, s.sesion.rol === 'admin' ? null : s.sesion.gerenciaId)
-  return f ? { status: 200, cuerpo: f } : NO_ENCONTRADO
+  return f ? { status: 200, cuerpo: f } : noEncontrado(bd, s, id)
 }
