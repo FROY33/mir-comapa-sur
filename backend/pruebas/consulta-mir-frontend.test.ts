@@ -23,7 +23,7 @@ const FILAS = [
 ]
 
 async function cargar(rol = 'admin', filas: unknown = FILAS) {
-  const codigo = codigoSesion() + '\n;\n' + archivo('consulta-mir.js')
+  const codigo = codigoSesion() + '\n;\n' + archivo('menu-rol.js') + '\n;\n' + archivo('consulta-mir.js')
   const p = ejecutarEnNavegador(codigo, ['ordenar', 'ordenarPor', 'menuDelRol', 'datos: () => DATA'], {
     cookie: perfil(rol), pagina: 'consulta-mir.html', respuestas: { '/api/consulta-mir': filas },
   })
@@ -77,7 +77,7 @@ describe('HU-R8-01 pantalla', () => {
   })
 
   test('si la API falla, lo dice en vez de mostrar una tabla vacía', async () => {
-    const codigo = codigoSesion() + '\n;\n' + archivo('consulta-mir.js')
+    const codigo = codigoSesion() + '\n;\n' + archivo('menu-rol.js') + '\n;\n' + archivo('consulta-mir.js')
     const p = ejecutarEnNavegador(codigo, [], { cookie: perfil('admin'), pagina: 'consulta-mir.html', respuestas: {} })
     await esperar()
     assert.match(p.htmlPintado(), /No se pudo cargar el catálogo/)

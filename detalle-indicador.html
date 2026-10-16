@@ -11,165 +11,7 @@
 <script src="vistas-mir.js"></script>
 <script src="mock-notifications.js"></script>
 <script src="layout.js"></script>
-<style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-surface); color: var(--color-text-primary); display: flex; min-height: 100vh; }
-/* ── BREADCRUMB ── */
-.breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
-.breadcrumb a { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color 0.15s; }
-.breadcrumb a:hover { color: var(--color-primary); }
-.breadcrumb .sep { font-size: 12px; color: var(--color-border); }
-.breadcrumb .current { font-size: 12px; font-weight: 700; color: var(--color-text-primary); }
-/* ── INDICATOR HEADER CARD ── */
-.ind-header {
-  background: var(--color-bg);
-  border-radius: var(--radius-card);
-  padding: 24px var(--pad-card);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  margin-bottom: var(--gap);
-  border-top: 3px solid var(--color-accent);
-}
-.ind-header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
-.ind-meta-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.ind-id { font-size: 11px; font-weight: 700; font-family: monospace; color: var(--color-text-secondary); background: var(--color-surface); padding: 4px 10px; border-radius: 8px; }
-.ind-title { font-size: 20px; font-weight: 700; color: var(--color-text-primary); line-height: 1.4; margin-bottom: 14px; max-width: 680px; }
-.ind-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn-outline-accent { background: transparent; color: var(--color-primary); border: 1.5px solid var(--color-primary); border-radius: var(--radius-btn); padding: 8px 16px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
-.btn-outline-accent:hover { background: var(--color-primary-tint); }
-/* ── BADGES ── */
-.level-tag { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.level-tag.fin { background: var(--color-text-primary); color: white; }
-.level-tag.proposito { background: var(--color-text-primary); color: white; }
-.level-tag.componente { background: var(--color-text-secondary); color: white; }
-.level-tag.actividad { background: var(--color-text-muted); color: white; }
-.g-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.g-chip.tec { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.g-chip.pe { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.g-chip.com { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.g-chip.adm { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.freq-tag.mensual { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.trimestral { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.semestral { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.anual { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.freq-tag.bimestral { background: var(--color-neutral-100); color: var(--color-text-secondary); }
-.mv-tag { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.mv-tag.interno { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-neutral-300); }
-.mv-tag.externo { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-neutral-300); }
-.mv-tag.mixto { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-neutral-300); }
-.den-tag { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-btn); white-space: nowrap; display: inline-block; }
-.den-tag.con { background: var(--color-neutral-100); color: var(--color-text-primary); border: 1px solid var(--color-neutral-300); }
-.den-tag.sin { background: var(--color-neutral-100); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
-/* ── SUMMARY STRIP ── */
-.summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); margin-bottom: var(--gap); }
-.sum-card { background: var(--color-bg); border-radius: var(--radius-card); padding: 16px var(--pad-card); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.sum-label { font-size: 10px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
-.sum-value { font-size: 18px; font-weight: 700; color: var(--color-text-primary); line-height: 1; margin-bottom: 4px; }
-.sum-sub { font-size: 11px; color: var(--color-text-secondary); }
-/* ── TABS ── */
-.tab-strip { display: flex; gap: 4px; background: var(--color-bg); border-radius: var(--radius-card); padding: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: var(--gap); }
-.tab-btn { flex: 1; padding: 8px 14px; border-radius: var(--radius-btn); border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; text-align: center; }
-.tab-btn:hover { background: var(--color-surface); color: var(--color-text-primary); }
-.tab-btn.active { background: var(--color-primary); color: white; }
-.tab-panel { display: none; }
-.tab-panel.active { display: flex; flex-direction: column; gap: var(--gap); }
-.section-title { font-size: 13px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.section-title svg { width: 16px; height: 16px; color: var(--color-primary); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.field { display: flex; flex-direction: column; gap: 5px; }
-.field-label { font-size: 10px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px; }
-.field-value { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
-.field-value.large { font-size: 22px; font-weight: 700; }
-/* ── OBJECTIVE BLOCK ── */
-.obj-highlight { background: var(--color-primary-tint); border-radius: 12px; padding: 16px; }
-.obj-highlight p { font-size: 13px; font-weight: 600; color: var(--color-primary); line-height: 1.6; }
-.obj-full { font-size: 13px; color: var(--color-text-primary); line-height: 1.7; }
-/* ── FORMULA BLOCK ── */
-.formula-block { background: var(--color-surface); border-radius: 12px; padding: 16px; }
-.formula-text { font-family: monospace; font-size: 13px; color: var(--color-text-primary); line-height: 1.7; }
-.formula-label { font-size: 10px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-/* ── NUMERADOR / DENOMINADOR ── */
-.num-den-grid { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; align-items: center; margin-top: 4px; }
-.nd-item { background: var(--color-surface); border-radius: 12px; padding: 14px 16px; }
-.nd-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
-.nd-label.num { color: var(--color-text-primary); }
-.nd-label.den { color: var(--color-text-secondary); }
-.nd-value { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
-.nd-operator { text-align: center; font-size: 22px; font-weight: 700; color: var(--color-text-secondary); }
-/* ── DIRECT VALUE BLOCK ── */
-.direct-block { background: #F8F8F8; border: 1px solid var(--color-border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; }
-.direct-block svg { width: 16px; height: 16px; color: var(--color-text-muted); flex-shrink: 0; margin-top: 1px; }
-.direct-block p { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
-/* ── INFO / DIDACTIC BLOCK ── */
-.info-block { background: #F8F8F8; border: 1px solid var(--color-border); border-radius: 12px; padding: 11px 14px; display: flex; align-items: flex-start; gap: 9px; }
-.info-block svg { width: 14px; height: 14px; color: var(--color-text-muted); flex-shrink: 0; margin-top: 1px; }
-.info-block p { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
-/* ── MV SECTION ── */
-.mv-card { background: var(--color-surface); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-.mv-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); line-height: 1.4; }
-.mv-source { font-size: 12px; color: var(--color-text-secondary); }
-.mv-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-/* ── PLANEACIÓN ── */
-.meta-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.meta-item { background: var(--color-surface); border-radius: 12px; padding: 16px; text-align: center; }
-.meta-num { font-size: 32px; font-weight: 700; color: var(--color-text-primary); line-height: 1; margin-bottom: 4px; }
-.meta-num.accent { color: var(--color-accent); }
-.meta-lbl { font-size: 11px; color: var(--color-text-secondary); }
-.meta-year { font-size: 10px; font-weight: 600; color: var(--color-text-secondary); background: var(--color-border); padding: 2px 8px; border-radius: 999px; display: inline-block; margin-top: 4px; }
-.progress-track { background: var(--color-border); border-radius: 999px; height: 6px; margin-top: 12px; overflow: hidden; }
-.progress-fill { background: var(--color-accent); height: 100%; border-radius: 999px; transition: width 0.6s ease; }
-/* ── PENDING TAG ── */
-.pending-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--color-neutral-100); color: var(--color-text-secondary); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-btn); }
-.pending-tag svg { width: 11px; height: 11px; }
-.por-definir-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--color-surface); color: var(--color-text-secondary); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-btn); border: 1px dashed var(--color-border); }
-/* ── TOOLTIPS ── */
-.tip-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
-.tip-icon { width: 14px; height: 14px; border-radius: 50%; background: var(--color-border); color: var(--color-text-secondary); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; cursor: help; flex-shrink: 0; position: relative; }
-.tip-icon::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%); background: var(--color-text-primary); color: white; font-size: 11px; line-height: 1.4; padding: 7px 10px; border-radius: 8px; white-space: normal; min-width: 160px; max-width: 220px; text-align: left; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 500; font-weight: 400; font-family: 'Plus Jakarta Sans', sans-serif; }
-.tip-icon:hover::after { opacity: 1; }
-/* ── BOTTOM ACTION BAR ── */
-.bottom-bar { background: var(--color-bg); border-radius: var(--radius-card); padding: 16px var(--pad-card); box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: var(--gap); flex-wrap: wrap; }
-.bottom-bar-label { font-size: 12px; color: var(--color-text-secondary); }
-.bottom-bar-label strong { color: var(--color-text-primary); }
-.bottom-bar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-/* ── AVANCE INLINE ── */
-.avance-card {background:var(--color-surface);border:1.5px solid var(--color-border);border-radius:12px;padding:16px;margin-top:0;}
-.avance-card-title {font-size:12px;font-weight:700;color:var(--color-text-primary);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.avance-card-title svg {width:14px;height:14px;color:var(--color-primary);flex-shrink:0;}
-.avance-ctx {display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
-.avance-ctx-item {background:var(--color-bg);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--color-text-secondary);border:1px solid var(--color-border);display:flex;align-items:center;gap:4px;}
-.avance-ctx-item strong {color:var(--color-text-primary);font-weight:700;}
-.avance-inp-lbl {font-size:12px;font-weight:600;color:var(--color-text-primary);display:block;margin-bottom:8px;}
-.avance-inp-row {display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.avance-inp {background:var(--color-bg);border:1.5px solid var(--color-border);border-radius:10px;padding:9px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--color-text-primary);outline:none;transition:border-color .15s,box-shadow .15s;width:170px;}
-.avance-inp:focus {border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(139,29,58,.08);}
-.avance-unit {font-size:16px;font-weight:700;color:var(--color-text-secondary);}
-.avance-inp-hint {font-size:11px;color:var(--color-text-secondary);margin-bottom:12px;line-height:1.5;}
-.avance-saved-msg {display:none;align-items:center;gap:7px;padding:9px 13px;background:var(--color-success-tint);border:1px solid #BBF7D0;border-radius:8px;font-size:12px;color:var(--color-success-dark);font-weight:600;margin-top:10px;}
-.avance-saved-msg svg {width:14px;height:14px;flex-shrink:0;}
-/* ── RESPONSIVE ── */
-@media (max-width: 1024px) {
-  .summary-strip { grid-template-columns: repeat(2, 1fr); }
-  .tab-btn { padding: 8px 10px; font-size: 11px; }
-}
-
-@media (max-width: 860px) {
-.field-row { grid-template-columns: 1fr; }
-.num-den-grid { grid-template-columns: 1fr; }
-.nd-operator { display: none; }
-.meta-visual { grid-template-columns: 1fr 1fr; }
-.ind-actions { flex-wrap: wrap; }
-}
-
-@media (max-width: 640px) {
-.summary-strip { grid-template-columns: 1fr 1fr; }
-.tab-strip { overflow-x: auto; flex-wrap: nowrap; }
-.tab-btn { white-space: nowrap; }
-.bottom-bar { flex-direction: column; align-items: flex-start; }
-.breadcrumb { display: none; }
-}
-</style>
-<script src="data/mir-comapa-sur.js"></script>
+<link rel="stylesheet" href="detalle-indicador.css">
 </head>
 <body>
 <!-- ═══ SIDEBAR ═══ -->
@@ -177,7 +19,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
   <div class="sidebar-logo">
     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
   </div>
-  <div class="sidebar-nav">
+  <div class="sidebar-nav" id="navAdmin">
     <a class="nav-item" href="dashboard-admin.html" title="Inicio">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
       <span class="nav-label">Inicio</span>
@@ -211,6 +53,28 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
       <span class="nav-label">Guía MIR</span>
     </div>
   </div>
+  <div class="sidebar-nav hidden" id="navRevisor">
+    <a class="nav-item" href="dashboard-revisor.html" title="Inicio">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>
+      <span class="nav-label">Inicio</span>
+    </a>
+    <a class="nav-item" href="bandeja-revision.html" title="Bandeja de revisión">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3"/></svg>
+      <span class="nav-label">Bandeja de revisión</span>
+    </a>
+    <a class="nav-item active" href="consulta-mir.html" title="Consulta MIR">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg>
+      <span class="nav-label">Consulta MIR</span>
+    </a>
+    <a class="nav-item" href="planeacion-metas-revisor.html" title="Planeación">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      <span class="nav-label">Planeación</span>
+    </a>
+    <a class="nav-item" href="reportes-revisor.html" title="Reportes">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+      <span class="nav-label">Reportes</span>
+    </a>
+  </div>
   <div class="sidebar-bottom">
     <a class="nav-item" href="configuracion.html" title="Configuración">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
@@ -227,314 +91,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--color-sur
 <main class="main-content" id="mainContent"></main>
 </div>
 
-<script>
-(function () {
-  var avanceVal  = '';
-  var avanceSaved = false;
-  window.onIndAvanceInput = function (val) {
-    avanceVal = val;
-    var btn = document.getElementById('avanceSaveBtn');
-    if (btn) btn.disabled = !val.trim();
-  };
-  window.saveIndAvance = function () {
-    if (!avanceVal.trim()) return;
-    avanceSaved = true;
-    var btn = document.getElementById('avanceSaveBtn');
-    var msg = document.getElementById('avanceSavedMsg');
-    var valEl = document.getElementById('avanceSavedVal');
-    if (btn) { btn.disabled = true; btn.textContent = 'Guardado'; }
-    if (valEl) valEl.textContent = avanceVal;
-    if (msg) msg.style.display = 'flex';
-  };
-
-  var params = new URLSearchParams(window.location.search);
-  var id = params.get('id') || 'PLA-FIN-001';
-  var dato = (window.MIR_DATA || []).find(function (x) { return x.id === id; });
-  var main = document.getElementById('mainContent');
-
-  if (!dato) {
-    main.innerHTML = '<p style="padding:48px 24px;color:var(--color-text-secondary);text-align:center">Indicador no encontrado: ' + escaparHTML(id) + '</p>';
-    return;
-  }
-
-  // Todos los textos del indicador acaban en HTML: se escapan una sola vez aquí. Los null,
-  // números y booleanos quedan igual, así que las comparaciones de abajo no cambian.
-  var r = {};
-  Object.keys(dato).forEach(function (k) { r[k] = typeof dato[k] === 'string' ? escaparHTML(dato[k]) : dato[k]; });
-
-  document.title = dato.id + ' — Detalle de indicador · MIR COMAPA Sur';
-
-  function gCls(g)  { return {'Planeación Estratégica':'pe','Técnica':'tec','Comercial':'com','Administrativa':'adm'}[g]||'pe'; }
-  function lvCls(n) { return {'Fin':'fin','Propósito':'proposito','Componente':'componente','Actividad':'actividad'}[n]||''; }
-  function frCls(f) { return {'Mensual':'mensual','Trimestral':'trimestral','Semestral':'semestral','Anual':'anual','Bimestral':'bimestral','Semanal':'semanal'}[f]||''; }
-  function mvCls(t) { return {'Interno':'interno','Externo':'externo','Mixto':'mixto'}[t]||''; }
-
-  var PENDING = '<span class="pending-tag">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>' +
-    'Pendiente de captura</span>';
-
-  function pend(v) { return (v !== null && v !== undefined && v !== '') ? String(v) : PENDING; }
-
-  var frecMap = {Mensual:'12',Trimestral:'4',Semestral:'2',Anual:'1',Bimestral:'6',Semanal:'52'};
-  var periodoLabel = {Mensual:'Junio 2026',Bimestral:'May–Jun 2026',Trimestral:'Q2 2026',Semestral:'Primer semestre 2026',Anual:'2026',Semanal:'Sem. 23 / 2026'}[r.frecuenciaMedicion] || '2026';
-  var isIndPercent = [(r.lineaBase !== null ? String(r.lineaBase) : ''), (r.metaAnual !== null ? String(r.metaAnual) : ''), (r.unidadMedida||'')].some(function(v){ return v.includes('%') || v.toLowerCase().includes('porcentaje'); });
-  var indUnit = isIndPercent ? '%' : (r.unidadMedida && r.unidadMedida !== 'Porcentaje' ? '' : '');
-  var indExample = isIndPercent ? '78.5' : '142';
-  var frecN   = frecMap[r.frecuenciaMedicion] || '—';
-  var uShort  = r.unidadMedida === 'Porcentaje' ? '%' : (r.unidadMedida || '—');
-  var denTag  = r.tieneDenominador
-    ? '<span class="den-tag con">Con denominador</span>'
-    : '<span class="den-tag sin">Sin denominador</span>';
-
-  var metaAnualHTML = r.metaAnual !== null
-    ? '<p class="sum-value" style="color:var(--color-accent)">' + r.metaAnual + '</p>'
-    : '<div style="margin-top:4px">' + PENDING + '</div>';
-
-  var mvTypeHTML = r.medioVerificacionTipo
-    ? '<span class="mv-tag ' + mvCls(r.medioVerificacionTipo) + '">' + r.medioVerificacionTipo + '</span>'
-    : PENDING;
-
-  var numDenHTML;
-  if (r.tieneDenominador) {
-    numDenHTML = '<div class="num-den-grid">' +
-      '<div class="nd-item"><span class="nd-label num">Numerador (X)</span><p class="nd-value">' + (r.numerador||'No especificado') + '</p></div>' +
-      '<div class="nd-operator">÷</div>' +
-      '<div class="nd-item"><span class="nd-label den">Denominador (Y)</span><p class="nd-value">' + (r.denominador||'No especificado') + '</p></div>' +
-      '</div>';
-  } else {
-    numDenHTML =
-      '<div class="direct-block">' +
-        '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>' +
-        '<p>Este indicador se mide como <strong>valor directo</strong> (sin denominador). Se reporta el valor absoluto.</p>' +
-      '</div>' +
-      '<div class="nd-item" style="margin-top:12px"><span class="nd-label num">Variable (X)</span><p class="nd-value">' + (r.numerador||'No especificado') + '</p></div>';
-  }
-
-  var mvCountText = r.medioVerificacionCount !== null
-    ? r.medioVerificacionCount + ' documento' + (r.medioVerificacionCount !== 1 ? 's' : '') + ' por reporte'
-    : PENDING;
-
-  var html = '' +
-'<div class="breadcrumb">' +
-  '<a href="dashboard-admin.html">Inicio</a>' +
-  '<span class="sep">›</span>' +
-  '<a href="consulta-mir.html">Consulta MIR</a>' +
-  '<span class="sep">›</span>' +
-  '<a href="consulta-mir.html">' + r.gerencia + '</a>' +
-  '<span class="sep">›</span>' +
-  '<span class="current">' + r.id + '</span>' +
-'</div>' +
-
-'<div class="ind-header">' +
-  '<div class="ind-header-top"><div style="flex:1">' +
-    '<div class="ind-meta-row">' +
-      '<span class="ind-id">' + r.id + '</span>' +
-      '<span class="level-tag ' + lvCls(r.nivel) + '">' + r.nivel + '</span>' +
-      '<span class="g-chip ' + gCls(r.gerencia) + '">' + r.gerencia + '</span>' +
-      '<span class="freq-tag ' + frCls(r.frecuenciaMedicion) + '">' + r.frecuenciaMedicion + '</span>' +
-      (r.medioVerificacionTipo ? '<span class="mv-tag ' + mvCls(r.medioVerificacionTipo) + '">MV ' + r.medioVerificacionTipo + '</span>' : '') +
-      denTag +
-    '</div>' +
-    '<h1 class="ind-title">' + isoBadge(r) + r.nombreIndicador + '</h1>' +
-    '<div class="ind-actions">' +
-      '<button class="btn btn-primary" onclick="document.querySelector(\'[data-tab=mv]\').click();setTimeout(function(){var i=document.getElementById(\'avanceInput\');if(i)i.focus();},80)">' +
-        '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>' +
-        'Reportar avance' +
-      '</button>' +
-      '<button class="btn btn-secondary">' +
-        '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8 2a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /></svg>' +
-        'Capturar meta' +
-      '</button>' +
-      '<button class="btn btn-secondary">' +
-        '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg>' +
-        'Subir MV' +
-      '</button>' +
-      '<button class="btn btn-ghost" onclick="window.location=\'consulta-mir.html\'">' +
-        '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>' +
-        'Volver' +
-      '</button>' +
-    '</div>' +
-  '</div></div>' +
-'</div>' +
-
-'<div class="summary-strip">' +
-  '<div class="sum-card">' +
-    '<p class="sum-label"><span class="tip-wrap">Nivel MIR <span class="tip-icon" data-tip="Posición del indicador en la lógica causal de la MIR">?</span></span></p>' +
-    '<p class="sum-value" style="font-size:15px;margin-top:2px"><span class="level-tag ' + lvCls(r.nivel) + '">' + r.nivel + '</span></p>' +
-    '<p class="sum-sub" style="margin-top:6px">Lógica causal MIR</p>' +
-  '</div>' +
-  '<div class="sum-card">' +
-    '<p class="sum-label"><span class="tip-wrap">Frecuencia <span class="tip-icon" data-tip="Periodicidad con la que se mide y reporta este indicador">?</span></span></p>' +
-    '<p class="sum-value">' + r.frecuenciaMedicion + '</p>' +
-    '<p class="sum-sub">' + frecN + ' reporte' + (frecN !== '1' ? 's' : '') + ' al año</p>' +
-  '</div>' +
-  '<div class="sum-card">' +
-    '<p class="sum-label">Unidad de medida</p>' +
-    '<p class="sum-value">' + uShort + '</p>' +
-    '<p class="sum-sub">' + r.unidadMedida + '</p>' +
-  '</div>' +
-  '<div class="sum-card">' +
-    '<p class="sum-label">Meta anual</p>' +
-    metaAnualHTML +
-    '<p class="sum-sub" style="margin-top:4px">' + (r.lineaBase !== null ? 'Línea base: ' + r.lineaBase : 'Línea base pendiente') + '</p>' +
-  '</div>' +
-'</div>' +
-
-'<div class="tab-strip">' +
-  '<button class="tab-btn active" data-tab="resumen">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="13" height="13" style="display:inline;margin-right:5px;vertical-align:-2px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" /></svg>' +
-    'Resumen' +
-  '</button>' +
-  '<button class="tab-btn" data-tab="medicion">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="13" height="13" style="display:inline;margin-right:5px;vertical-align:-2px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.652 4.5 4.756V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.756c0-1.104-.807-2.057-1.907-2.184A48.507 48.507 0 0 0 12 2.25Z" /></svg>' +
-    'Medición' +
-  '</button>' +
-  '<button class="tab-btn" data-tab="mv">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="13" height="13" style="display:inline;margin-right:5px;vertical-align:-2px"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg>' +
-    'Medio de verificación' +
-  '</button>' +
-  '<button class="tab-btn" data-tab="planeacion">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="13" height="13" style="display:inline;margin-right:5px;vertical-align:-2px"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>' +
-    'Planeación' +
-  '</button>' +
-'</div>' +
-
-'<div class="tab-panel active" id="tab-resumen">' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>Objetivo del indicador</p>' +
-    '<div class="obj-highlight" style="margin-bottom:14px"><p>' + pend(r.resumenNarrativo || r.objetivo) + '</p></div>' +
-    '<p class="field-label" style="margin-bottom:8px">Objetivo completo</p>' +
-    '<p class="obj-full">' + pend(r.resumenNarrativo) + '</p>' +
-  '</div>' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>Ubicación en la MIR</p>' +
-    '<div class="field-row">' +
-      '<div class="field"><span class="field-label">Gerencia</span><span class="field-value"><span class="g-chip ' + gCls(r.gerencia) + '">' + r.gerencia + '</span></span></div>' +
-      '<div class="field"><span class="field-label">Nivel MIR</span><span class="field-value"><span class="level-tag ' + lvCls(r.nivel) + '">' + r.nivel + '</span></span></div>' +
-      '<div class="field" style="grid-column:1/-1"><span class="field-label">Cadena de resultados</span>' +
-        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">' +
-          '<span class="level-tag fin">Fin</span>' +
-          '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="12" height="12" style="color:var(--color-text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>' +
-          '<span class="level-tag proposito">Propósito</span>' +
-          '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="12" height="12" style="color:var(--color-text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>' +
-          '<span class="level-tag componente">Componente</span>' +
-          '<svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="12" height="12" style="color:var(--color-text-muted)"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>' +
-          '<span class="level-tag actividad">Actividad</span>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
-  '</div>' +
-'</div>' +
-
-'<div class="tab-panel" id="tab-medicion">' +
-  '<div class="info-block"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg><p>El método de cálculo indica cómo se obtiene el resultado del indicador. Representa la fórmula que el responsable debe aplicar para reportar el valor de avance.</p></div>' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.652 4.5 4.756V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.756c0-1.104-.807-2.057-1.907-2.184A48.507 48.507 0 0 0 12 2.25Z" /></svg><span class="tip-wrap">Método de cálculo <span class="tip-icon" data-tip="Fórmula o procedimiento que permite calcular el valor del indicador a partir de sus variables">?</span></span></p>' +
-    '<div class="formula-block"><p class="formula-label">Fórmula</p><p class="formula-text">' + pend(r.metodoCalculo || r.numerador) + '</p></div>' +
-    '<div class="divider" style="margin:20px 0"></div>' +
-    '<p class="field-label" style="margin-bottom:12px">Variables del cálculo</p>' +
-    numDenHTML +
-    '<div class="divider" style="margin:20px 0"></div>' +
-    '<div class="field-row">' +
-      '<div class="field"><span class="field-label">Unidad de medida</span><span class="field-value">' + pend(r.unidadMedida) + '</span></div>' +
-      '<div class="field"><span class="field-label"><span class="tip-wrap">Frecuencia de medición <span class="tip-icon" data-tip="La frecuencia define cada cuánto debe reportarse este indicador">?</span></span></span><span class="field-value"><span class="freq-tag ' + frCls(r.frecuenciaMedicion) + '">' + r.frecuenciaMedicion + '</span> <span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px">→ ' + frecN + ' reporte' + (frecN !== '1' ? 's' : '') + ' al año</span></span></div>' +
-      '<div class="field"><span class="field-label">Tiene denominador</span><span class="field-value">' + denTag + '</span></div>' +
-    '</div>' +
-  '</div>' +
-'</div>' +
-
-'<div class="tab-panel" id="tab-mv">' +
-  '<div class="info-block"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg><p>El medio de verificación es el documento o fuente de información que permite comprobar el valor del avance reportado. Debe ser generado o resguardado por la unidad responsable del indicador.</p></div>' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg><span class="tip-wrap">Medio de verificación <span class="tip-icon" data-tip="Fuente o documento que respalda el valor reportado del indicador">?</span></span></p>' +
-    '<div class="mv-card">' +
-      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">' +
-        '<div><p class="mv-name">' + pend(r.medioVerificacionNombre) + '</p><p class="mv-source" style="margin-top:4px">' + (r.medioVerificacionFuente||'') + '</p></div>' +
-        mvTypeHTML +
-      '</div>' +
-      '<div class="divider"></div>' +
-      '<div class="field-row" style="gap:12px">' +
-        '<div class="field"><span class="field-label">Tipo</span><span class="field-value">' + mvTypeHTML + '</span></div>' +
-        '<div class="field"><span class="field-label">Número de documentos</span><span class="field-value">' + mvCountText + '</span></div>' +
-        '<div class="field" style="grid-column:1/-1"><span class="field-label">Fuente</span><span class="field-value">' + pend(r.medioVerificacionFuente) + '</span></div>' +
-      '</div>' +
-      '<div class="mv-actions">' +
-        '<button class="btn btn-secondary btn-sm"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>Ver formato</button>' +
-        '<button class="btn btn-primary btn-sm"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>Subir evidencia</button>' +
-      '</div>' +
-    '</div>' +
-  '</div>' +
-'<div class="avance-card">' +
-  '<p class="avance-card-title">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>' +
-    'Reportar avance · ' + r.frecuenciaMedicion + ' · ' + periodoLabel +
-  '</p>' +
-  '<div class="avance-ctx">' +
-    '<div class="avance-ctx-item"><span>Período:</span><strong>' + periodoLabel + '</strong></div>' +
-    '<div class="avance-ctx-item"><span>Frecuencia:</span><strong>' + r.frecuenciaMedicion + '</strong></div>' +
-    (r.lineaBase !== null ? '<div class="avance-ctx-item"><span>Línea base:</span><strong>' + r.lineaBase + '</strong></div>' : '') +
-    (r.metaAnual !== null ? '<div class="avance-ctx-item"><span>Meta anual:</span><strong>' + r.metaAnual + '</strong></div>' : '') +
-    '<div class="avance-ctx-item"><span>Unidad:</span><strong>' + (r.unidadMedida || '—') + '</strong></div>' +
-  '</div>' +
-  '<label class="avance-inp-lbl">Valor de avance — ' + periodoLabel + '</label>' +
-  '<div class="avance-inp-row">' +
-    '<input type="text" class="avance-inp" id="avanceInput" oninput="onIndAvanceInput(this.value)" placeholder="Ej: ' + indExample + '">' +
-    (indUnit ? '<span class="avance-unit">' + indUnit + '</span>' : '') +
-  '</div>' +
-  '<p class="avance-inp-hint">Registra el valor obtenido para este período según el método de cálculo del indicador.</p>' +
-  '<button class="btn btn-primary btn-sm" id="avanceSaveBtn" onclick="saveIndAvance()" disabled>' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>' +
-    'Guardar avance' +
-  '</button>' +
-  '<div class="avance-saved-msg" id="avanceSavedMsg">' +
-    '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>' +
-    'Avance guardado: <strong style="margin-left:3px"><span id="avanceSavedVal"></span>' + indUnit + '</strong>' +
-  '</div>' +
-'</div>' +
-'</div>' +
-
-'<div class="tab-panel" id="tab-planeacion">' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>Línea base y meta anual</p>' +
-    '<div class="meta-visual">' +
-      '<div class="meta-item"><p class="meta-lbl" style="margin-bottom:8px">Línea base</p>' + (r.lineaBase !== null ? '<p class="meta-num">' + r.lineaBase + '</p>' : '<div style="margin:8px 0">' + PENDING + '</div>') + '</div>' +
-      '<div class="meta-item"><p class="meta-lbl" style="margin-bottom:8px">Meta anual</p>' + (r.metaAnual !== null ? '<p class="meta-num accent">' + r.metaAnual + '</p>' : '<div style="margin:8px 0">' + PENDING + '</div>') + '</div>' +
-    '</div>' +
-    '<p style="font-size:11px;color:var(--color-text-secondary);margin-top:12px;line-height:1.5">La línea base y la meta anual se capturan por el responsable del indicador antes del inicio del ejercicio.</p>' +
-  '</div>' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg>Supuestos</p>' +
-    (r.supuestos !== null ? '<p class="field-value" style="line-height:1.7">' + r.supuestos + '</p>' : PENDING + '<p style="font-size:11px;color:var(--color-text-secondary);margin-top:8px">Este campo aún no ha sido capturado.</p>') +
-  '</div>' +
-  '<div class="section-card">' +
-    '<p class="section-title"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>Observaciones</p>' +
-    (r.observaciones !== null ? '<p class="field-value" style="line-height:1.7">' + r.observaciones + '</p>' : PENDING + '<p style="font-size:11px;color:var(--color-text-secondary);margin-top:8px">Este campo aún no ha sido capturado.</p>') +
-  '</div>' +
-'</div>' +
-
-'<div class="bottom-bar">' +
-  '<div><p class="bottom-bar-label">Indicador <strong>' + r.id + '</strong> · ' + r.gerencia + ' · ' + r.frecuenciaMedicion + '</p></div>' +
-  '<div class="bottom-bar-actions">' +
-    '<button class="btn btn-primary" onclick="document.querySelector(\'[data-tab=mv]\').click();setTimeout(function(){var i=document.getElementById(\'avanceInput\');if(i){i.focus();i.scrollIntoView({behavior:\'smooth\',block:\'center\'});}},80)">' +
-      '<svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" /></svg>Reportar avance' +
-    '</button>' +
-    '<button class="btn btn-secondary">Capturar meta</button>' +
-    '<button class="btn-outline-accent"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>Subir MV</button>' +
-    '<button class="btn btn-ghost" onclick="window.location=\'consulta-mir.html\'"><svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>Volver a consulta</button>' +
-  '</div>' +
-'</div>';
-
-  main.innerHTML = html;
-
-  document.querySelectorAll('.tab-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var t = btn.dataset.tab;
-      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
-      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.id === 'tab-' + t); });
-    });
-  });
-})();
-</script>
+<script src="menu-rol.js"></script>
+<script src="detalle-indicador.js"></script>
 <script src="dev-toolbar.js"></script>
 </body>
 </html>

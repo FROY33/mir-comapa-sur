@@ -8,7 +8,7 @@
 // Meta anual: la de la meta validada del ejercicio del periodo mostrado (o del año en curso).
 
 import type { Ejecutor } from '../bd.js'
-import { cumplimientoDeReporte } from './cumplimiento.js'
+import { cumplimientoDeReporte, ESTADOS_SIN_ENVIAR } from './cumplimiento.js'
 
 export interface FilaConsultaMir {
   id: string
@@ -41,9 +41,6 @@ interface Fila {
   periodo_estado: 'abierto' | 'cerrado' | null; meta_anual: string | null
 }
 
-/** Estados en que el avance todavía es del Enlace y no se muestra. */
-const SIN_ENVIAR = ['pendiente_carga', 'borrador']
-
 export async function consultarCatalogoMir(bd: Ejecutor, gerenciaId: string | null): Promise<FilaConsultaMir[]> {
   const filas = await bd.consultar<Fila>(
     `SELECT i.id, i.codigo, i.nombre, i.nivel, i.frecuencia, i.activo, i.resumen_narrativo, i.formula,
@@ -73,7 +70,7 @@ export async function consultarCatalogoMir(bd: Ejecutor, gerenciaId: string | nu
   )
 
   return Promise.all(filas.map(async (f) => {
-    const cuenta = f.reporte_id && f.periodo_estado === 'abierto' && !SIN_ENVIAR.includes(f.estado!)
+    const cuenta = f.reporte_id && f.periodo_estado === 'abierto' && !ESTADOS_SIN_ENVIAR.includes(f.estado!)
     const c = cuenta ? await cumplimientoDeReporte(bd, f.reporte_id!) : undefined
     return {
       id: f.id, codigo: f.codigo, nombre: f.nombre, nivel: f.nivel, frecuencia: f.frecuencia, activo: f.activo,

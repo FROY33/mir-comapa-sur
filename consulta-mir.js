@@ -279,14 +279,6 @@ function cambiarVista(vista) {
 document.getElementById('btnTabla').addEventListener('click', function () { cambiarVista('tabla'); });
 document.getElementById('btnJerarquica').addEventListener('click', function () { cambiarVista('jerarquica'); });
 
-// La página es de Admin y Revisor: el menú y la miga de pan van con el rol (el acceso lo decide el servidor)
-function menuDelRol() {
-  var u = typeof Session !== 'undefined' && Session.getUser();
-  if (!u || u.rol !== 'Revisor') return;
-  document.getElementById('navAdmin').classList.add('hidden');
-  document.getElementById('navRevisor').classList.remove('hidden');
-  document.getElementById('migaInicio').setAttribute('href', 'dashboard-revisor.html');
-}
 
 menuDelRol();
 cargar();

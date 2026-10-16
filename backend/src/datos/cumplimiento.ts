@@ -24,6 +24,9 @@ interface FilaAvance {
   denominador: string | null
 }
 
+/** Estados en que el avance todavía es del Enlace: no cuentan como reporte ni se muestran al Revisor. */
+export const ESTADOS_SIN_ENVIAR = ['pendiente_carga', 'borrador']
+
 const num = (v: string | null) => (v === null ? null : Number(v))
 
 /**

@@ -7,6 +7,7 @@
 
 import type { BD } from './bd.js'
 import type { SolicitudConSesion } from './autorizacion.js'
+import { fichaTecnica } from './datos/fichaTecnica.js'
 import { listarIndicadores, obtenerIndicador } from './datos/indicadores.js'
 import type { Respuesta } from './http.js'
 
@@ -44,4 +45,12 @@ export const detalle = (bd: BD) => async (s: SolicitudConSesion): Promise<Respue
   const gerencia = s.sesion.rol === 'admin' ? null : s.sesion.gerenciaId
   const indicador = await obtenerIndicador(bd, id, gerencia)
   return indicador ? { status: 200, cuerpo: indicador } : NO_ENCONTRADO
+}
+
+/** GET /api/indicadores/:id/ficha — ficha técnica (HU-R8-03). Otra gerencia: 404, como el detalle (CA_5). */
+export const ficha = (bd: BD) => async (s: SolicitudConSesion): Promise<Respuesta> => {
+  const id = s.params.id ?? ''
+  if (!UUID.test(id)) return NO_ENCONTRADO
+  const f = await fichaTecnica(bd, id, s.sesion.rol === 'admin' ? null : s.sesion.gerenciaId)
+  return f ? { status: 200, cuerpo: f } : NO_ENCONTRADO
 }

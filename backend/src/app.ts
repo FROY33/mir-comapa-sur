@@ -41,6 +41,7 @@ export function crearApp(
     'GET /api/indicadores': protegida(TODOS, indicadores.listar(bd)),
     'POST /api/indicadores/buscar': protegida(TODOS, indicadores.buscar(bd)),
     'GET /api/indicadores/:id': protegida(TODOS, indicadores.detalle(bd)),
+    'GET /api/indicadores/:id/ficha': protegida(TODOS, indicadores.ficha(bd)),   // HU-R8-03
     // Consulta MIR: Revisor y Administrador (HU-R8-01)
     'GET /api/consulta-mir': protegida(['admin', 'revisor'], consultaMir.listar(bd)),
 

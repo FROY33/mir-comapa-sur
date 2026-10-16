@@ -12,7 +12,7 @@ import { configBD, levantar } from './apoyo.js'
 const bd = crearBD(configBD, crearLog(() => {}))
 let app: Awaited<ReturnType<typeof levantar>>
 const s = randomUUID().slice(0, 6)
-const ejercicio = 2030 + Math.floor(Math.random() * 60)
+let ejercicio = 0
 const cookie: Record<string, string> = {}
 const G: Record<string, string> = {}
 const U: Record<string, string> = {}
@@ -80,6 +80,13 @@ const propias = (lista: any[]) => Object.fromEntries(lista
 
 before(async () => {
   app = await levantar()
+  // Un ejercicio sin periodos ni ciclo: otras pruebas (y corridas previas sobre la misma base) usan los suyos
+  const [e] = await bd.consultar<{ y: number }>(
+    `SELECT y FROM generate_series(2030, 2099) y
+      WHERE NOT EXISTS (SELECT 1 FROM periodos_reporte WHERE ejercicio = y)
+        AND NOT EXISTS (SELECT 1 FROM ciclos_planeacion WHERE ejercicio = y)
+      ORDER BY random() LIMIT 1`)
+  ejercicio = e!.y
   const [org] = await bd.consultar<{ id: string }>('INSERT INTO organizaciones (nombre) VALUES ($1) RETURNING id', [`Org R8-01 ${s}`])
   for (const clave of ['MA', 'MB']) {
     const [g] = await bd.consultar<{ id: string }>('INSERT INTO gerencias (organizacion_id, clave, nombre) VALUES ($1, $2, $3) RETURNING id',
